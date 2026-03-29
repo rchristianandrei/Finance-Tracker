@@ -1,3 +1,4 @@
+using backend.Attributes;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
@@ -15,6 +16,7 @@ public class AuthController(
     IEmailService _emailService
 ) : ControllerBase
 {
+    [Transaction]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto value)
     {
