@@ -11,18 +11,20 @@ public class OtpService(ICacheService _cache) : IOtpService
     {
         var otp = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
 
-        _cache.SetAsync(key, otp, _expiry);
+        _cache.SetAsync(ModifyKey(key), otp, _expiry);
 
         return otp;
     }
 
     public async Task<string?> GetOtp(string key)
     {
-        return await _cache.GetAsync<string>(key);
+        return await _cache.GetAsync<string>(ModifyKey(key));
     }
 
     public async Task RemoveOtp(string key)
     {
-        await _cache.RemoveAsync(key);
+        await _cache.RemoveAsync(ModifyKey(key));
     }
+
+    public string ModifyKey(string key) => $"otp:{key}";
 }
