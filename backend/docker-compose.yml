@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: FinanceTracker_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: FinanceTracker
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: MyPass123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - finance_tracker_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "myuser", "-pMyPass123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+
+networks:
+  finance_tracker_network:
+    driver: bridge
