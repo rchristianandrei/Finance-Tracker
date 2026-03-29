@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
@@ -12,7 +11,8 @@ namespace backend.Controllers;
 public class AuthController(
     ApplicationDbContext _context,
     IAuthService _authService,
-    IOtpService _otpService
+    IOtpService _otpService,
+    IEmailService _emailService
 ) : ControllerBase
 {
     [HttpPost("register")]
@@ -33,7 +33,8 @@ public class AuthController(
         await _context.SaveChangesAsync();
 
         var otp = _otpService.GenerateOtp(user.Email);
-        Console.WriteLine($"OTP for {user.Email}: {otp}");
+
+        await _emailService.SendOtpAsync(user.Email, otp);
 
         return Ok();
     }
