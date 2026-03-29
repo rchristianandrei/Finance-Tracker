@@ -14,11 +14,20 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+// Redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:ConnectionString"];
+    options.InstanceName = "FinanceTracker:"; // optional key prefix
+});
+
 // Identity
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // Services
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

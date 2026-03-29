@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
@@ -8,7 +9,11 @@ namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(ApplicationDbContext _context, IAuthService _authService) : ControllerBase
+public class AuthController(
+    ApplicationDbContext _context,
+    IAuthService _authService,
+    IOtpService _otpService
+) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto value)
@@ -26,6 +31,9 @@ public class AuthController(ApplicationDbContext _context, IAuthService _authSer
 
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+
+        var otp = _otpService.GenerateOtp(user.Email);
+        Console.WriteLine($"OTP for {user.Email}: {otp}");
 
         return Ok();
     }
