@@ -31,9 +31,27 @@
 
     <mat-checkbox formControlName="terms"> I agree to the Terms and Conditions </mat-checkbox>
 
+    @if (errorMessage()) {
+      <mat-error class="text-center"> {{ errorMessage() }} </mat-error>
+    }
+
+    @if (successMessage()) {
+      <div class="text-green-500 text-center">{{ successMessage() }}</div>
+    }
+
     <div class="flex flex-col gap-2.5">
-      <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
-        Register
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="isLoading() || registerForm.invalid"
+        class="flex items-center justify-center gap-2"
+      >
+        @if (isLoading()) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          Register
+        }
       </button>
 
       <a mat-button routerLink="/login">Already have an account? Login</a>
