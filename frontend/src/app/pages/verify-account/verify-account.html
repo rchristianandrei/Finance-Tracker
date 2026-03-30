@@ -1,0 +1,75 @@
+<!-- otp-verify.component.html -->
+<div class="h-screen w-screen flex justify-center items-center">
+  <div class="flex flex-col gap-3.75 w-100 m-5 p-5 rounded shadow-2xl">
+    <h1 class="text-3xl text-center">Verify Your Account</h1>
+
+    <p class="text-center text-sm text-gray-500">
+      Enter the 6-digit code sent to
+      <span class="font-medium text-gray-700">{{ maskedEmail }}</span>
+    </p>
+
+    <!-- OTP Inputs -->
+    <div class="flex justify-center gap-2" (paste)="onPaste($event)">
+      @for (digit of digits(); track $index) {
+        <input
+          #otpInput
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          class="w-11 h-12 text-center text-xl font-semibold border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          [class.border-red-500]="hasError()"
+          [class.border-gray-300]="!hasError()"
+          [value]="digit"
+          (input)="onInput($event, $index)"
+          (keydown)="onKeydown($event, $index)"
+        />
+      }
+    </div>
+
+    <!-- Error -->
+    @if (hasError()) {
+      <mat-error class="text-center">Incorrect code. Please try again.</mat-error>
+    }
+
+    <!-- Success -->
+    @if (isVerified()) {
+      <div class="text-green-500 text-center">Account verified successfully!</div>
+    }
+
+    <div class="flex flex-col gap-2.5">
+      <!-- Verify button -->
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        [disabled]="!isFilled() || isVerifying()"
+        (click)="verify()"
+        class="flex items-center justify-center gap-2"
+      >
+        @if (isVerifying()) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          Verify
+        }
+      </button>
+
+      <!-- Resend -->
+      <button
+        mat-button
+        type="button"
+        [disabled]="!canResend() || isResending()"
+        (click)="resendOtp()"
+      >
+        @if (isResending()) {
+          Sending…
+        } @else if (canResend()) {
+          Resend Code
+        } @else {
+          Resend in {{ countdown() }}s
+        }
+      </button>
+
+      <a mat-button routerLink="/login">Back to Login</a>
+    </div>
+  </div>
+</div>
