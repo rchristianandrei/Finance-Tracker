@@ -13,21 +13,17 @@ DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
-
-builder.Services.AddJwt(builder.Configuration);
+var jwtSettings = builder.Configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>() ?? throw new InvalidOperationException("EmailSettings section is missing or invalid");
+builder.Services.AddSingleton(jwtSettings);
 
 // MySql
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Redis
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration["Redis:ConnectionString"];
-    options.InstanceName = "FinanceTracker:"; // optional key prefix
-});
-builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+// Extensions
+builder.Services
+    .AddJwt(builder.Configuration)
+    .AddRedis(builder.Configuration);
 
 // Identity
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -39,20 +35,7 @@ builder.Services.AddScoped<IVerifyAccountService, VerifyAccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // CORS
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AppCorsPolicy", policy =>
-    {
-        policy
-            .WithOrigins(allowedOrigins!)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
-});
+var policyName = builder.Services.ConfigureCors(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -69,7 +52,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AppCorsPolicy");
+app.UseCors(policyName);
 
 app.UseExceptionHandler(options => { });
 

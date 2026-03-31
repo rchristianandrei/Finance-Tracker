@@ -1,15 +1,12 @@
 using MimeKit;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Options;
 using backend.Settings;
 using backend.Interfaces;
 
 namespace backend.Services;
 
-public class EmailService(IOptions<EmailSettings> _optionEmailSettings) : IEmailService
+public class EmailService(EmailSettings _emailSettings) : IEmailService
 {
-    private readonly EmailSettings _emailSettings = _optionEmailSettings.Value;
-
     public async Task SendVerifyAccountLink(string toEmail, string origin, string token)
     {
         var message = new MimeMessage();
