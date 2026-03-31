@@ -17,4 +17,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/verify-account/verify-account').then((c) => c.VerifyAccount),
   },
+  {
+    path: '',
+    title: 'Dashboard',
+    loadComponent: () => import('./pages/dashboard/dashboard').then((c) => c.Dashboard),
+  },
 ];
