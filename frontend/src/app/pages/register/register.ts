@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../services/auth-service';
 import { finalize } from 'rxjs';
+import { resolveHttpError } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-register',
@@ -88,14 +89,7 @@ export class Register {
           this.successMessage.set('Please check your email for the verification link');
         },
         error: (err) => {
-          switch (err.status) {
-            case 0:
-              this.errorMessage.set('Unable to reach the server');
-              break;
-
-            default:
-              this.errorMessage.set(err.error);
-          }
+          this.errorMessage.set(resolveHttpError(err));
         },
       });
   }
