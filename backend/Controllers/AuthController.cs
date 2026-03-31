@@ -3,6 +3,7 @@ using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
+using backend.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -13,7 +14,9 @@ public class AuthController(
     ApplicationDbContext _context,
     IAuthService _authService,
     IEmailService _emailService,
-    IVerifyAccountService _verifyAccountService
+    IVerifyAccountService _verifyAccountService,
+    IJwtService _jwtService,
+    JwtSettings _jwtSettings
 ) : ControllerBase
 {
     [Transaction]
@@ -34,13 +37,39 @@ public class AuthController(
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        var request = HttpContext.Request;
-        var host = $"{request.Scheme}://{request.Host}";
-        var verificationToken = await _verifyAccountService.GenerateToken(user);
-
-        await _emailService.SendVerifyAccountLink(user.Email, host, verificationToken);
+        await SendVerificationLink(user);
 
         return Ok();
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginUserDto value)
+    {
+        var user = await _context.Users.FindAsync(value.Email);
+        if (user == null) return BadRequest("Invalid Credentials");
+
+        var correctPassword = _authService.VerifyPassword(user, value.Password);
+        if (!correctPassword) return BadRequest("Invalid Credentials");
+
+        if (!user.IsVerified)
+        {
+            await SendVerificationLink(user);
+            return BadRequest("User not verified. Please check your email");
+        }
+
+        var token = _jwtService.GenerateToken(user);
+
+        Response.Cookies.Append("Authorization", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
+        });
+
+        var dto = new { Email = user.Email };
+
+        return Ok(dto);
     }
 
     [HttpGet("verify-account/{token}")]
@@ -56,5 +85,13 @@ public class AuthController(
         await _context.SaveChangesAsync();
 
         return Ok("Account Verifed. You may now login");
+    }
+
+    public async Task SendVerificationLink(User user)
+    {
+        var request = HttpContext.Request;
+        var host = $"{request.Scheme}://{request.Host}";
+        var verificationToken = await _verifyAccountService.GenerateToken(user);
+        await _emailService.SendVerifyAccountLink(user.Email, host, verificationToken);
     }
 }

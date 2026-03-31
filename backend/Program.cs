@@ -1,5 +1,6 @@
 using backend;
 using backend.Data;
+using backend.Extensions;
 using backend.Interfaces;
 using backend.Models;
 using backend.Services;
@@ -13,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
+
+builder.Services.AddJwt(builder.Configuration);
 
 // MySql
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
