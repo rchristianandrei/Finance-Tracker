@@ -4,7 +4,7 @@ using backend.Models;
 
 namespace backend.Services;
 
-public class VerifyAccountService(ICacheService _cache)
+public class VerifyAccountService(ICacheService _cache) : IVerifyAccountService
 {
     private readonly TimeSpan _expiry = TimeSpan.FromMinutes(5);
 

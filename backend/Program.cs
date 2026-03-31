@@ -3,12 +3,16 @@ using backend.Data;
 using backend.Interfaces;
 using backend.Models;
 using backend.Services;
+using backend.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 
 // MySql
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -20,15 +24,15 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration["Redis:ConnectionString"];
     options.InstanceName = "FinanceTracker:"; // optional key prefix
 });
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
 // Identity
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // Services
-builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddScoped<VerifyAccountService>();
+builder.Services.AddScoped<IVerifyAccountService, VerifyAccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // CORS

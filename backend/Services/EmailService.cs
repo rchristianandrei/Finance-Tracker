@@ -1,15 +1,19 @@
-using backend.Interfaces;
-using MailKit.Net.Smtp;
 using MimeKit;
+using MailKit.Net.Smtp;
+using Microsoft.Extensions.Options;
+using backend.Settings;
+using backend.Interfaces;
 
 namespace backend.Services;
 
-public class EmailService(IConfiguration _config) : IEmailService
+public class EmailService(IOptions<EmailSettings> _optionEmailSettings) : IEmailService
 {
+    private readonly EmailSettings _emailSettings = _optionEmailSettings.Value;
+
     public async Task SendVerifyAccountLink(string toEmail, string origin, string token)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress("Finance Tracker", _config["Email:From"]));
+        message.From.Add(new MailboxAddress("Finance Tracker", _emailSettings.From));
         message.To.Add(MailboxAddress.Parse(toEmail));
         message.Subject = "Your verification code";
         message.Body = new TextPart("html")
@@ -24,8 +28,8 @@ public class EmailService(IConfiguration _config) : IEmailService
         using var client = new SmtpClient();
         try
         {
-            await client.ConnectAsync(_config["Email:Host"], int.Parse(_config["Email:Port"]!), true);
-            await client.AuthenticateAsync(_config["Email:From"], _config["Email:Password"]);
+            await client.ConnectAsync(_emailSettings.Host, int.Parse(_emailSettings.Port), true);
+            await client.AuthenticateAsync(_emailSettings.From, _emailSettings.Password);
             await client.SendAsync(message);
         }
         finally

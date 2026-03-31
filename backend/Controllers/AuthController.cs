@@ -3,9 +3,7 @@ using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
-using backend.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace backend.Controllers;
 
@@ -15,7 +13,7 @@ public class AuthController(
     ApplicationDbContext _context,
     IAuthService _authService,
     IEmailService _emailService,
-    VerifyAccountService _verifyAccountService
+    IVerifyAccountService _verifyAccountService
 ) : ControllerBase
 {
     [Transaction]
