@@ -3,6 +3,7 @@ using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -12,8 +13,8 @@ namespace backend.Controllers;
 public class AuthController(
     ApplicationDbContext _context,
     IAuthService _authService,
-    IOtpService _otpService,
-    IEmailService _emailService
+    IEmailService _emailService,
+    VerifyAccountService _verifyAccountService
 ) : ControllerBase
 {
     [Transaction]
@@ -34,9 +35,10 @@ public class AuthController(
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        var otp = _otpService.GenerateOtp(user.Email);
+        var origin = Request.Headers.Origin.ToString();
+        var verificationToken = await _verifyAccountService.GenerateToken(user);
 
-        await _emailService.SendOtpAsync(user.Email, otp);
+        await _emailService.SendVerifyAccountLink(user.Email, origin, verificationToken);
 
         return Ok();
     }

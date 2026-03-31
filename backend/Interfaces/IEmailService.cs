@@ -6,7 +6,8 @@ public interface IEmailService
     /// Sends an email with the otp
     /// </summary>
     /// <param name="toEmail">Receiver</param>
-    /// <param name="otp"></param>
+    /// <param name="origin">Client Host</param>
+    /// <param name="token">User token</param>
     /// <returns></returns>
-    Task SendOtpAsync(string toEmail, string otp);
+    Task SendVerifyAccountLink(string toEmail, string origin, string token);
 }
