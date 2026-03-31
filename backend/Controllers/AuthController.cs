@@ -1,9 +1,11 @@
+using System.Security.Claims;
 using backend.Attributes;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
 using backend.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -87,7 +89,21 @@ public class AuthController(
         return Ok("Account Verifed. You may now login");
     }
 
-    public async Task SendVerificationLink(User user)
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMe()
+    {
+        var email = HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException("No email claim found");
+
+        var user = await _context.Users.FindAsync(email);
+        if (user == null) return Unauthorized();
+
+        var dto = new { Email = user.Email };
+
+        return Ok(dto);
+    }
+
+    private async Task SendVerificationLink(User user)
     {
         var request = HttpContext.Request;
         var host = $"{request.Scheme}://{request.Host}";
