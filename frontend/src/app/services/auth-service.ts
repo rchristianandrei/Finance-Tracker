@@ -8,6 +8,10 @@ import { environment } from '../../environtments/environment';
 export class AuthService {
   constructor(private httpClient: HttpClient) {}
 
+  login(body: { email: string; password: string }) {
+    return this.httpClient.post(`${environment.apiUrl}/auth/login`, body);
+  }
+
   register(body: { email: string; password: string }) {
     return this.httpClient.post(`${environment.apiUrl}/auth/register`, body);
   }

@@ -50,10 +50,6 @@ export class Register {
       },
       { validators: this.passwordMatchValidator },
     );
-
-    effect(() => {
-      console.log(this.isLoading());
-    });
   }
 
   passwordMatchValidator(form: FormGroup) {

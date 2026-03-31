@@ -9,6 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../services/auth-service';
+import { finalize } from 'rxjs';
+import { resolveHttpError } from '../../utils/http-error.util';
 
 @Component({
   selector: 'app-login',
@@ -33,7 +36,10 @@ export class Login {
   errorMessage = signal('');
   successMessage = signal('');
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
@@ -46,17 +52,26 @@ export class Login {
   }
 
   onSubmit(): void {
-    if (this.loginForm.invalid) return;
+    if (this.isLoading() || this.loginForm.invalid) return;
 
     this.isLoading.set(true);
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    // TODO: Replace with your auth service call
-    // this.authService.login(this.loginForm.value).subscribe({ ... })
-    setTimeout(() => {
-      this.isLoading.set(false);
-      this.successMessage.set('Login successful!');
-    }, 1500);
+    this.authService
+      .login({
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password,
+      })
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (value) => {
+          console.log(value);
+          this.successMessage.set("'Login successful!");
+        },
+        error: (err) => {
+          this.errorMessage.set(resolveHttpError(err));
+        },
+      });
   }
 }
