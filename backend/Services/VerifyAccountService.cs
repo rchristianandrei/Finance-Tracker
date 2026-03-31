@@ -19,7 +19,7 @@ public class VerifyAccountService(ICacheService _cache)
 
     public async Task<string?> GetUserEmailByToken(string token)
     {
-        return await _cache.GetAsync<string>(token);
+        return await _cache.GetAsync<string>(ModifyKey(token));
     }
 
     public string ModifyKey(string key) => $"verify-account:{key}";

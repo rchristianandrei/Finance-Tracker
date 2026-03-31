@@ -17,7 +17,7 @@ public class EmailService(IConfiguration _config) : IEmailService
             Text = $"""
                 <h2>Finance Tracker Account Created</strong></h2>
                 <p>This link expires in 5 minutes.</p>
-                <button><a target="_blank" href="{origin}/verify-account/{token}">Verify Account</a></button>
+                <button><a target="_blank" href="{origin}/api/auth/verify-account/{token}">Verify Account</a></button>
             """
         };
 
