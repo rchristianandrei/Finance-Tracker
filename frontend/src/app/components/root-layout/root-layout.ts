@@ -11,6 +11,8 @@ import { Router, RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../services/auth-service';
 import { ToastService } from '../../services/toast-service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog, ConfirmDialogData } from '../confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-root-layout',
@@ -44,6 +46,7 @@ export class RootLayout {
     protected authService: AuthService,
     private router: Router,
     private toastService: ToastService,
+    private dialog: MatDialog,
   ) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
       this.isMobile.set(result.matches);
@@ -61,11 +64,27 @@ export class RootLayout {
   }
 
   logout() {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.toastService.success('Logged out');
-        this.router.navigate(['/login']);
-      },
-    });
+    const data: ConfirmDialogData = {
+      title: 'Logout',
+      message: 'Do you want to logout?',
+      theme: 'destructive',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+    };
+
+    this.dialog
+      .open(ConfirmDialog, { data, width: '400px' })
+      .afterClosed()
+      .subscribe((result: boolean) => {
+        if (result) {
+          this.authService.logout().subscribe({
+            next: () => {
+              this.toastService.success('Logged out');
+              this.router.navigate(['/login']);
+            },
+          });
+        } else {
+        }
+      });
   }
 }
