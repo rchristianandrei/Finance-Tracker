@@ -34,9 +34,28 @@
 
       <span class="flex-1"></span>
 
-      <button mat-icon-button>
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu">
         <mat-icon>account_circle</mat-icon>
       </button>
+
+      <mat-menu #profileMenu="matMenu" class="w-56">
+        <!-- User Info -->
+        <div class="px-4 py-3 border-b">
+          <!-- <div class="font-semibold">John Doe</div> -->
+          <div class="text-sm text-gray-500">{{ authService.user() }}</div>
+        </div>
+
+        <!-- Menu Items -->
+        <button mat-menu-item routerLink="/profile">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
     </mat-toolbar>
 
     <!-- Content -->

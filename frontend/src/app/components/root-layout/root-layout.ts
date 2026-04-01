@@ -8,10 +8,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
+import { MatMenuModule } from '@angular/material/menu';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-root-layout',
   imports: [
+    MatMenuModule,
     RouterModule,
     MatToolbarModule,
     MatIconModule,
@@ -35,7 +38,10 @@ export class RootLayout {
   isMobile = signal(false);
   isCollapsed = signal(false);
 
-  constructor(private breakpointObserver: BreakpointObserver) {
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    protected authService: AuthService,
+  ) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
       this.isMobile.set(result.matches);
     });
@@ -49,5 +55,10 @@ export class RootLayout {
     if (this.isMobile()) {
       sidenav.close();
     }
+  }
+
+  logout() {
+    console.log('Logging out...');
+    // your logout logic here
   }
 }
