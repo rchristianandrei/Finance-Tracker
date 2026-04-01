@@ -21,7 +21,7 @@
       color="primary"
       (click)="dialogRef.close(true)"
       class="px-4 py-2 rounded text-white hover:opacity-50 transition"
-      [ngClass]="getTheme()"
+      [class]="getTheme()"
     >
       {{ data.confirmText || 'Proceed' }}
     </button>

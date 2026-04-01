@@ -5,7 +5,6 @@ import {
   MatDialogContent,
   MatDialogActions,
 } from '@angular/material/dialog';
-import { NgClass } from '../../../../node_modules/@angular/common/types/_common_module-chunk';
 
 export interface ConfirmDialogData {
   title?: string;
@@ -17,7 +16,7 @@ export interface ConfirmDialogData {
 
 @Component({
   selector: 'app-confirm-dialog',
-  imports: [MatDialogContent, MatDialogActions, NgClass],
+  imports: [MatDialogContent, MatDialogActions],
   templateUrl: './confirm-dialog.html',
 })
 export class ConfirmDialog {
