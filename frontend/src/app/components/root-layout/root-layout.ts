@@ -7,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../services/auth-service';
 
@@ -41,6 +41,7 @@ export class RootLayout {
   constructor(
     private breakpointObserver: BreakpointObserver,
     protected authService: AuthService,
+    private router: Router,
   ) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
       this.isMobile.set(result.matches);
@@ -58,7 +59,10 @@ export class RootLayout {
   }
 
   logout() {
-    console.log('Logging out...');
-    // your logout logic here
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+    });
   }
 }

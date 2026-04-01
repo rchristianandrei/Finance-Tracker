@@ -23,6 +23,12 @@ export class AuthService {
       .pipe(tap((user) => this._user.set(user.email)));
   }
 
+  logout() {
+    return this.httpClient
+      .post(`${environment.apiUrl}/auth/logout`, {})
+      .pipe(tap(() => this._user.set(null)));
+  }
+
   register(body: { email: string; password: string }) {
     return this.httpClient.post(`${environment.apiUrl}/auth/register`, body);
   }

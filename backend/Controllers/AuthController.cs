@@ -74,6 +74,21 @@ public class AuthController(
         return Ok(dto);
     }
 
+    [Authorize]
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Append("Authorization", "", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddDays(-1)
+        });
+
+        return Ok();
+    }
+
     [HttpGet("verify-account/{token}")]
     public async Task<IActionResult> VerifyAccount(string token)
     {
