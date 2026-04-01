@@ -31,11 +31,6 @@
       }
     </mat-form-field>
 
-    <div class="flex justify-between items-center -mt-2">
-      <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
-      <a mat-button routerLink="/forgot-password" class="text-sm">Forgot password?</a>
-    </div>
-
     @if (errorMessage()) {
       <mat-error class="text-center">{{ errorMessage() }}</mat-error>
     }
@@ -56,6 +51,10 @@
       </button>
 
       <a mat-button routerLink="/register">Don't have an account? Register</a>
+
+      <a routerLink="/forgot-password" class="text-xs! text-blue-600 hover:opacity-50 text-center">
+        Forgot password?
+      </a>
     </div>
   </form>
 </div>
