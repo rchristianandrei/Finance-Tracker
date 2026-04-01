@@ -65,8 +65,7 @@ export class Login {
       })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (value) => {
-          console.log(value);
+        next: () => {
           this.successMessage.set("'Login successful!");
         },
         error: (err) => {
