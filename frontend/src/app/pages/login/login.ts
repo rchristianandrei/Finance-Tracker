@@ -1,3 +1,4 @@
+import { finalize } from 'rxjs';
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,9 +10,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+
 import { AuthService } from '../../services/auth-service';
-import { finalize } from 'rxjs';
 import { resolveHttpError } from '../../utils/http-error.util';
+import { ToastService } from '../../services/toast-service';
 
 @Component({
   selector: 'app-login',
@@ -34,12 +36,12 @@ export class Login {
 
   isLoading = signal(false);
   errorMessage = signal('');
-  successMessage = signal('');
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private toastService: ToastService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -57,7 +59,6 @@ export class Login {
 
     this.isLoading.set(true);
     this.errorMessage.set('');
-    this.successMessage.set('');
 
     this.authService
       .login({
@@ -67,7 +68,7 @@ export class Login {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
-          this.successMessage.set("'Login successful!");
+          this.toastService.success('Login successful!');
           this.router.navigate(['/']);
         },
         error: (err) => {

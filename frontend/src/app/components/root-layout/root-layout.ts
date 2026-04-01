@@ -10,6 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from '../../services/auth-service';
+import { ToastService } from '../../services/toast-service';
 
 @Component({
   selector: 'app-root-layout',
@@ -42,6 +43,7 @@ export class RootLayout {
     private breakpointObserver: BreakpointObserver,
     protected authService: AuthService,
     private router: Router,
+    private toastService: ToastService,
   ) {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
       this.isMobile.set(result.matches);
@@ -61,6 +63,7 @@ export class RootLayout {
   logout() {
     this.authService.logout().subscribe({
       next: () => {
+        this.toastService.success('Logged out');
         this.router.navigate(['/login']);
       },
     });
