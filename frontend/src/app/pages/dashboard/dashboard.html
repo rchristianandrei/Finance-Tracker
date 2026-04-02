@@ -27,24 +27,15 @@
       <mat-card class="p-4 shadow-md rounded-2xl">
         <div class="text-lg font-semibold mb-3">Expenses Breakdown</div>
 
-        <div class="flex flex-col gap-3">
-          <div class="flex justify-between">
-            <span>Food</span>
-            <span>₱ 5,000</span>
-          </div>
-          <mat-progress-bar value="35"></mat-progress-bar>
-
-          <div class="flex justify-between">
-            <span>Utilities</span>
-            <span>₱ 3,000</span>
-          </div>
-          <mat-progress-bar value="20" color="accent"></mat-progress-bar>
-
-          <div class="flex justify-between">
-            <span>Transport</span>
-            <span>₱ 2,000</span>
-          </div>
-          <mat-progress-bar value="15" color="warn"></mat-progress-bar>
+        <div class="flex justify-center">
+          <canvas
+            baseChart
+            [data]="pieChartData"
+            [type]="pieChartType"
+            [options]="pieChartOptions"
+            [plugins]="[chartDataLabels]"
+          >
+          </canvas>
         </div>
       </mat-card>
 
