@@ -7,10 +7,18 @@ import { MatTableModule } from '@angular/material/table';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { AddTransaction } from '../../components/add-transaction/add-transaction';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RootLayout, MatCardModule, MatProgressBarModule, MatTableModule, BaseChartDirective],
+  imports: [
+    RootLayout,
+    MatCardModule,
+    MatProgressBarModule,
+    MatTableModule,
+    BaseChartDirective,
+    AddTransaction,
+  ],
   templateUrl: './dashboard.html',
 })
 export class Dashboard {
