@@ -1,0 +1,29 @@
+<section class="p-4 flex flex-col gap-2">
+  <h2 mat-dialog-title class="text-xl font-semibold text-gray-800">
+    {{ data.title || 'Confirm' }}
+  </h2>
+
+  <mat-dialog-content class="mt-2 text-gray-700 p-0!">
+    <p>{{ data.message || 'Are you sure?' }}</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="mt-4 flex justify-end gap-2 p-0!">
+    <button
+      mat-button
+      (click)="dialogRef.close(false)"
+      class="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+    >
+      {{ data.cancelText || 'Cancel' }}
+    </button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="dialogRef.close(true)"
+      class="px-4 py-2 rounded text-white hover:opacity-50 transition"
+      [class]="getTheme()"
+    >
+      {{ data.confirmText || 'Proceed' }}
+    </button>
+  </mat-dialog-actions>
+</section>

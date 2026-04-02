@@ -11,11 +11,7 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         context.Response.StatusCode = 500;
 
-        await context.Response.WriteAsJsonAsync(new
-        {
-            message = "Global error handled",
-            error = exception.Message
-        }, cancellationToken);
+        await context.Response.WriteAsJsonAsync("Something went wrong. Please try again later", cancellationToken);
 
         return true;
     }
