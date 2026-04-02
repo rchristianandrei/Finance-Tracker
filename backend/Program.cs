@@ -31,7 +31,6 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IVerifyAccountService, VerifyAccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
