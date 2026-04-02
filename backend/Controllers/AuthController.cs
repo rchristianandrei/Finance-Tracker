@@ -13,20 +13,19 @@ namespace backend.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController(
-    ApplicationDbContext _context,
     IAuthService _authService,
     IEmailService _emailService,
     IVerifyAccountService _verifyAccountService,
     IJwtService _jwtService,
-    JwtSettings _jwtSettings
+    JwtSettings _jwtSettings,
+    IUserRepo _userRepo
 ) : ControllerBase
 {
     [Transaction]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto value)
     {
-        var existingUser = await _context.Users.FindAsync(value.Email);
-
+        var existingUser = await _userRepo.GetUserByEmail(value.Email);
         if (existingUser != null) return BadRequest("Email already in use");
 
         var user = new User
@@ -36,8 +35,7 @@ public class AuthController(
 
         _authService.CreateUser(user, value.Password);
 
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
+        await _userRepo.CreateUser(user);
 
         await SendVerificationLink(user);
 
@@ -47,7 +45,7 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto value)
     {
-        var user = await _context.Users.FindAsync(value.Email);
+        var user = await _userRepo.GetUserByEmail(value.Email);
         if (user == null) return BadRequest("Invalid Credentials");
 
         var correctPassword = _authService.VerifyPassword(user, value.Password);
@@ -95,11 +93,11 @@ public class AuthController(
         var email = await _verifyAccountService.GetUserEmailByToken(token);
         if (email == null) return BadRequest("Invalid Token. Please try logging in again");
 
-        var user = await _context.Users.FindAsync(email);
+        var user = await _userRepo.GetUserByEmail(email);
         if (user == null) return NotFound("User does not exist");
 
         user.IsVerified = true;
-        await _context.SaveChangesAsync();
+        await _userRepo.UpdateUser(user);
 
         return Ok("Account Verifed. You may now login");
     }
@@ -110,7 +108,7 @@ public class AuthController(
     {
         var email = HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException("No email claim found");
 
-        var user = await _context.Users.FindAsync(email);
+        var user = await _userRepo.GetUserByEmail(email);
         if (user == null) return Unauthorized();
 
         var dto = new { Email = user.Email };

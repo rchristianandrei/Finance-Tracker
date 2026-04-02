@@ -3,6 +3,7 @@ using backend.Data;
 using backend.Extensions;
 using backend.Interfaces;
 using backend.Models;
+using backend.Repositories;
 using backend.Services;
 using backend.Settings;
 using Microsoft.AspNetCore.Identity;
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IVerifyAccountService, VerifyAccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 // CORS
 var policyName = builder.Services.ConfigureCors(builder.Configuration);
