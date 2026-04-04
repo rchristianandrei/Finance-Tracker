@@ -37,7 +37,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Category</mat-label>
         <mat-select formControlName="category">
-          @for (c of categories; track $index) {
+          @for (c of category(); track $index) {
             <mat-option [value]="c">
               {{ c }}
             </mat-option>
@@ -46,6 +46,12 @@
         @if (f['category'].touched && f['category'].invalid) {
           <mat-error> Category is required </mat-error>
         }
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" />
       </mat-form-field>
 
       <!-- Amount -->
@@ -58,12 +64,6 @@
         @if (f['amount'].hasError('min')) {
           <mat-error> Must be greater than 0 </mat-error>
         }
-      </mat-form-field>
-
-      <!-- Description -->
-      <mat-form-field appearance="outline">
-        <mat-label>Description</mat-label>
-        <input matInput formControlName="description" />
       </mat-form-field>
 
       <!-- Date -->
@@ -85,7 +85,11 @@
           type="submit"
           [disabled]="form.invalid || isLoading()"
         >
-          Save Expense
+          @if (isLoading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Save Expense
+          }
         </button>
       </div>
     </form>

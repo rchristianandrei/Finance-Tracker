@@ -1,19 +1,23 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, output, Signal, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 import { TransactionService } from '../../services/transaction-service';
 import { ToastService } from '../../services/toast-service';
 import { finalize } from 'rxjs';
+import { CategoryService } from '../../services/category-service';
 
 @Component({
   selector: 'app-add-transaction-form',
   imports: [
+    MatProgressSpinnerModule,
     MatRadioModule,
     MatCardModule,
     MatFormFieldModule,
@@ -28,6 +32,7 @@ import { finalize } from 'rxjs';
 })
 export class AddExpenseForm {
   private fb = inject(FormBuilder);
+  private categoryService = inject(CategoryService);
   private transactionService = inject(TransactionService);
   private toastService = inject(ToastService);
 
@@ -36,6 +41,21 @@ export class AddExpenseForm {
   isLoading = signal(false);
 
   categories = ['Food', 'Transportation', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Other'];
+
+  typeSignal: Signal<'Expense' | 'Income' | null>;
+  category = computed(() => {
+    switch (this.typeSignal()) {
+      case 'Expense':
+        return this.categoryService.ExpenseCategories();
+
+      case 'Income':
+        return this.categoryService.IncomeCategories();
+
+      default:
+        return [];
+    }
+  });
+
   form = this.fb.group({
     type: new FormControl<'Expense' | 'Income'>('Expense', Validators.required),
     category: ['', Validators.required],
@@ -46,6 +66,12 @@ export class AddExpenseForm {
 
   get f() {
     return this.form.controls;
+  }
+
+  constructor() {
+    this.typeSignal = toSignal(this.form.get('type')!.valueChanges, {
+      initialValue: this.form.get('type')!.value,
+    });
   }
 
   getNow(): string {
