@@ -6,9 +6,6 @@ namespace backend.Dtos;
 public class AddTransactionDto
 {
     [Required]
-    public int AccountId { get; set; }
-
-    [Required]
     public string Type { get; set; } = string.Empty;
 
     [Required]

@@ -12,9 +12,6 @@ public class Transaction
     public string? Id { get; set; }
 
     [Required]
-    public int AccountId { get; set; }
-
-    [Required]
     public TransactionType Type { get; set; }
 
     [Required]

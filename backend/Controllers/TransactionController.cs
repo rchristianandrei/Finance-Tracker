@@ -20,7 +20,6 @@ public class TransactionController(TransactionService _transactionService) : Con
 
         var transaction = new Transaction
         {
-            AccountId = value.AccountId,
             Type = type,
             Category = value.Category,
             Amount = value.Amount,
