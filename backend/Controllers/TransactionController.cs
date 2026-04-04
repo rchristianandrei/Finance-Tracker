@@ -12,18 +12,20 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class TransactionController(TransactionService _transactionService) : ControllerBase
 {
-    [HttpPost("add-transaction")]
-    public async Task<IActionResult> AddTransaction([FromBody] AddTransactionDto value)
+    [HttpPost]
+    public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
     {
-        if (!Enum.TryParse(value.Type, out TransactionType type))
-            return BadRequest("Invalid Transaction Type");
+        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
 
         var transaction = new Transaction
         {
-            Type = type,
+            Email = email!,
+            Type = value.Type,
             Category = value.Category,
             Amount = value.Amount,
             Description = value.Description,
+            CreatedAt = value.Date,
+            LastUpdated = value.Date
         };
 
         await _transactionService.Create(transaction);

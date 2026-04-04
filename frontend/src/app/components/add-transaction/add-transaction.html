@@ -3,25 +3,13 @@
   <div class="fixed inset-0 bg-black/30 z-1" (click)="toggleMenu()"></div>
 }
 <div class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-2">
-  <!-- Menu options -->
-  @if (open()) {
-    <div class="flex flex-col items-end space-y-2 text-black!">
-      <button mat-raised-button class="w-32 bg-green-300! text-black!" (click)="openForm('income')">
-        Income
-      </button>
-
-      <button mat-raised-button class="w-32 bg-red-300! text-black!" (click)="openForm('expense')">
-        Expense
-      </button>
-    </div>
+  @if (!open()) {
+    <button mat-fab color="accent" (click)="setOpen(true)" class="shadow-lg">
+      <mat-icon>{{ open() ? 'close' : 'add' }}</mat-icon>
+    </button>
   }
-
-  <!-- Floating button -->
-  <button mat-fab color="accent" (click)="toggleMenu()" class="shadow-lg">
-    <mat-icon>{{ open() ? 'close' : 'add' }}</mat-icon>
-  </button>
 </div>
 
-@if (openTransactionForm() === 'expense') {
-  <app-add-expense (closed)="openForm(null)"></app-add-expense>
+@if (open()) {
+  <app-add-transaction-form (closed)="setOpen(false)"></app-add-transaction-form>
 }

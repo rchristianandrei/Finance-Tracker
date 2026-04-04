@@ -12,6 +12,10 @@ public class Transaction
     public string? Id { get; set; }
 
     [Required]
+    [MaxLength(30)]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
     public TransactionType Type { get; set; }
 
     [Required]
