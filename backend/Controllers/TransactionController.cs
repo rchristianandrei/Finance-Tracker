@@ -63,6 +63,7 @@ public class TransactionController(TransactionService _transactionService) : Con
         var transactionDtos = transactions.Select(t => new
         {
             Date = t.CreatedAt,
+            Type = t.Type.ToString(),
             Category = t.Category,
             Description = t.Description,
             Amount = t.Amount
@@ -70,9 +71,10 @@ public class TransactionController(TransactionService _transactionService) : Con
 
         return Ok(new
         {
+            Balance = income - expenses,
             Income = income,
             Expenses = expenses,
-            ExpensesBreakdown = expensesBreakdown,
+            ExpensesBreakdown = expensesBreakdown.ToArray(),
             Transactions = transactionDtos
         });
     }

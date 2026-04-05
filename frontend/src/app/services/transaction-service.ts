@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environtments/environment';
+import { DashboardType } from '../types/dashboard';
 
 @Injectable({
   providedIn: 'root',
@@ -18,5 +19,9 @@ export class TransactionService {
     date: string;
   }) {
     return this.http.post(`${this.url}`, { ...expense, type: expense.type === 'Expense' ? 1 : 2 });
+  }
+
+  getDashboardData() {
+    return this.http.get<DashboardType>(`${this.url}/dashboard`);
   }
 }
