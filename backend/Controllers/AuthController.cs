@@ -18,7 +18,8 @@ public class AuthController(
     IVerifyAccountService _verifyAccountService,
     IJwtService _jwtService,
     JwtSettings _jwtSettings,
-    IUserRepo _userRepo
+    IUserRepo _userRepo,
+    ICurrentUserService _currentUserService
 ) : ControllerBase
 {
     [Transaction]
@@ -106,7 +107,7 @@ public class AuthController(
     [HttpGet("me")]
     public async Task<IActionResult> GetMe()
     {
-        var email = HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value ?? throw new UnauthorizedAccessException("No email claim found");
+        var email = _currentUserService.Email;
 
         var user = await _userRepo.GetUserByEmail(email);
         if (user == null) return Unauthorized();

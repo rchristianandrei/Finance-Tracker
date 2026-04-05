@@ -1,26 +1,27 @@
 using backend.Dtos;
 using backend.Enums;
+using backend.Interfaces;
 using backend.Models;
-using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharpCompress.Common;
 
 namespace backend.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionController(TransactionService _transactionService) : ControllerBase
+public class TransactionController(
+    ITransactionService _transactionService,
+    ICurrentUserService _currentUserService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
     {
-        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        var email = _currentUserService.Email;
 
         var transaction = new Transaction
         {
-            Email = email!,
+            Email = email,
             Type = value.Type,
             Category = value.Category,
             Amount = value.Amount,
@@ -37,11 +38,13 @@ public class TransactionController(TransactionService _transactionService) : Con
     [HttpGet("dashboard")]
     public async Task<IActionResult> Dashboard()
     {
+        var email = _currentUserService.Email;
+
         var expensesBreakdown = new Dictionary<string, double>();
         var expenses = 0.00;
         var income = 0.00;
 
-        var transactions = await _transactionService.GetLastDays(30);
+        var transactions = await _transactionService.GetLastDays(email, 30);
 
         foreach (var transaction in transactions)
         {

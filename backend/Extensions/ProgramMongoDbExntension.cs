@@ -1,4 +1,5 @@
 using backend.Infrastructure;
+using backend.Interfaces;
 using backend.Services;
 using backend.Settings;
 using Microsoft.Extensions.Options;
@@ -25,7 +26,7 @@ public static class ProgramMongoDbExntension
             return client.GetDatabase(settings.DatabaseName);
         });
 
-        services.AddScoped<TransactionService>();
+        services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<MongoDbInitializer>();
         return services;
     }

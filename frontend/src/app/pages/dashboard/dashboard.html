@@ -26,17 +26,7 @@
       <!-- Expense Breakdown -->
       <mat-card class="p-4 shadow-md rounded-2xl">
         <div class="text-lg font-semibold mb-3">Expenses Breakdown</div>
-
-        <div class="flex justify-center">
-          <canvas
-            baseChart
-            [data]="pieChartData"
-            [type]="pieChartType"
-            [options]="pieChartOptions"
-            [plugins]="[chartDataLabels]"
-          >
-          </canvas>
-        </div>
+        <app-pie-chart [pieData]="pieData()"></app-pie-chart>
       </mat-card>
 
       <!-- Savings Goal -->
@@ -65,7 +55,7 @@
           <!-- Date -->
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let t">{{ t.date | date: 'MMM d, y' }}</td>
+            <td mat-cell *matCellDef="let t">{{ t.date | date: 'MMM d' }}</td>
           </ng-container>
 
           <!-- Category -->
