@@ -4,6 +4,7 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharpCompress.Common;
 
 namespace backend.Controllers;
 
@@ -33,10 +34,46 @@ public class TransactionController(TransactionService _transactionService) : Con
         return Ok();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> Dashboard()
     {
-        var transactions = await _transactionService.GetAll();
-        return Ok(transactions);
+        var expensesBreakdown = new Dictionary<string, double>();
+        var expenses = 0.00;
+        var income = 0.00;
+
+        var transactions = await _transactionService.GetLastDays(30);
+
+        foreach (var transaction in transactions)
+        {
+            if (transaction.Type == TransactionType.INCOME)
+            {
+                income += transaction.Amount;
+            }
+            else if (transaction.Type == TransactionType.EXPENSE)
+            {
+                expenses += transaction.Amount;
+
+                if (!expensesBreakdown.ContainsKey(transaction.Category))
+                    expensesBreakdown.Add(transaction.Category, 0);
+
+                expensesBreakdown[transaction.Category] += transaction.Amount;
+            }
+        }
+
+        var transactionDtos = transactions.Select(t => new
+        {
+            Date = t.CreatedAt,
+            Category = t.Category,
+            Description = t.Description,
+            Amount = t.Amount
+        });
+
+        return Ok(new
+        {
+            Income = income,
+            Expenses = expenses,
+            ExpensesBreakdown = expensesBreakdown,
+            Transactions = transactionDtos
+        });
     }
 }

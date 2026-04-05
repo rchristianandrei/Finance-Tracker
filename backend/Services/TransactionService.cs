@@ -12,10 +12,10 @@ public class TransactionService(IMongoDatabase database)
         await _entities.InsertOneAsync(entity);
     }
 
-    public async Task<IEnumerable<Transaction>> GetAll()
+    public async Task<IEnumerable<Transaction>> GetLastDays(int days)
     {
         var now = DateTime.UtcNow;
-        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-days);
         var filter = Builders<Transaction>.Filter.And(
             Builders<Transaction>.Filter.Gte(t => t.CreatedAt, thirtyDaysAgo),
             Builders<Transaction>.Filter.Lte(t => t.CreatedAt, now)
