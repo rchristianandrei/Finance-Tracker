@@ -33,7 +33,8 @@ export class RootLayout {
   heading = input.required();
 
   navigations = [
-    { icon: 'dashboard', feature: 'Dashboard', route: '/dashboard' },
+    { icon: 'dashboard', feature: 'Dashboard', route: '/' },
+    { icon: 'payment', feature: 'Transactions', route: '/transactions' },
     { icon: 'people', feature: 'Users', route: '/users' },
     { icon: 'settings', feature: 'Settings', route: '/settings' },
   ];

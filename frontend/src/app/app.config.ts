@@ -7,6 +7,7 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { credentialsInterceptor } from './interceptors/credentials-interceptor';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
@@ -16,5 +17,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([credentialsInterceptor])),
     provideCharts(withDefaultRegisterables()),
+    provideNativeDateAdapter(),
   ],
 };
