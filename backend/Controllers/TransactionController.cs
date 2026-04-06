@@ -1,6 +1,7 @@
 using backend.Dtos;
 using backend.Enums;
 using backend.Interfaces;
+using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -63,14 +64,7 @@ public class TransactionController(
             }
         }
 
-        var transactionDtos = transactions.Select(t => new
-        {
-            Date = t.CreatedAt,
-            Type = t.Type.ToString(),
-            Category = t.Category,
-            Description = t.Description,
-            Amount = t.Amount
-        });
+        var transactionDtos = transactions.Select(t => t.ToDto());
 
         return Ok(new
         {
@@ -80,5 +74,14 @@ public class TransactionController(
             ExpensesBreakdown = expensesBreakdown.ToArray(),
             Transactions = transactionDtos
         });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] PaginatedQueryParameters query)
+    {
+        var email = _currentUserService.Email;
+        var transactions = await _transactionService.GetAll(email, query.Search!, query.PageSizeOrDefault);
+        var dto = transactions.Select(t => t.ToDto());
+        return Ok(dto);
     }
 }
