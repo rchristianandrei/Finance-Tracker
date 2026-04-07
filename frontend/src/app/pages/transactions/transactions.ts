@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RootLayout } from '../../components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { TransactionService } from '../../services/transaction-service';
+import { TransactionType } from '../../types/transaction';
+import { AddTransaction } from '../../components/add-transaction/add-transaction';
 
 @Component({
   selector: 'app-transactions',
@@ -26,11 +29,13 @@ import { MatButtonModule } from '@angular/material/button';
     MatPaginatorModule,
     MatInputModule,
     ReactiveFormsModule,
+    AddTransaction,
   ],
   templateUrl: './transactions.html',
 })
-export class Transactions {
+export class Transactions implements OnInit {
   private fb = inject(FormBuilder);
+  private transactionService = inject(TransactionService);
 
   filterForm = this.fb.group({
     searchTerm: [''],
@@ -47,7 +52,11 @@ export class Transactions {
   pageSize = 10;
   totalItems = 0;
 
-  dataSource = [];
+  dataSource = signal<TransactionType[]>([]);
+
+  ngOnInit(): void {
+    this.loadTransactions();
+  }
 
   applyFilters() {
     this.loadTransactions();
@@ -61,10 +70,17 @@ export class Transactions {
 
   onPageChange(event: any) {
     this.pageSize = event.pageSize;
-    this.loadTransactions(event.pageIndex);
   }
 
-  loadTransactions(page: number = 0) {
-    // Call API with searchTerm + filters + pagination
+  loadTransactions() {
+    let filter = {
+      search: this.f.searchTerm.value ?? undefined,
+    };
+
+    this.transactionService.getTransactions(filter).subscribe({
+      next: (value) => {
+        this.dataSource.set(value);
+      },
+    });
   }
 }
