@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace backend.Dtos;
@@ -7,7 +8,8 @@ public class TransactionQueryParameters
 {
    public string? Search { get; set; } = string.Empty;
 
-   public DateTime? _startDate { get; set; }
+   [JsonIgnore]
+   private DateTime? _startDate { get; set; } = DateTime.Now;
    public DateTime? StartDate
    {
       get => _startDate;
@@ -18,7 +20,8 @@ public class TransactionQueryParameters
               : value.Value.ToUniversalTime();
    }
 
-   public DateTime? _endDate { get; set; }
+   [JsonIgnore]
+   private DateTime? _endDate { get; set; } = DateTime.Now;
    public DateTime? EndDate
    {
       get => _endDate;

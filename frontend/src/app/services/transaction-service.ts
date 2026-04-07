@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environtments/environment';
 import { DashboardType } from '../types/dashboard';
 import { TransactionType } from '../types/transaction';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -46,6 +47,18 @@ export class TransactionService {
       params = params.set('EndDate', filter.endDate.toISOString());
     }
 
-    return this.http.get<TransactionType[]>(this.url, { params });
+    return this.http.get<TransactionType[]>(this.url, { params }).pipe(
+      map((transactions) =>
+        transactions.map((t) => {
+          const utcDate = new Date(t.date); // parse string to Date
+          const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+
+          return {
+            ...t,
+            date: localDate,
+          };
+        }),
+      ),
+    );
   }
 }

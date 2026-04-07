@@ -44,6 +44,7 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         var transactions = await _entities
             .Find(filter)
             .SortByDescending(t => t.CreatedAt)
+            .Skip((query.PageOrDefault - 1) * query.PageSizeOrDefault)
             .Limit(query.PageSizeOrDefault)
             .ToListAsync();
 
