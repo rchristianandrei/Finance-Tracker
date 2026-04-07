@@ -75,6 +75,8 @@ export class Transactions implements OnInit {
   loadTransactions() {
     let filter = {
       search: this.f.searchTerm.value ?? undefined,
+      startDate: this.f.startDate.value ?? undefined,
+      endDate: this.f.endDate.value ?? undefined,
     };
 
     this.transactionService.getTransactions(filter).subscribe({

@@ -96,7 +96,7 @@ export class AddExpenseForm {
         category: this.f.category.value!,
         amount: this.f.amount.value!,
         description: this.f.description.value!,
-        date: new Date(this.f.date.value!).toISOString(),
+        date: new Date(this.f.date.value!),
       })
       .pipe(
         finalize(() => {

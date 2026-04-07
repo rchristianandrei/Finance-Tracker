@@ -7,9 +7,27 @@ public class TransactionQueryParameters
 {
    public string? Search { get; set; } = string.Empty;
 
-   public DateTime? StartDate { get; set; } = DateTime.Now;
+   public DateTime? _startDate { get; set; }
+   public DateTime? StartDate
+   {
+      get => _startDate;
+      set => _startDate = value == null
+          ? DateTime.UtcNow
+          : value.Value.Kind == DateTimeKind.Utc
+              ? value.Value
+              : value.Value.ToUniversalTime();
+   }
 
-   public DateTime? EndDate { get; set; } = DateTime.Now;
+   public DateTime? _endDate { get; set; }
+   public DateTime? EndDate
+   {
+      get => _endDate;
+      set => _endDate = value == null
+          ? DateTime.UtcNow
+          : value.Value.Kind == DateTimeKind.Utc
+              ? value.Value
+              : value.Value.ToUniversalTime();
+   }
 
    private int? _page;
    [Range(1, int.MaxValue)]
