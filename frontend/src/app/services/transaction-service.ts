@@ -32,7 +32,12 @@ export class TransactionService {
     return this.http.get<DashboardType>(`${this.url}/dashboard`);
   }
 
-  getTransactions(filter?: { search?: string; startDate?: Date; endDate?: Date }) {
+  getTransactions(filter?: {
+    search?: string;
+    startDate?: Date;
+    endDate?: Date;
+    pageSize?: number;
+  }) {
     let params = new HttpParams();
 
     if (filter?.search) {
@@ -45,6 +50,10 @@ export class TransactionService {
 
     if (filter?.endDate) {
       params = params.set('EndDate', filter.endDate.toISOString());
+    }
+
+    if (filter?.pageSize) {
+      params = params.set('PageSize', filter.pageSize);
     }
 
     return this.http.get<TransactionType[]>(this.url, { params }).pipe(

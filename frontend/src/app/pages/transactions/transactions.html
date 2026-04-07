@@ -121,7 +121,7 @@
       <div class="flex justify-center">
         <mat-paginator
           [length]="totalItems"
-          [pageSize]="pageSize"
+          [pageSize]="pageSize()"
           [pageSizeOptions]="[5, 10, 20]"
           (page)="onPageChange($event)"
           class="mt-4"

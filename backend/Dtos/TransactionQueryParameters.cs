@@ -41,7 +41,7 @@ public class TransactionQueryParameters
    }
 
    private int? _pageSize;
-   [Range(1, 10)]
+   [Range(1, 20)]
    public int? PageSize
    {
       get => _pageSize;

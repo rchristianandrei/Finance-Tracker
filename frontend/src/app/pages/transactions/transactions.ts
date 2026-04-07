@@ -49,7 +49,7 @@ export class Transactions implements OnInit {
 
   displayedColumns: string[] = ['date', 'category', 'description', 'amount', 'actions'];
 
-  pageSize = 10;
+  pageSize = signal(10);
   totalItems = 0;
 
   dataSource = signal<TransactionType[]>([]);
@@ -69,7 +69,7 @@ export class Transactions implements OnInit {
   }
 
   onPageChange(event: any) {
-    this.pageSize = event.pageSize;
+    this.pageSize.set(event.pageSize);
   }
 
   loadTransactions() {
@@ -77,6 +77,7 @@ export class Transactions implements OnInit {
       search: this.f.searchTerm.value ?? undefined,
       startDate: this.f.startDate.value ?? undefined,
       endDate: this.f.endDate.value ?? undefined,
+      pageSize: this.pageSize(),
     };
 
     this.transactionService.getTransactions(filter).subscribe({
