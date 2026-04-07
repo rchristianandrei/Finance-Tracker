@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
 using MongoDB.Bson;
@@ -15,15 +16,15 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         await _entities.InsertOneAsync(entity);
     }
 
-    public async Task<IEnumerable<Transaction>> GetAll(string email, string filterTerm = "", int limit = 20)
+    public async Task<IEnumerable<Transaction>> GetAll(string email, TransactionQueryParameters query)
     {
         var builder = Builders<Transaction>.Filter;
 
         var filter = builder.Eq(t => t.Email, email);
 
-        if (!string.IsNullOrWhiteSpace(filterTerm))
+        if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var regex = new BsonRegularExpression(Regex.Escape(filterTerm), "i");
+            var regex = new BsonRegularExpression(Regex.Escape(query.Search), "i");
 
             var keywordFilter = builder.Or(
                 builder.Regex(t => t.Type, regex),
@@ -34,10 +35,16 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
             filter &= keywordFilter;
         }
 
+        if (query.StartDate.HasValue)
+            filter &= builder.Gte(t => t.CreatedAt, query.StartDate.Value.Date);
+
+        if (query.EndDate.HasValue)
+            filter &= builder.Lte(t => t.CreatedAt, query.EndDate.Value.Date.AddDays(1).AddTicks(-1));
+
         var transactions = await _entities
             .Find(filter)
             .SortByDescending(t => t.CreatedAt)
-            .Limit(limit)
+            .Limit(query.PageSizeOrDefault)
             .ToListAsync();
 
         return transactions;

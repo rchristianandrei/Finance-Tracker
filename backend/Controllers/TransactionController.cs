@@ -77,10 +77,10 @@ public class TransactionController(
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] PaginatedQueryParameters query)
+    public async Task<IActionResult> Get([FromQuery] TransactionQueryParameters query)
     {
         var email = _currentUserService.Email;
-        var transactions = await _transactionService.GetAll(email, query.Search!, query.PageSizeOrDefault);
+        var transactions = await _transactionService.GetAll(email, query);
         var dto = transactions.Select(t => t.ToDto());
         return Ok(dto);
     }
