@@ -16,6 +16,16 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         await _entities.InsertOneAsync(entity);
     }
 
+    public async Task<ReplaceOneResult?> Update(Transaction entity)
+    {
+        return await _entities.ReplaceOneAsync(t => t.Id == entity.Id, entity);
+    }
+
+    public async Task<Transaction?> GetById(string id)
+    {
+        return await _entities.Find(t => t.Id == id).FirstOrDefaultAsync();
+    }
+
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(string email, TransactionQueryParameters query)
     {
         var builder = Builders<Transaction>.Filter;

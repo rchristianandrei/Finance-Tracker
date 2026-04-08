@@ -6,8 +6,7 @@ import { TransactionService } from '@app/services/transaction-service';
 import { finalize } from 'rxjs';
 import { ToastService } from '@app/services/toast-service';
 import { resolveHttpError } from '@app/utils/http-error.util';
-
-type TransactionType = 'expense' | 'income' | null;
+import { TransactionType } from '@app/types/transaction';
 
 @Component({
   selector: 'app-add-transaction',
@@ -24,7 +23,7 @@ export class AddTransaction {
   isLoading = signal(false);
   errorMessage = signal('');
 
-  openTransactionForm = signal<TransactionType>(null);
+  openTransactionForm = signal<TransactionType>('EXPENSE');
 
   toggleMenu() {
     this.isOpen.update((prev) => !prev);
@@ -34,13 +33,8 @@ export class AddTransaction {
     this.isOpen.set(isOpen);
   }
 
-  openForm(transactionType: TransactionType) {
-    this.openTransactionForm.set(transactionType);
-    this.isOpen.set(false);
-  }
-
   onSubmit(value: {
-    type: 'Expense' | 'Income';
+    type: TransactionType;
     category: string;
     amount: number;
     description: string;

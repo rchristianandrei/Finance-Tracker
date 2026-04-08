@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
 import { DashboardType } from '@app/types/dashboard';
-import { TransactionType } from '@app/types/transaction';
+import { Transaction, TransactionType } from '@app/types/transaction';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -14,7 +14,7 @@ export class TransactionService {
   url = `${environment.apiUrl}/transaction`;
 
   addExpense(expense: {
-    type: 'Expense' | 'Income';
+    type: TransactionType;
     category: string;
     amount: number;
     description: string;
@@ -23,9 +23,18 @@ export class TransactionService {
     const body = {
       ...expense,
       date: expense.date.toISOString(),
-      type: expense.type === 'Expense' ? 1 : 2,
+      type: expense.type === 'EXPENSE' ? 1 : 2,
     };
     return this.http.post(`${this.url}`, body);
+  }
+
+  update(transaction: Transaction) {
+    const body = {
+      ...transaction,
+      date: transaction.date.toISOString(),
+      type: transaction.type === 'EXPENSE' ? 1 : 2,
+    };
+    return this.http.put(`${this.url}/${transaction.id}`, body);
   }
 
   getDashboardData() {
@@ -63,7 +72,7 @@ export class TransactionService {
 
     return this.http.get<{
       totalCount: number;
-      data: TransactionType[];
+      data: Transaction[];
     }>(this.url, { params });
     // .pipe(
     //   map((paginatedData) => ({

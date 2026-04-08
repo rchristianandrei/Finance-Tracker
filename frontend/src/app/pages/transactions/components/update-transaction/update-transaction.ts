@@ -1,25 +1,18 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
-import { MatIconModule } from '@angular/material/icon';
+import { AddExpenseForm } from '@app/components/add-transaction-form/add-transaction-form';
 import { ToastService } from '@app/services/toast-service';
-import { MatCard } from '@angular/material/card';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatButtonModule } from '@angular/material/button';
 import { TransactionService } from '@app/services/transaction-service';
-import { Transaction } from '@app/types/transaction';
-import { DatePipe } from '@angular/common';
+import { Transaction, TransactionType } from '@app/types/transaction';
 import { resolveHttpError } from '@app/utils/http-error.util';
 import { finalize } from 'rxjs';
-import { MatError } from '@angular/material/form-field';
 
 @Component({
-  selector: 'app-delete-transaction',
-  imports: [MatIconModule, MatCard, MatProgressSpinner, MatButtonModule, DatePipe, MatError],
-  templateUrl: './delete-transaction.html',
-  styleUrl: './delete-transaction.scss',
+  selector: 'app-update-transaction',
+  imports: [AddExpenseForm],
+  templateUrl: './update-transaction.html',
+  styleUrl: './update-transaction.scss',
 })
-export class DeleteTransaction {
+export class UpdateTransaction {
   private transactionService = inject(TransactionService);
   private toastService = inject(ToastService);
 
@@ -30,22 +23,28 @@ export class DeleteTransaction {
   isLoading = signal(false);
   errorMessage = signal('');
 
-  delete() {
+  onSubmit(transaction: { category: string; amount: number; description: string; date: Date }) {
     if (this.isLoading()) return;
     this.isLoading.set(true);
     this.errorMessage.set('');
 
     this.transactionService
-      .delete(this.transaction().id)
+      .update({
+        ...this.transaction(),
+        category: transaction.category,
+        description: transaction.description,
+        amount: transaction.amount,
+        date: transaction.date,
+      })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
-          this.toastService.success('Transaction Deleted');
+          this.toastService.success('Updated the Transaction');
           this.onClose.emit(true);
         },
         error: (err) => {
           this.errorMessage.set(resolveHttpError(err));
-          this.toastService.error('Failed to delete the transaction');
+          this.toastService.error('Failed to update the transaction');
         },
       });
   }

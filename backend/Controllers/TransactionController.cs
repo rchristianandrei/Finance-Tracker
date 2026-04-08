@@ -16,27 +16,6 @@ public class TransactionController(
     ITransactionService _transactionService,
     ICurrentUserService _currentUserService) : ControllerBase
 {
-    [HttpPost]
-    public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
-    {
-        var email = _currentUserService.Email;
-
-        var transaction = new Transaction
-        {
-            Email = email,
-            Type = value.Type,
-            Category = value.Category,
-            Amount = value.Amount,
-            Description = value.Description,
-            CreatedAt = value.Date,
-            LastUpdated = value.Date
-        };
-
-        await _transactionService.Create(transaction);
-
-        return Ok();
-    }
-
     [HttpGet("dashboard")]
     public async Task<IActionResult> Dashboard()
     {
@@ -88,6 +67,48 @@ public class TransactionController(
             totalCount = count,
             data = dto
         });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
+    {
+        var email = _currentUserService.Email;
+
+        var transaction = new Transaction
+        {
+            Email = email,
+            Type = value.Type,
+            Category = value.Category,
+            Amount = value.Amount,
+            Description = value.Description,
+            CreatedAt = value.Date,
+            LastUpdated = value.Date
+        };
+
+        await _transactionService.Create(transaction);
+
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateTransactionDto value)
+    {
+        var email = _currentUserService.Email;
+
+        var transaction = await _transactionService.GetById(id);
+        if (transaction == null) return NotFound();
+        if (transaction.Email != email) return Forbid();
+
+        transaction.Category = value.Category;
+        transaction.Description = value.Description;
+        transaction.Amount = value.Amount;
+        // TODO - Separate Created at and date of transaction
+        transaction.CreatedAt = value.Date;
+        transaction.LastUpdated = DateTime.Now;
+
+        await _transactionService.Update(transaction);
+
+        return Ok();
     }
 
     [HttpDelete("{id}")]

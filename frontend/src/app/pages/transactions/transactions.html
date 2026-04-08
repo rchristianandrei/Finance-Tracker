@@ -16,21 +16,22 @@
           </mat-form-field>
 
           <!-- Date Range -->
-          <div class="flex flex-row justify-around gap-2">
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="flex-1">
-              <mat-label>Start Date</mat-label>
-              <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
-              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-              <mat-datepicker #startPicker></mat-datepicker>
-            </mat-form-field>
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+            formGroupName="dateRange"
+            class="w-full"
+          >
+            <mat-label>Date range</mat-label>
 
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="flex-1">
-              <mat-label>End Date</mat-label>
-              <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
-              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-              <mat-datepicker #endPicker></mat-datepicker>
-            </mat-form-field>
-          </div>
+            <mat-date-range-input [rangePicker]="rangePicker">
+              <input matStartDate formControlName="start" placeholder="Start date" />
+              <input matEndDate formControlName="end" placeholder="End date" />
+            </mat-date-range-input>
+
+            <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #rangePicker></mat-date-range-picker>
+          </mat-form-field>
         </div>
 
         <div class="flex flex-row gap-2">
@@ -104,7 +105,7 @@
                 <button mat-icon-button class="text-red-600!" (click)="onStartDelete(t)">
                   <mat-icon>delete</mat-icon>
                 </button>
-                <button mat-icon-button class="text-blue-600!">
+                <button mat-icon-button class="text-blue-600!" (click)="onStartUpdate(t)">
                   <mat-icon>edit</mat-icon>
                 </button>
               </div>
@@ -131,11 +132,17 @@
       </div>
     </mat-card>
   </div>
-  <app-add-transaction></app-add-transaction>
+  <app-add-transaction (onAddSucess)="loadTransactions()"></app-add-transaction>
   @if (deleteEvent()) {
     <app-delete-transaction
       [transaction]="deleteEvent()!"
       (onClose)="onEndDelete($event)"
     ></app-delete-transaction>
+  }
+  @if (updateEvent()) {
+    <app-update-transaction
+      [transaction]="updateEvent()!"
+      (onClose)="onEndUpdate($event)"
+    ></app-update-transaction>
   }
 </app-root-layout>

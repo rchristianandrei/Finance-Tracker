@@ -1,7 +1,9 @@
-export type TransactionType = {
+export type TransactionType = 'EXPENSE' | 'INCOME';
+
+export type Transaction = {
   id: string;
   date: Date;
-  type: 'EXPENSE' | 'INCOME';
+  type: TransactionType;
   category: string;
   description: string;
   amount: number;

@@ -1,6 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,9 +13,10 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { TransactionService } from '@app/services/transaction-service';
-import { TransactionType } from '@app/types/transaction';
+import { Transaction } from '@app/types/transaction';
 import { AddTransaction } from '@app/components/add-transaction/add-transaction';
 import { DeleteTransaction } from './components/delete-transaction/delete-transaction';
+import { UpdateTransaction } from './components/update-transaction/update-transaction';
 
 @Component({
   selector: 'app-transactions',
@@ -34,6 +35,7 @@ import { DeleteTransaction } from './components/delete-transaction/delete-transa
     ReactiveFormsModule,
     AddTransaction,
     DeleteTransaction,
+    UpdateTransaction,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.css',
@@ -43,12 +45,15 @@ export class Transactions implements OnInit {
   private transactionService = inject(TransactionService);
 
   // Events
-  deleteEvent = signal<TransactionType | null>(null);
+  deleteEvent = signal<Transaction | null>(null);
+  updateEvent = signal<Transaction | null>(null);
 
   filterForm = this.fb.group({
     searchTerm: [''],
-    startDate: [new Date(), Validators.required],
-    endDate: [new Date(), Validators.required],
+    dateRange: this.fb.group({
+      start: new FormControl(new Date(), Validators.required),
+      end: new FormControl(new Date(), Validators.required),
+    }),
   });
 
   get f() {
@@ -63,7 +68,7 @@ export class Transactions implements OnInit {
     totalItems: 0,
   });
 
-  dataSource = signal<TransactionType[]>([]);
+  dataSource = signal<Transaction[]>([]);
 
   ngOnInit(): void {
     this.loadTransactions();
@@ -75,8 +80,8 @@ export class Transactions implements OnInit {
 
   clearFilters() {
     this.f.searchTerm.reset();
-    this.f.startDate.setValue(new Date());
-    this.f.endDate.setValue(new Date());
+    this.f.dateRange.controls.start.setValue(new Date());
+    this.f.dateRange.controls.end.setValue(new Date());
   }
 
   onPageChange(event: any) {
@@ -91,8 +96,8 @@ export class Transactions implements OnInit {
   loadTransactions() {
     let filter = {
       search: this.f.searchTerm.value ?? undefined,
-      startDate: this.f.startDate.value ?? undefined,
-      endDate: this.f.endDate.value ?? undefined,
+      startDate: this.f.dateRange.controls.start.value ?? undefined,
+      endDate: this.f.dateRange.controls.end.value ?? undefined,
       pageSize: this.paginationDetails().pageSize,
       page: this.paginationDetails().page + 1,
     };
@@ -105,12 +110,22 @@ export class Transactions implements OnInit {
     });
   }
 
-  onStartDelete(transaction: TransactionType) {
+  onStartDelete(transaction: Transaction) {
     this.deleteEvent.set(transaction);
   }
 
   onEndDelete(success: boolean) {
     this.deleteEvent.set(null);
+    if (!success) return;
+    this.loadTransactions();
+  }
+
+  onStartUpdate(transaction: Transaction) {
+    this.updateEvent.set(transaction);
+  }
+
+  onEndUpdate(success: boolean) {
+    this.updateEvent.set(null);
     if (!success) return;
     this.loadTransactions();
   }

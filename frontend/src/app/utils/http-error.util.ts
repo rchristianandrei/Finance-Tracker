@@ -12,6 +12,8 @@ export function resolveHttpError(err: HttpErrorResponse): string {
       return 'You do not have permission to perform this action.';
     case 404:
       return 'The requested resource was not found.';
+    case 405:
+      return 'Endpoint not found.';
     case 409:
       return err.error ?? 'A conflict occurred.';
     case 422:
