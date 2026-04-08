@@ -48,6 +48,10 @@ export class Dashboard implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadDashboard();
+  }
+
+  loadDashboard() {
     this.transactionService.getDashboardData().subscribe({
       next: (value) => {
         this.dashboardData.set(value);

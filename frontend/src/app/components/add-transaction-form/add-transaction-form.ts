@@ -1,6 +1,5 @@
-import { finalize } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Component, computed, inject, output, Signal, signal } from '@angular/core';
+import { Component, computed, inject, input, output, Signal, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,8 +11,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 
-import { TransactionService } from '@app/services/transaction-service';
-import { ToastService } from '@app/services/toast-service';
 import { CategoryService } from '@app/services/category-service';
 
 @Component({
@@ -35,12 +32,19 @@ import { CategoryService } from '@app/services/category-service';
 export class AddExpenseForm {
   private fb = inject(FormBuilder);
   private categoryService = inject(CategoryService);
-  private transactionService = inject(TransactionService);
-  private toastService = inject(ToastService);
 
-  closed = output();
+  heading = input('Transaction');
+  isLoading = input(false);
+  errorMessage = input('');
 
-  isLoading = signal(false);
+  onClose = output();
+  onSubmit = output<{
+    type: 'Expense' | 'Income';
+    category: string;
+    amount: number;
+    description: string;
+    date: Date;
+  }>();
 
   categories = ['Food', 'Transportation', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Other'];
 
@@ -84,32 +88,18 @@ export class AddExpenseForm {
   }
 
   close() {
-    this.closed.emit();
+    this.onClose.emit();
   }
 
   submit() {
     if (this.form.invalid || this.isLoading()) return;
 
-    this.isLoading.set(true);
-
-    this.transactionService
-      .addExpense({
-        type: this.f.type.value!,
-        category: this.f.category.value!,
-        amount: this.f.amount.value!,
-        description: this.f.description.value!,
-        date: new Date(this.f.date.value!),
-      })
-      .pipe(
-        finalize(() => {
-          this.isLoading.set(false);
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.toastService.success('Expense successfully saved!');
-          this.close();
-        },
-      });
+    this.onSubmit.emit({
+      type: this.f.type.value!,
+      category: this.f.category.value!,
+      amount: this.f.amount.value!,
+      description: this.f.description.value!,
+      date: new Date(this.f.date.value!),
+    });
   }
 }

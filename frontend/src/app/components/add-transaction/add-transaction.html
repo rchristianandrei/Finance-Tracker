@@ -1,9 +1,9 @@
 <!-- Backdrop -->
-@if (open()) {
+@if (isOpen()) {
   <div class="fixed inset-0 bg-black/30 z-1" (click)="toggleMenu()"></div>
 }
 <div class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-2">
-  @if (!open()) {
+  @if (!isOpen()) {
     <button
       mat-fab
       color="accent"
@@ -15,6 +15,12 @@
   }
 </div>
 
-@if (open()) {
-  <app-add-transaction-form (closed)="setOpen(false)"></app-add-transaction-form>
+@if (isOpen()) {
+  <app-add-transaction-form
+    heading="Add Transaction"
+    [isLoading]="isLoading()"
+    [errorMessage]="errorMessage()"
+    (onSubmit)="onSubmit($event)"
+    (onClose)="setOpen(false)"
+  ></app-add-transaction-form>
 }
