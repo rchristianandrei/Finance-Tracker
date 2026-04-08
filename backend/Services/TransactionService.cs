@@ -16,7 +16,7 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         await _entities.InsertOneAsync(entity);
     }
 
-    public async Task<IEnumerable<Transaction>> GetAll(string email, TransactionQueryParameters query)
+    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(string email, TransactionQueryParameters query)
     {
         var builder = Builders<Transaction>.Filter;
 
@@ -41,6 +41,7 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         if (query.EndDate.HasValue)
             filter &= builder.Lte(t => t.CreatedAt, query.EndDate.Value.Date.AddDays(1).AddTicks(-1));
 
+        var count = await _entities.Find(filter).CountDocumentsAsync();
         var transactions = await _entities
             .Find(filter)
             .SortByDescending(t => t.CreatedAt)
@@ -48,7 +49,7 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
             .Limit(query.PageSizeOrDefault)
             .ToListAsync();
 
-        return transactions;
+        return (transactions, count);
     }
 
     public async Task<IEnumerable<Transaction>> GetLastDays(string email, int days)

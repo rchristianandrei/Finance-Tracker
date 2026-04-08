@@ -9,7 +9,7 @@ public interface ITransactionService
 {
     Task Create(Transaction entity);
 
-    Task<IEnumerable<Transaction>> GetAll(string email, TransactionQueryParameters query);
+    Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(string email, TransactionQueryParameters query);
 
     Task<IEnumerable<Transaction>> GetLastDays(string email, int days);
 }

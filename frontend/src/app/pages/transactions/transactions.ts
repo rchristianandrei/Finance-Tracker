@@ -32,6 +32,7 @@ import { AddTransaction } from '../../components/add-transaction/add-transaction
     AddTransaction,
   ],
   templateUrl: './transactions.html',
+  styleUrl: './transactions.css',
 })
 export class Transactions implements OnInit {
   private fb = inject(FormBuilder);
@@ -49,8 +50,11 @@ export class Transactions implements OnInit {
 
   displayedColumns: string[] = ['date', 'category', 'description', 'amount', 'actions'];
 
-  pageSize = signal(10);
-  totalItems = 0;
+  paginationDetails = signal({
+    page: 0,
+    pageSize: 10,
+    totalItems: 0,
+  });
 
   dataSource = signal<TransactionType[]>([]);
 
@@ -69,7 +73,12 @@ export class Transactions implements OnInit {
   }
 
   onPageChange(event: any) {
-    this.pageSize.set(event.pageSize);
+    this.paginationDetails.update((p) => ({
+      ...p,
+      pageSize: event.pageSize,
+      page: event.pageIndex,
+    }));
+    this.loadTransactions();
   }
 
   loadTransactions() {
@@ -77,12 +86,14 @@ export class Transactions implements OnInit {
       search: this.f.searchTerm.value ?? undefined,
       startDate: this.f.startDate.value ?? undefined,
       endDate: this.f.endDate.value ?? undefined,
-      pageSize: this.pageSize(),
+      pageSize: this.paginationDetails().pageSize,
+      page: this.paginationDetails().page + 1,
     };
 
     this.transactionService.getTransactions(filter).subscribe({
       next: (value) => {
-        this.dataSource.set(value);
+        this.dataSource.set(value.data);
+        this.paginationDetails.update((p) => ({ ...p, totalItems: value.totalCount }));
       },
     });
   }

@@ -80,8 +80,12 @@ public class TransactionController(
     public async Task<IActionResult> Get([FromQuery] TransactionQueryParameters query)
     {
         var email = _currentUserService.Email;
-        var transactions = await _transactionService.GetAll(email, query);
+        var (transactions, count) = await _transactionService.GetAll(email, query);
         var dto = transactions.Select(t => t.ToDto());
-        return Ok(dto);
+        return Ok(new
+        {
+            totalCount = count,
+            data = dto
+        });
     }
 }

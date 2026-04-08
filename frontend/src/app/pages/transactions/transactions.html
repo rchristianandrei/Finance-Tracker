@@ -120,8 +120,9 @@
       <!-- Pagination -->
       <div class="flex justify-center">
         <mat-paginator
-          [length]="totalItems"
-          [pageSize]="pageSize()"
+          [length]="paginationDetails().totalItems"
+          [pageSize]="paginationDetails().pageSize"
+          [pageIndex]="paginationDetails().page"
           [pageSizeOptions]="[5, 10, 20]"
           (page)="onPageChange($event)"
           class="mt-4"
@@ -130,5 +131,5 @@
       </div>
     </mat-card>
   </div>
+  <app-add-transaction></app-add-transaction>
 </app-root-layout>
-<app-add-transaction></app-add-transaction>
