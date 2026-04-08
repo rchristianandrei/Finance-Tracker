@@ -10,7 +10,7 @@ public static class TransactionDtoMapper
         return new TransactionDto
         {
             Id = t.Id!,
-            Date = t.CreatedAt,
+            Date = t.Date,
             Type = t.Type.ToString(),
             Category = t.Category,
             Description = t.Description,

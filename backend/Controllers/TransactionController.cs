@@ -81,8 +81,7 @@ public class TransactionController(
             Category = value.Category,
             Amount = value.Amount,
             Description = value.Description,
-            CreatedAt = value.Date,
-            LastUpdated = value.Date
+            Date = value.Date,
         };
 
         await _transactionService.Create(transaction);
@@ -103,7 +102,7 @@ public class TransactionController(
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
         // TODO - Separate Created at and date of transaction
-        transaction.CreatedAt = value.Date;
+        transaction.Date = value.Date;
         transaction.LastUpdated = DateTime.Now;
 
         await _transactionService.Update(transaction);

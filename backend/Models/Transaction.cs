@@ -30,6 +30,9 @@ public class Transaction
     public string Description { get; set; } = string.Empty;
 
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTime Date { get; set; } = DateTime.UtcNow;
+
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
