@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { RootLayout } from '../../components/root-layout/root-layout';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,11 +9,12 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { TransactionService } from '../../services/transaction-service';
-import { TransactionType } from '../../types/transaction';
-import { AddTransaction } from '../../components/add-transaction/add-transaction';
+
+import { RootLayout } from '@app/components/root-layout/root-layout';
+import { TransactionService } from '@app/services/transaction-service';
+import { TransactionType } from '@app/types/transaction';
+import { AddTransaction } from '@app/components/add-transaction/add-transaction';
 
 @Component({
   selector: 'app-transactions',

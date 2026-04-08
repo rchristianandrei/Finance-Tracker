@@ -1,6 +1,8 @@
-import { Component, computed, inject, output, Signal, signal } from '@angular/core';
+import { finalize } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, output, Signal, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -9,10 +11,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
-import { TransactionService } from '../../services/transaction-service';
-import { ToastService } from '../../services/toast-service';
-import { finalize } from 'rxjs';
-import { CategoryService } from '../../services/category-service';
+
+import { TransactionService } from '@app/services/transaction-service';
+import { ToastService } from '@app/services/toast-service';
+import { CategoryService } from '@app/services/category-service';
 
 @Component({
   selector: 'app-add-transaction-form',

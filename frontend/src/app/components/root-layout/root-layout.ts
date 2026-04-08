@@ -1,3 +1,4 @@
+import { Router, RouterModule } from '@angular/router';
 import { Component, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,12 +8,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
-import { Router, RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
-import { AuthService } from '../../services/auth-service';
-import { ToastService } from '../../services/toast-service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialog, ConfirmDialogData } from '../confirm-dialog/confirm-dialog';
+
+import { AuthService } from '@app/services/auth-service';
+import { ToastService } from '@app/services/toast-service';
+import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-root-layout',

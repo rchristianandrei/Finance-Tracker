@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AddExpenseForm } from '../add-transaction-form/add-transaction-form';
+import { AddExpenseForm } from '@app/components/add-transaction-form/add-transaction-form';
 
 type TransactionType = 'expense' | 'income' | null;
 

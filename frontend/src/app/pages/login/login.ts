@@ -11,9 +11,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 
-import { AuthService } from '../../services/auth-service';
-import { resolveHttpError } from '../../utils/http-error.util';
-import { ToastService } from '../../services/toast-service';
+import { AuthService } from '@app/services/auth-service';
+import { resolveHttpError } from '@app/utils/http-error.util';
+import { ToastService } from '@app/services/toast-service';
 
 @Component({
   selector: 'app-login',

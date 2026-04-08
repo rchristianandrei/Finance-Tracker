@@ -1,9 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../environtments/environment';
-import { DashboardType } from '../types/dashboard';
-import { TransactionType } from '../types/transaction';
-import { map } from 'rxjs';
+
+import { DashboardType } from '@app/types/dashboard';
+import { TransactionType } from '@app/types/transaction';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root',
