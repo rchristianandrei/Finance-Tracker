@@ -61,24 +61,23 @@ export class TransactionService {
       params = params.set('Page', filter.page);
     }
 
-    return this.http
-      .get<{
-        totalCount: number;
-        data: TransactionType[];
-      }>(this.url, { params })
-      .pipe(
-        map((paginatedData) => ({
-          ...paginatedData,
-          data: paginatedData.data.map((t) => {
-            const utcDate = new Date(t.date); // parse string to Date
-            const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+    return this.http.get<{
+      totalCount: number;
+      data: TransactionType[];
+    }>(this.url, { params });
+    // .pipe(
+    //   map((paginatedData) => ({
+    //     ...paginatedData,
+    //     data: paginatedData.data.map((t) => {
+    //       const utcDate = new Date(t.date); // parse string to Date
+    //       const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
 
-            return {
-              ...t,
-              date: localDate,
-            };
-          }),
-        })),
-      );
+    //       return {
+    //         ...t,
+    //         date: localDate,
+    //       };
+    //     }),
+    //   })),
+    // );
   }
 }
