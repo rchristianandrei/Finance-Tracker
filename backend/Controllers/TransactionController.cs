@@ -5,6 +5,7 @@ using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 
 namespace backend.Controllers;
 
@@ -87,5 +88,12 @@ public class TransactionController(
             totalCount = count,
             data = dto
         });
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await _transactionService.Delete(id);
+        return NoContent();
     }
 }

@@ -15,6 +15,7 @@ import { RootLayout } from '@app/components/root-layout/root-layout';
 import { TransactionService } from '@app/services/transaction-service';
 import { TransactionType } from '@app/types/transaction';
 import { AddTransaction } from '@app/components/add-transaction/add-transaction';
+import { DeleteTransaction } from './components/delete-transaction/delete-transaction';
 
 @Component({
   selector: 'app-transactions',
@@ -32,6 +33,7 @@ import { AddTransaction } from '@app/components/add-transaction/add-transaction'
     MatInputModule,
     ReactiveFormsModule,
     AddTransaction,
+    DeleteTransaction,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.css',
@@ -39,6 +41,9 @@ import { AddTransaction } from '@app/components/add-transaction/add-transaction'
 export class Transactions implements OnInit {
   private fb = inject(FormBuilder);
   private transactionService = inject(TransactionService);
+
+  // Events
+  deleteEvent = signal<TransactionType | null>(null);
 
   filterForm = this.fb.group({
     searchTerm: [''],
@@ -98,5 +103,15 @@ export class Transactions implements OnInit {
         this.paginationDetails.update((p) => ({ ...p, totalItems: value.totalCount }));
       },
     });
+  }
+
+  onStartDelete(transaction: TransactionType) {
+    this.deleteEvent.set(transaction);
+  }
+
+  onEndDelete(success: boolean) {
+    this.deleteEvent.set(null);
+    if (!success) return;
+    this.loadTransactions();
   }
 }

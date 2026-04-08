@@ -80,4 +80,8 @@ export class TransactionService {
     //   })),
     // );
   }
+
+  delete(id: string) {
+    return this.http.delete(`${this.url}/${id}`);
+  }
 }

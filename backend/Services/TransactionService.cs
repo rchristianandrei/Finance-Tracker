@@ -67,4 +67,9 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
             .SortByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
+
+    public async Task<DeleteResult?> Delete(string id)
+    {
+        return await _entities.DeleteOneAsync(t => t.Id == id);
+    }
 }

@@ -14,4 +14,12 @@ export class ToastService {
       panelClass: ['custom-snackbar', 'bg-green-500'],
     });
   }
+
+  error(message: string) {
+    this.snackBar.open(message, 'close', {
+      duration: 2500,
+      verticalPosition: 'top',
+      panelClass: ['custom-snackbar', 'bg-red-500'],
+    });
+  }
 }
