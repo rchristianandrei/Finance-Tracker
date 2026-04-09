@@ -2,7 +2,7 @@ using System.Text.Json;
 using backend.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace backend.Services;
+namespace backend.Repositories.Caching;
 
 public class RedisCacheService(IDistributedCache _cache) : ICacheService
 {
