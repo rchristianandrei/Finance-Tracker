@@ -7,10 +7,12 @@ using backend.Models;
 using backend.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Controllers;
 
 [ApiController]
+[EnableRateLimiting("fixed")]
 [Route("api/[controller]")]
 public class AuthController(
     IAuthService _authService,
@@ -18,7 +20,7 @@ public class AuthController(
     IVerifyAccountService _verifyAccountService,
     IJwtService _jwtService,
     JwtSettings _jwtSettings,
-    IUserRepo _userRepo,
+    IUserCacheService _userCache,
     ICurrentUserService _currentUserService
 ) : ControllerBase
 {
@@ -26,7 +28,7 @@ public class AuthController(
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto value)
     {
-        var existingUser = await _userRepo.GetUserByEmail(value.Email);
+        var existingUser = await _userCache.GetById(value.Email);
         if (existingUser != null) return BadRequest("Email already in use");
 
         var user = new User
@@ -36,7 +38,7 @@ public class AuthController(
 
         _authService.CreateUser(user, value.Password);
 
-        await _userRepo.CreateUser(user);
+        await _userCache.Create(user);
 
         await SendVerificationLink(user);
 
@@ -46,7 +48,7 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserDto value)
     {
-        var user = await _userRepo.GetUserByEmail(value.Email);
+        var user = await _userCache.GetById(value.Email);
         if (user == null) return BadRequest("Invalid Credentials");
 
         var correctPassword = _authService.VerifyPassword(user, value.Password);
@@ -94,22 +96,23 @@ public class AuthController(
         var email = await _verifyAccountService.GetUserEmailByToken(token);
         if (email == null) return BadRequest("Invalid Token. Please try logging in again");
 
-        var user = await _userRepo.GetUserByEmail(email);
+        var user = await _userCache.GetById(email);
         if (user == null) return NotFound("User does not exist");
 
         user.IsVerified = true;
-        await _userRepo.UpdateUser(user);
+        await _userCache.Update(user);
 
         return Ok("Account Verifed. You may now login");
     }
 
     [Authorize]
+    [EnableRateLimiting("per-user")]
     [HttpGet("me")]
     public async Task<IActionResult> GetMe()
     {
         var email = _currentUserService.Email;
 
-        var user = await _userRepo.GetUserByEmail(email);
+        var user = await _userCache.GetById(email);
         if (user == null) return Unauthorized();
 
         var dto = new { Email = user.Email };

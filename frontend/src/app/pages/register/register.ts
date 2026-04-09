@@ -1,4 +1,5 @@
-import { Component, effect, signal } from '@angular/core';
+import { finalize } from 'rxjs';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -8,9 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../../services/auth-service';
-import { finalize } from 'rxjs';
-import { resolveHttpError } from '../../utils/http-error.util';
+
+import { AuthService } from '@app/services/auth-service';
+import { resolveHttpError } from '@app/utils/http-error.util';
 
 @Component({
   selector: 'app-register',

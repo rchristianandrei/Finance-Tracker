@@ -1,40 +1,23 @@
 using backend.Dtos;
 using backend.Enums;
 using backend.Interfaces;
+using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Sprache;
 
 namespace backend.Controllers;
 
 [Authorize]
+[EnableRateLimiting("per-user")]
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionController(
     ITransactionService _transactionService,
     ICurrentUserService _currentUserService) : ControllerBase
 {
-    [HttpPost]
-    public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
-    {
-        var email = _currentUserService.Email;
-
-        var transaction = new Transaction
-        {
-            Email = email,
-            Type = value.Type,
-            Category = value.Category,
-            Amount = value.Amount,
-            Description = value.Description,
-            CreatedAt = value.Date,
-            LastUpdated = value.Date
-        };
-
-        await _transactionService.Create(transaction);
-
-        return Ok();
-    }
-
     [HttpGet("dashboard")]
     public async Task<IActionResult> Dashboard()
     {
@@ -63,14 +46,7 @@ public class TransactionController(
             }
         }
 
-        var transactionDtos = transactions.Select(t => new
-        {
-            Date = t.CreatedAt,
-            Type = t.Type.ToString(),
-            Category = t.Category,
-            Description = t.Description,
-            Amount = t.Amount
-        });
+        var transactionDtos = transactions.Select(t => t.ToDto());
 
         return Ok(new
         {
@@ -80,5 +56,66 @@ public class TransactionController(
             ExpensesBreakdown = expensesBreakdown.ToArray(),
             Transactions = transactionDtos
         });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] TransactionQueryParameters query)
+    {
+        var email = _currentUserService.Email;
+        var (transactions, count) = await _transactionService.GetAll(email, query);
+        var dto = transactions.Select(t => t.ToDto());
+        return Ok(new
+        {
+            totalCount = count,
+            data = dto
+        });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
+    {
+        var email = _currentUserService.Email;
+
+        var transaction = new Transaction
+        {
+            Email = email,
+            Type = value.Type,
+            Category = value.Category,
+            Amount = value.Amount,
+            Description = value.Description,
+            Date = value.Date,
+        };
+
+        await _transactionService.Create(transaction);
+
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateTransactionDto value)
+    {
+        var email = _currentUserService.Email;
+
+        var transaction = await _transactionService.GetById(id);
+        if (transaction == null) return NotFound();
+        if (transaction.Email != email) return Forbid();
+
+        transaction.Category = value.Category;
+        transaction.Description = value.Description;
+        transaction.Amount = value.Amount;
+        // TODO - Separate Created at and date of transaction
+        transaction.Date = value.Date;
+        transaction.LastUpdated = DateTime.Now;
+
+        await _transactionService.Update(transaction);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await _transactionService.Delete(id);
+        return NoContent();
     }
 }

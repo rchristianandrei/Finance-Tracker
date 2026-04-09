@@ -1,9 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AddExpenseForm } from '../add-transaction-form/add-transaction-form';
-
-type TransactionType = 'expense' | 'income' | null;
+import { AddExpenseForm } from '@app/components/add-transaction-form/add-transaction-form';
+import { TransactionService } from '@app/services/transaction-service';
+import { finalize } from 'rxjs';
+import { ToastService } from '@app/services/toast-service';
+import { resolveHttpError } from '@app/utils/http-error.util';
+import { TransactionType } from '@app/types/transaction';
 
 @Component({
   selector: 'app-add-transaction',
@@ -11,20 +14,50 @@ type TransactionType = 'expense' | 'income' | null;
   templateUrl: './add-transaction.html',
 })
 export class AddTransaction {
-  open = signal(false);
+  private transactionService = inject(TransactionService);
+  private toastService = inject(ToastService);
 
-  openTransactionForm = signal<TransactionType>(null);
+  onAddSucess = output();
+
+  isOpen = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal('');
+
+  openTransactionForm = signal<TransactionType>('EXPENSE');
 
   toggleMenu() {
-    this.open.update((prev) => !prev);
+    this.isOpen.update((prev) => !prev);
   }
 
   setOpen(isOpen: boolean) {
-    this.open.set(isOpen);
+    this.isOpen.set(isOpen);
   }
 
-  openForm(transactionType: TransactionType) {
-    this.openTransactionForm.set(transactionType);
-    this.open.set(false);
+  onSubmit(value: {
+    type: TransactionType;
+    category: string;
+    amount: number;
+    description: string;
+    date: Date;
+  }) {
+    this.isLoading.set(true);
+
+    this.transactionService
+      .addExpense(value)
+      .pipe(
+        finalize(() => {
+          this.isLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.success('Expense successfully saved!');
+          this.isOpen.set(false);
+          this.onAddSucess.emit();
+        },
+        error: (err) => {
+          this.errorMessage.set(resolveHttpError(err));
+        },
+      });
   }
 }

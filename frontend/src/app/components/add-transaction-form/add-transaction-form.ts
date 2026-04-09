@@ -1,6 +1,7 @@
-import { Component, computed, inject, output, Signal, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, input, output, Signal, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -9,14 +10,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
-import { TransactionService } from '../../services/transaction-service';
-import { ToastService } from '../../services/toast-service';
-import { finalize } from 'rxjs';
-import { CategoryService } from '../../services/category-service';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
+import { CategoryService } from '@app/services/category-service';
+import { Transaction, TransactionType } from '@app/types/transaction';
 
 @Component({
   selector: 'app-add-transaction-form',
   imports: [
+    MatDatepickerModule,
     MatProgressSpinnerModule,
     MatRadioModule,
     MatCardModule,
@@ -33,22 +35,30 @@ import { CategoryService } from '../../services/category-service';
 export class AddExpenseForm {
   private fb = inject(FormBuilder);
   private categoryService = inject(CategoryService);
-  private transactionService = inject(TransactionService);
-  private toastService = inject(ToastService);
 
-  closed = output();
+  heading = input('Transaction');
+  transaction = input<Transaction>();
+  isLoading = input(false);
+  errorMessage = input('');
 
-  isLoading = signal(false);
+  onClose = output();
+  onSubmit = output<{
+    type: TransactionType;
+    category: string;
+    amount: number;
+    description: string;
+    date: Date;
+  }>();
 
   categories = ['Food', 'Transportation', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Other'];
 
-  typeSignal: Signal<'Expense' | 'Income' | null>;
+  typeSignal: Signal<TransactionType | null>;
   category = computed(() => {
-    switch (this.typeSignal()) {
-      case 'Expense':
+    switch (this.transaction()?.type ?? this.typeSignal()) {
+      case 'EXPENSE':
         return this.categoryService.ExpenseCategories();
 
-      case 'Income':
+      case 'INCOME':
         return this.categoryService.IncomeCategories();
 
       default:
@@ -56,21 +66,26 @@ export class AddExpenseForm {
     }
   });
 
-  form = this.fb.group({
-    type: new FormControl<'Expense' | 'Income'>('Expense', Validators.required),
-    category: ['', Validators.required],
-    amount: [null, [Validators.required, Validators.min(1)]],
-    description: [''],
-    date: [this.getNow(), Validators.required],
-  });
+  form = computed(() =>
+    this.fb.group({
+      type: new FormControl<'EXPENSE' | 'INCOME'>(
+        this.transaction()?.type ?? 'EXPENSE',
+        Validators.required,
+      ),
+      category: [this.transaction()?.category ?? '', Validators.required],
+      description: [this.transaction()?.description ?? ''],
+      amount: [this.transaction()?.amount ?? null, [Validators.required, Validators.min(1)]],
+      date: new FormControl<Date | null>(new Date(), Validators.required),
+    }),
+  );
 
   get f() {
-    return this.form.controls;
+    return this.form().controls;
   }
 
   constructor() {
-    this.typeSignal = toSignal(this.form.get('type')!.valueChanges, {
-      initialValue: this.form.get('type')!.value,
+    this.typeSignal = toSignal(this.form().get('type')!.valueChanges, {
+      initialValue: this.form().get('type')!.value,
     });
   }
 
@@ -82,32 +97,18 @@ export class AddExpenseForm {
   }
 
   close() {
-    this.closed.emit();
+    this.onClose.emit();
   }
 
   submit() {
-    if (this.form.invalid || this.isLoading()) return;
+    if (this.form().invalid || this.isLoading()) return;
 
-    this.isLoading.set(true);
-
-    this.transactionService
-      .addExpense({
-        type: this.f.type.value!,
-        category: this.f.category.value!,
-        amount: this.f.amount.value!,
-        description: this.f.description.value!,
-        date: new Date(this.f.date.value!).toISOString(),
-      })
-      .pipe(
-        finalize(() => {
-          this.isLoading.set(false);
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.toastService.success('Expense successfully saved!');
-          this.close();
-        },
-      });
+    this.onSubmit.emit({
+      type: this.f.type.value!,
+      category: this.f.category.value!,
+      amount: this.f.amount.value!,
+      description: this.f.description.value!,
+      date: this.f.date.value!,
+    });
   }
 }

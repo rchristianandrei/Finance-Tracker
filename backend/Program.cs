@@ -29,7 +29,8 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services
     .AddJwt(builder.Configuration)
     .AddRedis(builder.Configuration)
-    .AddMongoDb(builder.Configuration);
+    .AddMongoDb(builder.Configuration)
+    .AddRateLimiting();
 
 // Identity
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -65,6 +66,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(policyName);
+
+app.UseRateLimiter();
 
 app.UseExceptionHandler(options => { });
 

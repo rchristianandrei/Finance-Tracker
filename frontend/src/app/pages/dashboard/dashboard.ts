@@ -5,12 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { PieChart } from '../../components/pie-chart/pie-chart';
-import { RootLayout } from '../../components/root-layout/root-layout';
-import { AddTransaction } from '../../components/add-transaction/add-transaction';
+import { PieChart } from '@app/components/pie-chart/pie-chart';
+import { RootLayout } from '@app/components/root-layout/root-layout';
+import { AddTransaction } from '@app/components/add-transaction/add-transaction';
 
-import { TransactionService } from '../../services/transaction-service';
-import { DashboardType } from '../../types/dashboard';
+import { TransactionService } from '@app/services/transaction-service';
+import { DashboardType } from '@app/types/dashboard';
 
 @Component({
   selector: 'app-dashboard',
@@ -48,6 +48,10 @@ export class Dashboard implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadDashboard();
+  }
+
+  loadDashboard() {
     this.transactionService.getDashboardData().subscribe({
       next: (value) => {
         this.dashboardData.set(value);

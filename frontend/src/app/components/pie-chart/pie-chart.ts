@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, effect, inject, input } from '@angular/core';
+import { Component, effect, input } from '@angular/core';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ChartConfiguration } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
