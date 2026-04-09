@@ -5,6 +5,7 @@ using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
 using backend.Settings;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -15,6 +16,7 @@ namespace backend.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/[controller]")]
 public class AuthController(
+    IConfiguration _config,
     IAuthService _authService,
     IEmailService _emailService,
     IVerifyAccountService _verifyAccountService,
@@ -70,9 +72,40 @@ public class AuthController(
             Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
         });
 
-        var dto = new { Email = user.Email };
+        return Ok(new { email = user.Email });
+    }
 
-        return Ok(dto);
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = [_config["Google:ClientId"]]
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, settings);
+
+            var user = await _userCache.GetById(payload.Email);
+            if (user == null) return BadRequest("Invalid Credentials");
+
+            var token = _jwtService.GenerateToken(user);
+
+            Response.Cookies.Append("Authorization", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
+            });
+
+            return Ok(new { email = user.Email });
+        }
+        catch (InvalidJwtException)
+        {
+            return Unauthorized("Invalid Google token.");
+        }
     }
 
     [Authorize]

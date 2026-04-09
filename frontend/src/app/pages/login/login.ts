@@ -76,7 +76,10 @@ export class Login implements OnInit {
       this.isLoading.set(true);
 
       if (user) {
-        // send user.idToken to your backend
+        this.authService
+          .googleLogin({ idToken: user.idToken })
+          .pipe(finalize(() => this.isLoading.set(false)))
+          .subscribe(this.loginReaction());
       }
     });
   }
@@ -104,14 +107,18 @@ export class Login implements OnInit {
         password: this.loginForm.value.password!,
       })
       .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: () => {
-          this.toastService.success('Login successful!');
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          this.errorMessage.set(resolveHttpError(err));
-        },
-      });
+      .subscribe(this.loginReaction());
+  }
+
+  loginReaction() {
+    return {
+      next: () => {
+        this.toastService.success('Login successful!');
+        this.router.navigate(['/']);
+      },
+      error: (err: any) => {
+        this.errorMessage.set(resolveHttpError(err));
+      },
+    };
   }
 }

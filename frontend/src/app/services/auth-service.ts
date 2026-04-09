@@ -23,6 +23,12 @@ export class AuthService {
       .pipe(tap((user) => this._user.set(user.email)));
   }
 
+  googleLogin(body: { idToken?: string }) {
+    return this.httpClient
+      .post<{ email: string }>(`${environment.apiUrl}/auth/google`, body)
+      .pipe(tap((user) => this._user.set(user.email)));
+  }
+
   logout() {
     return this.httpClient
       .post(`${environment.apiUrl}/auth/logout`, {})
