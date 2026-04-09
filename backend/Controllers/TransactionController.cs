@@ -5,11 +5,13 @@ using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Sprache;
 
 namespace backend.Controllers;
 
 [Authorize]
+[EnableRateLimiting("per-user")]
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionController(

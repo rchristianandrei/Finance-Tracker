@@ -7,10 +7,12 @@ using backend.Models;
 using backend.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Controllers;
 
 [ApiController]
+[EnableRateLimiting("fixed")]
 [Route("api/[controller]")]
 public class AuthController(
     IAuthService _authService,
@@ -104,6 +106,7 @@ public class AuthController(
     }
 
     [Authorize]
+    [EnableRateLimiting("per-user")]
     [HttpGet("me")]
     public async Task<IActionResult> GetMe()
     {
