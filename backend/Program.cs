@@ -33,7 +33,7 @@ builder.Services
     .AddRateLimiting();
 
 // Identity
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IPasswordHasher<LocalCredential>, PasswordHasher<LocalCredential>>();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();

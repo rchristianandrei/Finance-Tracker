@@ -4,7 +4,7 @@ namespace backend.Interfaces;
 
 public interface IUserCacheService
 {
-    Task<User?> GetById(string email);
+    Task<User?> GetById(int id);
 
     Task Create(User user);
 

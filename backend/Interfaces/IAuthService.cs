@@ -4,7 +4,7 @@ namespace backend.Interfaces;
 
 public interface IAuthService
 {
-    void CreateUser(User user, string password);
+    void CreateUser(LocalCredential localCredentials, string password);
 
-    bool VerifyPassword(User user, string password);
+    bool VerifyPassword(LocalCredential localCredentials, string password);
 }

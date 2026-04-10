@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Identity;
 
 namespace backend.Services;
 
-public class AuthService(IPasswordHasher<User> _passwordHasher) : IAuthService
+public class AuthService(IPasswordHasher<LocalCredential> _passwordHasher) : IAuthService
 {
-    public void CreateUser(User user, string password)
+    public void CreateUser(LocalCredential localCredentials, string password)
     {
-        user.PasswordHash = _passwordHasher.HashPassword(user, password);
+        localCredentials.PasswordHash = _passwordHasher.HashPassword(localCredentials, password);
     }
 
-    public bool VerifyPassword(User user, string password)
+    public bool VerifyPassword(LocalCredential localCredentials, string password)
     {
         var result = _passwordHasher.VerifyHashedPassword(
-            user,
-            user.PasswordHash,
+            localCredentials,
+            localCredentials.PasswordHash,
             password);
 
         return result == PasswordVerificationResult.Success;

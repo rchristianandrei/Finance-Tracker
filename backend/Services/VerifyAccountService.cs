@@ -12,7 +12,7 @@ public class VerifyAccountService(ICacheService _cache) : IVerifyAccountService
     {
         var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 
-        await _cache.SetAsync(ModifyKey(token), user.Email, _expiry);
+        await _cache.SetAsync(ModifyKey(token), user.Id, _expiry);
 
         return token;
     }
