@@ -12,9 +12,9 @@ public interface ITransactionService
 
     Task<Transaction?> GetById(string id);
 
-    Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(string email, TransactionQueryParameters query);
+    Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query);
 
-    Task<IEnumerable<Transaction>> GetLastDays(string email, int days);
+    Task<IEnumerable<Transaction>> GetLastDays(int userId, int days);
 
     Task<DeleteResult?> Delete(string id);
 }
