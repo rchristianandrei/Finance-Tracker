@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace backend.Services;
 
-public class AuthService(IPasswordHasher<LocalCredential> _passwordHasher) : IAuthService
+public class PasswordService(IPasswordHasher<LocalCredential> _passwordHasher) : IPasswordService
 {
-    public void CreateUser(LocalCredential localCredentials, string password)
+    public void HashPassword(LocalCredential localCredentials, string password)
     {
         localCredentials.PasswordHash = _passwordHasher.HashPassword(localCredentials, password);
     }

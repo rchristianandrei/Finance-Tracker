@@ -5,7 +5,7 @@ using backend.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace backend.Services;
+namespace backend.Repositories.MongoDb;
 
 public class TransactionService(IMongoDatabase database) : ITransactionService
 {

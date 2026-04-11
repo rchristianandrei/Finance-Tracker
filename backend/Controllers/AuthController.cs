@@ -1,5 +1,4 @@
 using backend.Attributes;
-using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
@@ -9,7 +8,6 @@ using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers;
 
@@ -17,13 +15,12 @@ namespace backend.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/[controller]")]
 public class AuthController(
-    ApplicationDbContext _context,
-    IGoogleCredentialRepo _googleCredRepo,
-    IConfiguration _config,
-    IAuthService _authService,
-    IVerifyAccountService _verifyAccountService,
-    IJwtService _jwtService,
     IUserCache _userCache,
+    IGoogleCredentialRepo _googleCredRepo,
+    ILocalCredentialRepo _localCredRepo,
+    IConfiguration _config,
+    IPasswordService _authService,
+    IJwtService _jwtService,
     ICurrentUserService _currentUserService,
     IAuthCookiesService _authCookiesService
 ) : ControllerBase
@@ -32,7 +29,7 @@ public class AuthController(
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
     {
-        var existingLocalCred = await _context.LocalCredentials.FirstOrDefaultAsync(l => l.Email == dto.Email);
+        var existingLocalCred = await _localCredRepo.GetByEmail(dto.Email);
         if (existingLocalCred != null) return BadRequest("Email already in use");
 
         // Create User
@@ -49,29 +46,26 @@ public class AuthController(
             UserId = user.Id,
             Email = dto.Email
         };
-        _authService.CreateUser(localCredentials, dto.Password);
-
-        await SendVerificationLink(user);
+        _authService.HashPassword(localCredentials, dto.Password);
+        await _localCredRepo.Create(localCredentials);
 
         return Ok();
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginUserDto value)
+    public async Task<IActionResult> Login([FromBody] LoginUserDto dto)
     {
-        var localCreds = await _context.LocalCredentials
-            .Include(l => l.User)
-            .FirstOrDefaultAsync(l => l.Email == value.Email);
+        var localCreds = await _localCredRepo.GetByEmail(dto.Email);
         if (localCreds == null) return BadRequest("Invalid Credentials");
 
-        var correctPassword = _authService.VerifyPassword(localCreds, value.Password);
+        var correctPassword = _authService.VerifyPassword(localCreds, dto.Password);
         if (!correctPassword) return BadRequest("Invalid Credentials");
 
-        var user = localCreds.User;
+        var user = await _userCache.GetById(localCreds.UserId);
+        if (user == null) return Unauthorized();
 
         if (!localCreds.IsVerified)
         {
-            await SendVerificationLink(user);
             return BadRequest("User not verified. Please check your email");
         }
 
@@ -156,13 +150,5 @@ public class AuthController(
         var dto = new { user.Id, user.FirstName, user.LastName };
 
         return Ok(dto);
-    }
-
-    private async Task SendVerificationLink(User user)
-    {
-        var request = HttpContext.Request;
-        var host = $"{request.Scheme}://{request.Host}";
-        var verificationToken = await _verifyAccountService.GenerateToken(user);
-        // await _emailService.SendVerifyAccountLink(user.Email, host, verificationToken);
     }
 }

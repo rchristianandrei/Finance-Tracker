@@ -1,9 +1,7 @@
 using backend;
 using backend.Extensions;
-using backend.Infrastructure;
 using backend.Interfaces;
 using backend.Models;
-using backend.Repositories.MySql;
 using backend.Services;
 using backend.Settings;
 using Microsoft.AspNetCore.Identity;
@@ -28,8 +26,7 @@ builder.Services
 builder.Services.AddScoped<IPasswordHasher<LocalCredential>, PasswordHasher<LocalCredential>>();
 
 // Services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IVerifyAccountService, VerifyAccountService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // CORS
@@ -42,12 +39,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var initializer = scope.ServiceProvider.GetRequiredService<MongoDbInitializer>();
-    await initializer.InitializeAsync();
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

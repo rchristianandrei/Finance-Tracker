@@ -2,9 +2,9 @@ using backend.Models;
 
 namespace backend.Interfaces;
 
-public interface IAuthService
+public interface IPasswordService
 {
-    void CreateUser(LocalCredential localCredentials, string password);
+    void HashPassword(LocalCredential localCredentials, string password);
 
     bool VerifyPassword(LocalCredential localCredentials, string password);
 }
