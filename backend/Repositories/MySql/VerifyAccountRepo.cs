@@ -13,7 +13,7 @@ public class VerifyAccountRepo(
 {
     private readonly static int ExpiresInMinutes = 5;
 
-    public async Task<(string token, string otp)> Create(string email)
+    public async Task<VerifyAccount> Create(string email)
     {
         var token = _tokenService.GenerateToken();
         var otp = _otpService.GenerateOtp();
@@ -27,6 +27,18 @@ public class VerifyAccountRepo(
         await _context.VerifyAccounts.AddAsync(verify);
         await _context.SaveChangesAsync();
 
-        return (token, otp);
+        return verify;
+    }
+
+    public async Task<VerifyAccount?> GetByEmail(string email)
+    {
+        return await _context.VerifyAccounts.FindAsync(email);
+    }
+
+    public async Task Update(VerifyAccount verify)
+    {
+        var otp = _otpService.GenerateOtp();
+        verify.Otp = otp;
+        await _context.SaveChangesAsync();
     }
 }

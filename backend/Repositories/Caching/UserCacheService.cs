@@ -1,4 +1,3 @@
-using backend.Data;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;

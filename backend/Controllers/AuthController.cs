@@ -53,11 +53,11 @@ public class AuthController(
         _authService.HashPassword(localCredentials, dto.Password);
         await _localCredRepo.Create(localCredentials);
 
-        var (token, otp) = await _verifyAccountRepo.Create(localCredentials.Email); ;
+        var verify = await _verifyAccountRepo.Create(localCredentials.Email); ;
 
-        await _emailService.SendVerifyAccountLink(dto.Email, otp);
+        await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
 
-        return Ok(new { token });
+        return Ok(new { verify.Token });
     }
 
     [HttpPost("login")]
@@ -74,11 +74,20 @@ public class AuthController(
 
         if (!localCreds.IsVerified)
         {
+            var verify = await _verifyAccountRepo.GetByEmail(dto.Email);
+
+            if (verify == null)
+                verify = await _verifyAccountRepo.Create(dto.Email);
+            else
+                await _verifyAccountRepo.Update(verify);
+
+            await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
+
             return BadRequest("User not verified. Please check your email");
         }
 
-        var token = _jwtService.GenerateToken(user);
-        _authCookiesService.AttachAuthCookies(token);
+        var authToken = _jwtService.GenerateToken(user);
+        _authCookiesService.AttachAuthCookies(authToken);
 
         return Ok(new { user.Id, user.FirstName, user.LastName });
     }

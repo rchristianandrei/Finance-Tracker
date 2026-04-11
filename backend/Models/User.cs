@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -14,6 +15,8 @@ public class User
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    [JsonIgnore]
     public LocalCredential? LocalCredential { get; set; }
+    [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
 }
