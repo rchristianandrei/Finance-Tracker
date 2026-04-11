@@ -1,8 +1,10 @@
 using backend.Attributes;
+using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
+using backend.Interfaces.Utils;
 using backend.Models;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -18,11 +20,13 @@ public class AuthController(
     IUserCache _userCache,
     IGoogleCredentialRepo _googleCredRepo,
     ILocalCredentialRepo _localCredRepo,
+    IVerifyAccountRepo _verifyAccountRepo,
     IConfiguration _config,
     IPasswordService _authService,
     IJwtService _jwtService,
     ICurrentUserService _currentUserService,
-    IAuthCookiesService _authCookiesService
+    IAuthCookiesService _authCookiesService,
+    IEmailService _emailService
 ) : ControllerBase
 {
     [Transaction]
@@ -49,7 +53,11 @@ public class AuthController(
         _authService.HashPassword(localCredentials, dto.Password);
         await _localCredRepo.Create(localCredentials);
 
-        return Ok();
+        var (token, otp) = await _verifyAccountRepo.Create(localCredentials.Email); ;
+
+        await _emailService.SendVerifyAccountLink(dto.Email, otp);
+
+        return Ok(new { token });
     }
 
     [HttpPost("login")]

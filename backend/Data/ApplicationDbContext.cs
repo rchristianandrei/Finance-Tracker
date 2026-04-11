@@ -8,6 +8,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<User> Users { get; set; }
     public DbSet<LocalCredential> LocalCredentials { get; set; }
     public DbSet<GoogleCredential> GoogleCredentials { get; set; }
+    public DbSet<VerifyAccount> VerifyAccounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,9 +28,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<LocalCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<LocalCredential>().HasIndex(u => u.Email).IsUnique();
+        modelBuilder.Entity<LocalCredential>()
+            .HasOne(l => l.VerifyAccount)
+            .WithOne(v => v.LocalCredential)
+            .HasPrincipalKey<LocalCredential>(l => l.Email)
+            .HasForeignKey<VerifyAccount>(v => v.Email);
 
         modelBuilder.Entity<GoogleCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Email).IsUnique();
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Subject).IsUnique();
+
+        modelBuilder.Entity<VerifyAccount>().HasKey(v => v.Email);
+        modelBuilder.Entity<VerifyAccount>().HasIndex(v => v.Token).IsUnique();
     }
 }

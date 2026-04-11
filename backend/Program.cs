@@ -1,6 +1,7 @@
 using backend;
 using backend.Extensions;
 using backend.Interfaces;
+using backend.Interfaces.Utils;
 using backend.Models;
 using backend.Services;
 using backend.Settings;
@@ -28,6 +29,8 @@ builder.Services.AddScoped<IPasswordHasher<LocalCredential>, PasswordHasher<Loca
 // Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // CORS
 var policyName = builder.Services.ConfigureCors(builder.Configuration);
