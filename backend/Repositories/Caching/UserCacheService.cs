@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Interfaces;
+using backend.Interfaces.MySql;
 using backend.Models;
 
 namespace backend.Repositories.Caching;

@@ -1,10 +1,10 @@
 using backend.Models;
 
-namespace backend.Interfaces;
+namespace backend.Interfaces.MySql;
 
 public interface IUserRepo
 {
-    Task<User?> GetUserByEmail(string email);
+    Task<User?> GetUserByEmail(int id);
 
     Task CreateUser(User user);
 

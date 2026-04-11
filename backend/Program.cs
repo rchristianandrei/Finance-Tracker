@@ -1,33 +1,25 @@
 using backend;
-using backend.Data;
 using backend.Extensions;
 using backend.Infrastructure;
 using backend.Interfaces;
 using backend.Models;
-using backend.Repositories;
+using backend.Repositories.MySql;
 using backend.Services;
 using backend.Settings;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure
-var jwtSettings = builder.Configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>() ?? throw new InvalidOperationException("EmailSettings section is missing or invalid");
-builder.Services.AddSingleton(jwtSettings);
-
-// MySql
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+var emailSettings = builder.Configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>() ?? throw new InvalidOperationException("EmailSettings section is missing or invalid");
+builder.Services.AddSingleton(emailSettings);
 
 // Extensions
 builder.Services
     .AddJwt(builder.Configuration)
+    .AddMySql(builder.Configuration)
     .AddRedis(builder.Configuration)
     .AddMongoDb(builder.Configuration)
     .AddRateLimiting();
@@ -39,7 +31,6 @@ builder.Services.AddScoped<IPasswordHasher<LocalCredential>, PasswordHasher<Loca
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVerifyAccountService, VerifyAccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IUserRepo, UserRepo>();
 
 // CORS
 var policyName = builder.Services.ConfigureCors(builder.Configuration);

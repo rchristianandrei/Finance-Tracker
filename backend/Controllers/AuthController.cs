@@ -2,8 +2,8 @@ using backend.Attributes;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
+using backend.Interfaces.MySql;
 using backend.Models;
-using backend.Services;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +17,7 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class AuthController(
     ApplicationDbContext _context,
+    IGoogleCredentialRepo _googleCredRepo,
     IConfiguration _config,
     IAuthService _authService,
     IVerifyAccountService _verifyAccountService,
@@ -92,7 +93,7 @@ public class AuthController(
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, settings);
 
-            var existingAcc = await _context.GoogleCredentials.FirstOrDefaultAsync(g => g.Subject == payload.Subject);
+            var existingAcc = await _googleCredRepo.GetBySub(payload.Subject);
             User? user;
 
             if (existingAcc == null)
