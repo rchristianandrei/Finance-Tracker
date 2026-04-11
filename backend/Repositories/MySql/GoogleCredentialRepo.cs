@@ -11,4 +11,10 @@ public class GoogleCredentialRepo(ApplicationDbContext _context) : IGoogleCreden
     {
         return await _context.GoogleCredentials.FirstOrDefaultAsync(g => g.Subject == sub);
     }
+
+    public async Task Create(GoogleCredential googleCreds)
+    {
+        await _context.GoogleCredentials.AddAsync(googleCreds);
+        await _context.SaveChangesAsync();
+    }
 }

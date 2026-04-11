@@ -1,8 +1,8 @@
 using backend.Models;
 
-namespace backend.Interfaces;
+namespace backend.Interfaces.Caching;
 
-public interface IUserCacheService
+public interface IUserCache
 {
     Task<User?> GetById(int id);
 

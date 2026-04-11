@@ -2,6 +2,7 @@ using backend.Attributes;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
+using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Models;
 using Google.Apis.Auth;
@@ -22,7 +23,7 @@ public class AuthController(
     IAuthService _authService,
     IVerifyAccountService _verifyAccountService,
     IJwtService _jwtService,
-    IUserCacheService _userCache,
+    IUserCache _userCache,
     ICurrentUserService _currentUserService,
     IAuthCookiesService _authCookiesService
 ) : ControllerBase
@@ -114,12 +115,11 @@ public class AuthController(
                     Email = payload.Email,
                     Subject = payload.Subject
                 };
-                await _context.GoogleCredentials.AddAsync(googleCreds);
-                await _context.SaveChangesAsync();
+                await _googleCredRepo.Create(googleCreds);
             }
             else
             {
-                user = await _context.Users.FindAsync(existingAcc.UserId);
+                user = await _userCache.GetById(existingAcc.UserId);
             }
 
             if (user == null) return BadRequest("User does not exists");
@@ -150,7 +150,7 @@ public class AuthController(
     {
         var id = _currentUserService.Id();
 
-        var user = await _context.Users.FindAsync(id);
+        var user = await _userCache.GetById(id);
         if (user == null) return Unauthorized();
 
         var dto = new { user.Id, user.FirstName, user.LastName };

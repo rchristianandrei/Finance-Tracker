@@ -4,9 +4,9 @@ namespace backend.Interfaces.MySql;
 
 public interface IUserRepo
 {
-    Task<User?> GetUserByEmail(int id);
+    Task<User?> GetById(int id);
 
-    Task CreateUser(User user);
+    Task Create(User user);
 
-    Task UpdateUser(User user);
+    Task Update(User user);
 }
