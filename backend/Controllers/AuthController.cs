@@ -1,10 +1,9 @@
-using System.Security.Claims;
 using backend.Attributes;
 using backend.Data;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Models;
-using backend.Settings;
+using backend.Services;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +21,9 @@ public class AuthController(
     IAuthService _authService,
     IVerifyAccountService _verifyAccountService,
     IJwtService _jwtService,
-    JwtSettings _jwtSettings,
     IUserCacheService _userCache,
-    ICurrentUserService _currentUserService
+    ICurrentUserService _currentUserService,
+    IAuthCookiesService _authCookiesService
 ) : ControllerBase
 {
     [Transaction]
@@ -55,33 +54,30 @@ public class AuthController(
         return Ok();
     }
 
-    // [HttpPost("login")]
-    // public async Task<IActionResult> Login([FromBody] LoginUserDto value)
-    // {
-    //     var user = await _userCache.GetById(value.Email);
-    //     if (user == null) return BadRequest("Invalid Credentials");
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginUserDto value)
+    {
+        var localCreds = await _context.LocalCredentials
+            .Include(l => l.User)
+            .FirstOrDefaultAsync(l => l.Email == value.Email);
+        if (localCreds == null) return BadRequest("Invalid Credentials");
 
-    //     var correctPassword = _authService.VerifyPassword(user, value.Password);
-    //     if (!correctPassword) return BadRequest("Invalid Credentials");
+        var correctPassword = _authService.VerifyPassword(localCreds, value.Password);
+        if (!correctPassword) return BadRequest("Invalid Credentials");
 
-    //     if (!user.IsVerified)
-    //     {
-    //         await SendVerificationLink(user);
-    //         return BadRequest("User not verified. Please check your email");
-    //     }
+        var user = localCreds.User;
 
-    //     var token = _jwtService.GenerateToken(user);
+        if (!localCreds.IsVerified)
+        {
+            await SendVerificationLink(user);
+            return BadRequest("User not verified. Please check your email");
+        }
 
-    //     Response.Cookies.Append("Authorization", token, new CookieOptions
-    //     {
-    //         HttpOnly = true,
-    //         Secure = true,
-    //         SameSite = SameSiteMode.None,
-    //         Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
-    //     });
+        var token = _jwtService.GenerateToken(user);
+        _authCookiesService.AttachAuthCookies(token);
 
-    //     return Ok(new { email = user.Email });
-    // }
+        return Ok(new { user.Id, user.FirstName, user.LastName });
+    }
 
     [Transaction]
     [HttpPost("google")]
@@ -128,13 +124,7 @@ public class AuthController(
             if (user == null) return BadRequest("User does not exists");
 
             var token = _jwtService.GenerateToken(user);
-            Response.Cookies.Append("Authorization", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
-            });
+            _authCookiesService.AttachAuthCookies(token);
 
             return Ok(new { user.Id, user.FirstName, user.LastName });
         }
@@ -148,14 +138,7 @@ public class AuthController(
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Append("Authorization", "", new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddDays(-1)
-        });
-
+        _authCookiesService.RemoveAuthCookies();
         return Ok();
     }
 

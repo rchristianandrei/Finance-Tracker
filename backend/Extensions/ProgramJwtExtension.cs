@@ -46,6 +46,8 @@ public static class ProgramJwtExtension
             };
         });
 
+        services.AddScoped<IAuthCookiesService, AuthCookiesService>();
+
         return services;
     }
 }

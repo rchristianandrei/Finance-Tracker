@@ -1,5 +1,5 @@
 import { Router, RouterModule } from '@angular/router';
-import { Component, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '@app/services/auth-service';
 import { ToastService } from '@app/services/toast-service';
 import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
+import { AsyncPipe } from '@angular/common';
+import { User } from '@app/types/user';
 
 @Component({
   selector: 'app-root-layout',
@@ -31,6 +33,12 @@ import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog
   templateUrl: './root-layout.html',
 })
 export class RootLayout {
+  private breakpointObserver = inject(BreakpointObserver);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private toastService = inject(ToastService);
+  private dialog = inject(MatDialog);
+
   heading = input.required();
 
   navigations = [
@@ -40,16 +48,11 @@ export class RootLayout {
     { icon: 'settings', feature: 'Settings', route: '/settings' },
   ];
 
+  user = this.authService.user;
   isMobile = signal(false);
   isCollapsed = signal(false);
 
-  constructor(
-    private breakpointObserver: BreakpointObserver,
-    protected authService: AuthService,
-    private router: Router,
-    private toastService: ToastService,
-    private dialog: MatDialog,
-  ) {
+  constructor() {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
       this.isMobile.set(result.matches);
     });

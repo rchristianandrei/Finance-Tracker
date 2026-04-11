@@ -41,8 +41,10 @@
       <mat-menu #profileMenu="matMenu" class="w-56">
         <!-- User Info -->
         <div class="px-4 py-3 border-b">
-          <!-- <div class="font-semibold">John Doe</div> -->
-          <div class="text-sm text-gray-500">{{ authService.user() }}</div>
+          @if (user()) {
+            <div class="font-semibold">{{ user()?.firstName }} {{ user()?.lastName }}</div>
+            <!-- <div class="text-sm text-gray-500">{{ authService.user()?.firstName }}</div> -->
+          }
         </div>
 
         <!-- Menu Items -->
