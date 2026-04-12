@@ -117,7 +117,13 @@ export class Login implements OnInit {
         this.router.navigate(['/']);
       },
       error: (err: any) => {
-        this.errorMessage.set(resolveHttpError(err));
+        if (err.status === 403) {
+          const { message, token } = err.error;
+          this.errorMessage.set(message);
+          this.router.navigate(['/verify-account', token]);
+        } else {
+          this.errorMessage.set(resolveHttpError(err));
+        }
       },
     };
   }

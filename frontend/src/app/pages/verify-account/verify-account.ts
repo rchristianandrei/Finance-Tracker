@@ -7,14 +7,16 @@ import {
   ElementRef,
   signal,
   computed,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatInputModule } from '@angular/material/input';
 import { interval, Subscription, take } from 'rxjs';
+import { AuthService } from '@app/services/auth-service';
 
 @Component({
   selector: 'app-verify-account',
@@ -28,9 +30,14 @@ import { interval, Subscription, take } from 'rxjs';
   ],
   templateUrl: './verify-account.html',
 })
-export class VerifyAccount {
+export class VerifyAccount implements OnInit {
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private countdownSub?: Subscription;
+
+  verifyStatus = signal<{ email: string; expiresAt: Date } | null>(null);
   digits = signal<string[]>(['', '', '', '', '', '']);
   isVerifying = signal(false);
   isResending = signal(false);
@@ -42,13 +49,20 @@ export class VerifyAccount {
   // Pass this in via @Input() or router state in real usage
   maskedEmail = 'an***@email.com';
 
-  private countdownSub?: Subscription;
-
   otp = computed(() => this.digits().join(''));
   isFilled = computed(() => this.digits().every((d) => d.length === 1));
 
   ngOnInit(): void {
-    this.startCountdown();
+    const value = this.route.snapshot.paramMap.get('token') ?? '';
+    this.authService.getVerifyAccountByToken(value).subscribe({
+      next: (value) => {
+        this.verifyStatus.set({ ...value, expiresAt: new Date(value.expiresAt + 'Z') });
+        this.startCountdown();
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -56,12 +70,17 @@ export class VerifyAccount {
   }
 
   startCountdown(): void {
+    if (!this.verifyStatus) return;
+
+    const secondsLeft = Math.ceil(
+      (new Date(this.verifyStatus()!.expiresAt).getTime() - new Date().getTime()) / 1000,
+    );
     this.canResend.set(false);
-    this.countdown.set(60);
+    this.countdown.set(secondsLeft);
     this.countdownSub?.unsubscribe();
 
     this.countdownSub = interval(1000)
-      .pipe(take(60))
+      .pipe(take(secondsLeft))
       .subscribe({
         next: () => this.countdown.update((v) => v - 1),
         complete: () => this.canResend.set(true),

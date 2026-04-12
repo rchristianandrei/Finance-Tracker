@@ -2,6 +2,7 @@ using backend.Data;
 using backend.Interfaces.MySql;
 using backend.Interfaces.Utils;
 using backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories.MySql;
 
@@ -11,7 +12,7 @@ public class VerifyAccountRepo(
     IOtpService _otpService
 ) : IVerifyAccountRepo
 {
-    private readonly static int ExpiresInMinutes = 5;
+    private readonly static int ExpiresInMinutes = 1;
 
     public async Task<VerifyAccount> Create(string email)
     {
@@ -22,7 +23,7 @@ public class VerifyAccountRepo(
             Email = email,
             Token = token,
             Otp = otp,
-            ExpiresAt = DateTime.Now.AddMinutes(ExpiresInMinutes)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(ExpiresInMinutes)
         };
         await _context.VerifyAccounts.AddAsync(verify);
         await _context.SaveChangesAsync();
@@ -35,10 +36,16 @@ public class VerifyAccountRepo(
         return await _context.VerifyAccounts.FindAsync(email);
     }
 
+    public async Task<VerifyAccount?> GetByToken(string token)
+    {
+        return await _context.VerifyAccounts.FirstOrDefaultAsync(v => v.Token == token);
+    }
+
     public async Task Update(VerifyAccount verify)
     {
         var otp = _otpService.GenerateOtp();
         verify.Otp = otp;
+        verify.ExpiresAt = DateTime.UtcNow.AddMinutes(ExpiresInMinutes);
         await _context.SaveChangesAsync();
     }
 }

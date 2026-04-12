@@ -11,6 +11,8 @@ export class AuthService {
   private _user = signal<User | null>(null);
   private _isLoading = new BehaviorSubject<boolean>(true);
 
+  private baseUrl = `${environment.apiUrl}/auth`;
+
   user = this._user.asReadonly();
   isLoading = this._isLoading.asObservable();
 
@@ -38,6 +40,12 @@ export class AuthService {
 
   register(body: { email: string; password: string }) {
     return this.httpClient.post(`${environment.apiUrl}/auth/register`, body);
+  }
+
+  getVerifyAccountByToken(token: string) {
+    return this.httpClient.get<{ email: string; expiresAt: string }>(
+      `${this.baseUrl}/verify-token/${token}`,
+    );
   }
 
   getMe() {

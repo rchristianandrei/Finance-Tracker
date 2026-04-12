@@ -4,7 +4,9 @@
 
     <p class="text-center text-sm text-gray-500">
       Enter the 6-digit code sent to
-      <span class="font-medium text-gray-700">{{ maskedEmail }}</span>
+      @if (verifyStatus()) {
+        <span class="font-medium text-gray-700">{{ verifyStatus()?.email }}</span>
+      }
     </p>
 
     <!-- OTP Inputs -->

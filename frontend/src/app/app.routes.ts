@@ -39,7 +39,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/register/register').then((c) => c.Register),
       },
       {
-        path: 'verify-account',
+        path: 'verify-account/:token',
         title: 'Verify Account',
         loadComponent: () =>
           import('./pages/verify-account/verify-account').then((c) => c.VerifyAccount),

@@ -75,15 +75,23 @@ public class AuthController(
         if (!localCreds.IsVerified)
         {
             var verify = await _verifyAccountRepo.GetByEmail(dto.Email);
+            var isExpired = false;
 
             if (verify == null)
                 verify = await _verifyAccountRepo.Create(dto.Email);
             else
-                await _verifyAccountRepo.Update(verify);
+            {
+                isExpired = (verify.ExpiresAt - DateTime.UtcNow).Seconds <= 0;
+                if(isExpired) await _verifyAccountRepo.Update(verify);
+            }
 
-            await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
+            if(isExpired) await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
 
-            return BadRequest("User not verified. Please check your email");
+            return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                message = "Account not verified",
+                token = verify.Token
+            });
         }
 
         var authToken = _jwtService.GenerateToken(user);
@@ -167,5 +175,24 @@ public class AuthController(
         var dto = new { user.Id, user.FirstName, user.LastName };
 
         return Ok(dto);
+    }
+
+    [HttpGet("verify-token/{token}")]
+    public async Task<IActionResult> VerifyToken(string token)
+    {
+        var verify = await _verifyAccountRepo.GetByToken(token);
+        if (verify == null) return NotFound();
+
+        return Ok(new { verify.ExpiresAt, Email = MaskEmail(verify.Email) });
+    }
+
+    private static string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        var local = parts[0];
+        var domain = parts[1];
+
+        var masked = local[0] + new string('*', local.Length - 1);
+        return $"{masked}@{domain}";
     }
 }
