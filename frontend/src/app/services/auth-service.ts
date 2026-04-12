@@ -59,4 +59,8 @@ export class AuthService {
         error: () => {},
       });
   }
+
+  renewOtp(token: string) {
+    return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/renew-otp/${token}`, {});
+  }
 }

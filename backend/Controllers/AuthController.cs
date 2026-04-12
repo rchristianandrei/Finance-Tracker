@@ -82,10 +82,10 @@ public class AuthController(
             else
             {
                 isExpired = (verify.ExpiresAt - DateTime.UtcNow).Seconds <= 0;
-                if(isExpired) await _verifyAccountRepo.Update(verify);
+                if (isExpired) await _verifyAccountRepo.Update(verify);
             }
 
-            if(isExpired) await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
+            if (isExpired) await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
 
             return StatusCode(StatusCodes.Status403Forbidden, new
             {
@@ -162,6 +162,24 @@ public class AuthController(
         return Ok();
     }
 
+    [HttpPut("renew-otp/{token}")]
+    public async Task<IActionResult> RenewVerification(string token)
+    {
+        var verify = await _verifyAccountRepo.GetByToken(token);
+
+        if (verify == null)
+            verify = await _verifyAccountRepo.Create(token);
+        else
+        {
+            var isExpired = (verify.ExpiresAt - DateTime.UtcNow).Seconds <= 0;
+            if (!isExpired) return Conflict("OTP not yet expired");
+            await _verifyAccountRepo.Update(verify);
+        }
+
+        await _emailService.SendVerifyAccountLink(verify.Email, verify.Otp);
+        return Ok(new { ExpiresAt = verify.ExpiresAt.ToUniversalTime() });
+    }
+
     [Authorize]
     [EnableRateLimiting("per-user")]
     [HttpGet("me")]
@@ -183,7 +201,7 @@ public class AuthController(
         var verify = await _verifyAccountRepo.GetByToken(token);
         if (verify == null) return NotFound();
 
-        return Ok(new { verify.ExpiresAt, Email = MaskEmail(verify.Email) });
+        return Ok(new { ExpiresAt = verify.ExpiresAt.ToUniversalTime(), Email = MaskEmail(verify.Email) });
     }
 
     private static string MaskEmail(string email)

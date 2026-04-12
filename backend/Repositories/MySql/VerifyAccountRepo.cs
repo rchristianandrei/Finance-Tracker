@@ -38,7 +38,10 @@ public class VerifyAccountRepo(
 
     public async Task<VerifyAccount?> GetByToken(string token)
     {
-        return await _context.VerifyAccounts.FirstOrDefaultAsync(v => v.Token == token);
+        var verify = await _context.VerifyAccounts.FirstOrDefaultAsync(v => v.Token == token);
+        if (verify != null)
+            verify.ExpiresAt = DateTime.SpecifyKind(verify.ExpiresAt, DateTimeKind.Utc);
+        return verify;
     }
 
     public async Task Update(VerifyAccount verify)
