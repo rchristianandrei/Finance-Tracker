@@ -47,11 +47,17 @@ public class VerifyAccountRepo(
         return verify;
     }
 
-    public async Task Update(VerifyAccount verify)
+    public async Task RenewOtp(VerifyAccount verify)
     {
         var otp = _otpService.GenerateOtp();
         verify.Otp = otp;
         verify.ExpiresAt = DateTime.UtcNow.AddMinutes(ExpiresInMinutes);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task Delete(VerifyAccount verify)
+    {
+        _context.VerifyAccounts.Remove(verify);
         await _context.SaveChangesAsync();
     }
 }

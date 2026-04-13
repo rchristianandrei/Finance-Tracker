@@ -19,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { finalize, interval, Subscription, take } from 'rxjs';
 import { AuthService } from '@app/services/auth-service';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { resolveHttpError } from '@app/utils/http-error.util';
 
 @Component({
   selector: 'app-verify-account',
@@ -144,22 +145,26 @@ export class VerifyAccount implements OnInit {
 
     this.isLoading.update((l) => ({ ...l, verifying: true }));
     this.errorMessage.set('');
+    this.isVerified.set(false);
 
-    // Replace with your actual service call
-    setTimeout(() => {
-      this.isLoading.update((l) => ({ ...l, verifying: false }));
-      if (otp === '123456') {
-        this.isVerified.set(true);
-      } else {
-        this.errorMessage.set('Incorrect code. Please try again.');
-        setTimeout(() => this.focusInput(0), 50);
-      }
-    }, 1500);
+    this.authService
+      .verifyAccount({ token: this.token(), otp: otp })
+      .pipe(finalize(() => this.isLoading.update((l) => ({ ...l, verifying: false }))))
+      .subscribe({
+        next: () => {
+          this.isVerified.set(true);
+        },
+        error: (err) => {
+          this.errorMessage.set(resolveHttpError(err));
+        },
+      });
   }
 
   resendOtp(): void {
     if (!this.canResend() || this.isLoading().resending || !this.verifyStatus()) return;
     this.isLoading.update((l) => ({ ...l, resending: true }));
+    this.errorMessage.set('');
+    this.isVerified.set(false);
 
     this.authService
       .renewOtp(this.token())
@@ -175,6 +180,9 @@ export class VerifyAccount implements OnInit {
             return { ...v, expiresAt: new Date(value.expiresAt) };
           });
           this.form.reset();
+        },
+        error: (err) => {
+          this.errorMessage.set(resolveHttpError(err));
         },
       });
   }

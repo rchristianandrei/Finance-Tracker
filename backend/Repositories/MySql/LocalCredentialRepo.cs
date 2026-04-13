@@ -17,4 +17,9 @@ public class LocalCredentialRepo(ApplicationDbContext _context) : ILocalCredenti
     {
         return await _context.LocalCredentials.FirstOrDefaultAsync(l => l.Email == email);
     }
+
+    public async Task Update()
+    {
+        await _context.SaveChangesAsync();
+    }
 }

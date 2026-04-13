@@ -63,4 +63,8 @@ export class AuthService {
   renewOtp(token: string) {
     return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/renew-otp/${token}`, {});
   }
+
+  verifyAccount(body: { token: string; otp: string }) {
+    return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/verify-account/`, body);
+  }
 }

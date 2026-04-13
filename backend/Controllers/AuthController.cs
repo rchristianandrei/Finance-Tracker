@@ -82,7 +82,7 @@ public class AuthController(
             else
             {
                 isExpired = (verify.ExpiresAt - DateTime.UtcNow).Seconds <= 0;
-                if (isExpired) await _verifyAccountRepo.Update(verify);
+                if (isExpired) await _verifyAccountRepo.RenewOtp(verify);
             }
 
             if (isExpired) await _emailService.SendVerifyAccountLink(dto.Email, verify.Otp);
@@ -173,11 +173,30 @@ public class AuthController(
         {
             var isExpired = (verify.ExpiresAt - DateTime.UtcNow).Seconds <= 0;
             if (!isExpired) return Conflict("OTP not yet expired");
-            await _verifyAccountRepo.Update(verify);
+            await _verifyAccountRepo.RenewOtp(verify);
         }
 
         await _emailService.SendVerifyAccountLink(verify.Email, verify.Otp);
         return Ok(new { ExpiresAt = verify.ExpiresAt.ToUniversalTime() });
+    }
+
+    [HttpPut("verify-account")]
+    public async Task<IActionResult> VerifyAccount([FromBody] VerifyAccountDto dto)
+    {
+        var verify = await _verifyAccountRepo.GetByToken(dto.Token);
+        if (verify == null) return BadRequest("Invalid Token");
+
+        if (verify.Otp != dto.Otp) return BadRequest("Invalid OTP");
+
+        var localCredentials = await _localCredRepo.GetByEmail(verify.Email);
+        if (localCredentials == null) return NotFound("Account do not exist");
+
+        localCredentials.IsVerified = true;
+        await _localCredRepo.Update();
+
+        await _verifyAccountRepo.Delete(verify);
+
+        return Ok();
     }
 
     [Authorize]
