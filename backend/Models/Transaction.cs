@@ -13,7 +13,7 @@ public class Transaction
 
     [Required]
     [MaxLength(30)]
-    public string Email { get; set; } = string.Empty;
+    public int UserId { get; set; }
 
     [Required]
     public TransactionType Type { get; set; }

@@ -21,13 +21,13 @@ public class TransactionController(
     [HttpGet("dashboard")]
     public async Task<IActionResult> Dashboard()
     {
-        var email = _currentUserService.Email;
+        var id = _currentUserService.Id();
 
         var expensesBreakdown = new Dictionary<string, double>();
         var expenses = 0.00;
         var income = 0.00;
 
-        var transactions = await _transactionService.GetLastDays(email, 30);
+        var transactions = await _transactionService.GetLastDays(id, 30);
 
         foreach (var transaction in transactions)
         {
@@ -61,8 +61,8 @@ public class TransactionController(
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] TransactionQueryParameters query)
     {
-        var email = _currentUserService.Email;
-        var (transactions, count) = await _transactionService.GetAll(email, query);
+        var id = _currentUserService.Id();
+        var (transactions, count) = await _transactionService.GetAll(id, query);
         var dto = transactions.Select(t => t.ToDto());
         return Ok(new
         {
@@ -74,11 +74,11 @@ public class TransactionController(
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
     {
-        var email = _currentUserService.Email;
+        var id = _currentUserService.Id();
 
         var transaction = new Transaction
         {
-            Email = email,
+            UserId = id,
             Type = value.Type,
             Category = value.Category,
             Amount = value.Amount,
@@ -94,11 +94,11 @@ public class TransactionController(
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] UpdateTransactionDto value)
     {
-        var email = _currentUserService.Email;
+        var userId = _currentUserService.Id();
 
         var transaction = await _transactionService.GetById(id);
         if (transaction == null) return NotFound();
-        if (transaction.Email != email) return Forbid();
+        if (transaction.UserId != userId) return Forbid();
 
         transaction.Category = value.Category;
         transaction.Description = value.Description;
@@ -115,7 +115,14 @@ public class TransactionController(
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
+        var userId = _currentUserService.Id();
+
+        var transaction = await _transactionService.GetById(id);
+        if (transaction == null) return NoContent();
+
+        if (transaction.UserId != userId) return Forbid();
         await _transactionService.Delete(id);
+
         return NoContent();
     }
 }

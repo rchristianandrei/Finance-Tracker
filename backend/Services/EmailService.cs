@@ -7,7 +7,7 @@ namespace backend.Services;
 
 public class EmailService(EmailSettings _emailSettings) : IEmailService
 {
-    public async Task SendVerifyAccountLink(string toEmail, string origin, string token)
+    public async Task SendVerifyAccountLink(string toEmail, string otp)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress("Finance Tracker", _emailSettings.From));
@@ -16,9 +16,9 @@ public class EmailService(EmailSettings _emailSettings) : IEmailService
         message.Body = new TextPart("html")
         {
             Text = $"""
-                <h2>Finance Tracker Account Created</strong></h2>
-                <p>This link expires in 5 minutes.</p>
-                <button><a target="_blank" href="{origin}/api/auth/verify-account/{token}">Verify Account</a></button>
+                <h1>Finance Tracker</h1>
+                <h2>Verify Account</strong></h2>
+                <p>Your Otp {otp} expires in 5 minutes.</p>
             """
         };
 

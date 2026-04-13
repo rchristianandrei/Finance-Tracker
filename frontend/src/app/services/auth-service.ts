@@ -2,13 +2,16 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, finalize, tap } from 'rxjs';
 import { environment } from '@env/environment';
+import { User } from '@app/types/user';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private _user = signal<string | null>(null);
+  private _user = signal<User | null>(null);
   private _isLoading = new BehaviorSubject<boolean>(true);
+
+  private baseUrl = `${environment.apiUrl}/auth`;
 
   user = this._user.asReadonly();
   isLoading = this._isLoading.asObservable();
@@ -19,8 +22,14 @@ export class AuthService {
 
   login(body: { email: string; password: string }) {
     return this.httpClient
-      .post<{ email: string }>(`${environment.apiUrl}/auth/login`, body)
-      .pipe(tap((user) => this._user.set(user.email)));
+      .post<User>(`${environment.apiUrl}/auth/login`, body)
+      .pipe(tap((user) => this._user.set(user)));
+  }
+
+  googleLogin(body: { idToken?: string }) {
+    return this.httpClient
+      .post<User>(`${environment.apiUrl}/auth/google`, body)
+      .pipe(tap((user) => this._user.set(user)));
   }
 
   logout() {
@@ -33,15 +42,29 @@ export class AuthService {
     return this.httpClient.post(`${environment.apiUrl}/auth/register`, body);
   }
 
+  getVerifyAccountByToken(token: string) {
+    return this.httpClient.get<{ email: string; expiresAt: string }>(
+      `${this.baseUrl}/verify-token/${token}`,
+    );
+  }
+
   getMe() {
     this.httpClient
-      .get<{ email: string }>(`${environment.apiUrl}/auth/me`)
+      .get<User>(`${environment.apiUrl}/auth/me`)
       .pipe(finalize(() => this._isLoading.next(false)))
       .subscribe({
         next: (user) => {
-          this._user.set(user.email);
+          this._user.set(user);
         },
         error: () => {},
       });
+  }
+
+  renewOtp(token: string) {
+    return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/renew-otp/${token}`, {});
+  }
+
+  verifyAccount(body: { token: string; otp: string }) {
+    return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/verify-account/`, body);
   }
 }

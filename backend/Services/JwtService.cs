@@ -22,8 +22,7 @@ public class JwtService(JwtSettings _jwtSettings) : IJwtService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
         };
 
         var token = new JwtSecurityToken(

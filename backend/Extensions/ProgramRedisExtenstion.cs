@@ -1,4 +1,5 @@
 using backend.Interfaces;
+using backend.Interfaces.Caching;
 using backend.Repositories.Caching;
 
 namespace backend.Extensions;
@@ -13,7 +14,7 @@ public static class ProgramRedisExtenstion
             options.InstanceName = "FinanceTracker:"; // optional key prefix
         });
         services.AddSingleton<ICacheService, RedisCacheService>();
-        services.AddScoped<IUserCacheService, UserCacheService>();
+        services.AddScoped<IUserCache, UserCache>();
         return services;
     }
 }

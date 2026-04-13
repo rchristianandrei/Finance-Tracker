@@ -1,0 +1,84 @@
+<div class="h-screen w-screen flex justify-center items-center">
+  <div class="flex flex-col gap-3.75 w-100 m-5 p-5 rounded shadow-2xl">
+    <h1 class="text-3xl text-center">Verify Your Account</h1>
+
+    @if (verifyStatus()) {
+      <p class="text-center text-sm text-gray-500">
+        Enter the 6-digit code sent to
+        <span class="font-medium text-gray-700">{{ verifyStatus()?.email }}</span>
+      </p>
+    }
+
+    <!-- OTP Inputs -->
+    <form [formGroup]="form" class="flex justify-center gap-2" (paste)="onPaste($event)">
+      @for (i of [0, 1, 2, 3, 4, 5]; track i) {
+        <input
+          #otpInput
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          class="w-11 h-12 border-gray-300 text-center text-xl font-semibold border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          [formControlName]="i"
+          (input)="onInput($event, $index)"
+          (keydown)="onKeydown($event, $index)"
+        />
+      }
+    </form>
+
+    <!-- Error -->
+    @if (errorMessage()) {
+      <mat-error class="text-center text-red-700">{{ errorMessage() }}</mat-error>
+    }
+
+    @if (!verifyStatus() && !isLoading().initial) {
+      <mat-error class="text-center text-red-700">Invalid Token</mat-error>
+    }
+
+    <!-- Success -->
+    @if (isVerified()) {
+      <div class="text-green-500 text-center">Account verified successfully!</div>
+    }
+
+    <div class="flex flex-col gap-2.5">
+      <!-- Verify button -->
+      @if (verifyStatus()) {
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          [disabled]="
+            form.invalid || isLoading().verifying || isLoading().resending || !verifyStatus()
+          "
+          (click)="verify()"
+          class="flex items-center justify-center gap-2"
+        >
+          @if (isLoading().verifying) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Verify
+          }
+        </button>
+      }
+
+      <!-- Resend -->
+      @if (verifyStatus()) {
+        <button
+          mat-button
+          type="button"
+          [disabled]="!canResend() || isLoading().verifying || isLoading().resending"
+          (click)="resendOtp()"
+        >
+          @if (isLoading().resending) {
+            Sending…
+          } @else if (canResend()) {
+            Resend Code
+          } @else {
+            Resend in {{ countdown() }}s
+          }
+        </button>
+      }
+
+      <a mat-button routerLink="/login">Back to Login</a>
+    </div>
+  </div>
+</div>

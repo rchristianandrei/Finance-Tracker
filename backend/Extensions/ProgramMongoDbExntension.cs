@@ -1,6 +1,5 @@
-using backend.Infrastructure;
 using backend.Interfaces;
-using backend.Services;
+using backend.Repositories.MongoDb;
 using backend.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -27,7 +26,6 @@ public static class ProgramMongoDbExntension
         });
 
         services.AddScoped<ITransactionService, TransactionService>();
-        services.AddScoped<MongoDbInitializer>();
         return services;
     }
 }
