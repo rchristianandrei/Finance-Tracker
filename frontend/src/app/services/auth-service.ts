@@ -1,13 +1,19 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, finalize, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { User } from '@app/types/user';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private httpClient = inject(HttpClient);
+  private router = inject(Router);
+  private socialAuthService = inject(SocialAuthService);
+
   private _user = signal<User | null>(null);
   private _isLoading = new BehaviorSubject<boolean>(true);
 
@@ -16,7 +22,7 @@ export class AuthService {
   user = this._user.asReadonly();
   isLoading = this._isLoading.asObservable();
 
-  constructor(private httpClient: HttpClient) {
+  constructor() {
     this.getMe();
   }
 
@@ -33,9 +39,13 @@ export class AuthService {
   }
 
   logout() {
-    return this.httpClient
-      .post(`${environment.apiUrl}/auth/logout`, {})
-      .pipe(tap(() => this._user.set(null)));
+    return this.httpClient.post(`${environment.apiUrl}/auth/logout`, {}).pipe(
+      tap(async () => {
+        await this.socialAuthService.signOut();
+        this._user.set(null);
+        this.router.navigate(['/login']);
+      }),
+    );
   }
 
   register(body: { email: string; password: string }) {

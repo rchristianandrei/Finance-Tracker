@@ -1,4 +1,4 @@
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Component, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,8 +14,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '@app/services/auth-service';
 import { ToastService } from '@app/services/toast-service';
 import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
-import { AsyncPipe } from '@angular/common';
-import { User } from '@app/types/user';
 
 @Component({
   selector: 'app-root-layout',
@@ -35,7 +33,6 @@ import { User } from '@app/types/user';
 export class RootLayout {
   private breakpointObserver = inject(BreakpointObserver);
   private authService = inject(AuthService);
-  private router = inject(Router);
   private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
@@ -85,7 +82,6 @@ export class RootLayout {
           this.authService.logout().subscribe({
             next: () => {
               this.toastService.success('Logged out');
-              this.router.navigate(['/login']);
             },
           });
         } else {

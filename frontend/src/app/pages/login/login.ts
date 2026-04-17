@@ -1,6 +1,7 @@
 import { finalize } from 'rxjs';
 import {
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
   inject,
@@ -28,6 +29,7 @@ import {
   SocialLoginModule,
   GoogleSigninButtonModule,
 } from '@abacritt/angularx-social-login';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -47,6 +49,7 @@ import {
   templateUrl: './login.html',
 })
 export class Login implements OnInit {
+  private destroyRef = inject(DestroyRef);
   private socialAuthService = inject(SocialAuthService);
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
@@ -71,16 +74,14 @@ export class Login implements OnInit {
   errorMessage = signal('');
 
   ngOnInit() {
-    this.socialAuthService.authState.subscribe((user) => {
-      if (this.isLoading()) return;
+    this.socialAuthService.authState.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((user) => {
+      if (!user || this.isLoading()) return;
       this.isLoading.set(true);
 
-      if (user) {
-        this.authService
-          .googleLogin({ idToken: user.idToken })
-          .pipe(finalize(() => this.isLoading.set(false)))
-          .subscribe(this.loginReaction());
-      }
+      this.authService
+        .googleLogin({ idToken: user.idToken })
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe(this.loginReaction());
     });
   }
 
