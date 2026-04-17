@@ -1,13 +1,16 @@
 using backend.Interfaces;
 using backend.Settings;
+using Microsoft.Extensions.Options;
 
 namespace backend.Services;
 
 public class AuthCookiesService(
     IHttpContextAccessor _httpContextAccessor,
-    JwtSettings _jwtSettings
+    IOptions<JwtSettings> _jwtSettingsAccessor
 ) : IAuthCookiesService
 {
+    private readonly JwtSettings _jwtSettings = _jwtSettingsAccessor.Value;
+
     public readonly static string AuthKey = "Authorization";
 
     public void AttachAuthCookies(string token)

@@ -3,6 +3,7 @@ using backend.Interfaces;
 using backend.Services;
 using backend.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Extensions;
@@ -11,8 +12,8 @@ public static class ProgramJwtExtension
 {
     public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>() ?? throw new InvalidOperationException("JwtSettings section is missing or invalid");
-        services.AddSingleton(jwtSettings);
+        services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
+
         services.AddScoped<IJwtService, JwtService>();
 
         services.AddAuthentication(options =>
@@ -20,31 +21,44 @@ public static class ProgramJwtExtension
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key!))
-            };
+        .AddJwtBearer();
 
-            options.Events = new JwtBearerEvents
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection(nameof(JwtSettings)))
+            .ValidateDataAnnotations()
+            .Validate(settings => !string.IsNullOrEmpty(settings.Key), "JWT Key must not be empty")
+            .ValidateOnStart();
+
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<JwtSettings>>((options, jwtSettingsAccessor) =>
             {
-                OnMessageReceived = context =>
+                var jwtSettings = jwtSettingsAccessor.Value;
+
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    if (context.Request.Cookies.ContainsKey("Authorization"))
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings.Key!)
+                    )
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["Authorization"];
+                        if (context.Request.Cookies.ContainsKey("Authorization"))
+                        {
+                            context.Token = context.Request.Cookies["Authorization"];
+                        }
+                        return Task.CompletedTask;
                     }
-                    return Task.CompletedTask;
-                }
-            };
-        });
+                };
+            });
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();

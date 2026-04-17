@@ -4,12 +4,15 @@ using System.Text;
 using backend.Interfaces;
 using backend.Models;
 using backend.Settings;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Services;
 
-public class JwtService(JwtSettings _jwtSettings) : IJwtService
+public class JwtService(IOptions<JwtSettings> jwtSettingsAccessor) : IJwtService
 {
+    private readonly JwtSettings _jwtSettings = jwtSettingsAccessor.Value;
+
     public string GenerateToken(User user)
     {
         var key = _jwtSettings.Key;
