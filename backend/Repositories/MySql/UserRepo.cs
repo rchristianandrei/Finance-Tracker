@@ -22,7 +22,8 @@ public class UserRepo(ApplicationDbContext _context, IAccountRepo _accountRepo) 
             OwnerId = user.Id,
             Owner = user,
             Name = "Default Account",
-            Balance = 0
+            Balance = 0,
+            IsDefault = true
         };
         await _accountRepo.Create(account);
 
