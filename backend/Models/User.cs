@@ -20,5 +20,5 @@ public class User
     [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
     [JsonIgnore]
-    public IEnumerable<Account> Accounts { get; set; } = [];
+    public ICollection<Account> Accounts { get; set; } = [];
 }
