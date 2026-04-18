@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '@app/services/auth-service';
 import { ToastService } from '@app/services/toast-service';
 import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
+import { SelectAccount } from '../select-account/select-account';
 
 @Component({
   selector: 'app-root-layout',
@@ -34,7 +35,8 @@ export class RootLayout {
   private breakpointObserver = inject(BreakpointObserver);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
-  private dialog = inject(MatDialog);
+  private logoutDialog = inject(MatDialog);
+  private accountDialog = inject(MatDialog);
 
   heading = input.required();
 
@@ -65,6 +67,18 @@ export class RootLayout {
     }
   }
 
+  selectAccount() {
+    const dialogRef = this.accountDialog.open(SelectAccount);
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        console.log('Selected:', result);
+      } else {
+        console.log('Cancelled');
+      }
+    });
+  }
+
   logout() {
     const data: ConfirmDialogData = {
       title: 'Logout',
@@ -74,7 +88,7 @@ export class RootLayout {
       cancelText: 'Cancel',
     };
 
-    this.dialog
+    this.logoutDialog
       .open(ConfirmDialog, { data, width: '400px' })
       .afterClosed()
       .subscribe((result: boolean) => {

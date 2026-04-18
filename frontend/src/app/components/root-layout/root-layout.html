@@ -10,6 +10,18 @@
         </button>
       </div>
 
+      <div
+        mat-button
+        class="flex! justify-between items-center p-2 bg-blue-300"
+        (click)="selectAccount()"
+      >
+        <div class="flex items-center">
+          <mat-icon>attach_money</mat-icon>
+          <p>Default Account</p>
+        </div>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </div>
+
       <!-- Menu -->
       <nav class="flex flex-col gap-2 px-2 mt-4">
         @for (path of navigations; track $index) {
