@@ -19,4 +19,6 @@ public class User
     public LocalCredential? LocalCredential { get; set; }
     [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
+    [JsonIgnore]
+    public IEnumerable<Account> Accounts { get; set; } = [];
 }
