@@ -15,6 +15,7 @@ import { AuthService } from '@app/services/auth-service';
 import { ToastService } from '@app/services/toast-service';
 import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
 import { SelectAccount } from '../select-account/select-account';
+import { AccountService } from '@app/services/account-service';
 
 @Component({
   selector: 'app-root-layout',
@@ -34,6 +35,7 @@ import { SelectAccount } from '../select-account/select-account';
 export class RootLayout {
   private breakpointObserver = inject(BreakpointObserver);
   private authService = inject(AuthService);
+  private accountService = inject(AccountService);
   private toastService = inject(ToastService);
   private logoutDialog = inject(MatDialog);
   private accountDialog = inject(MatDialog);
@@ -48,6 +50,7 @@ export class RootLayout {
   ];
 
   user = this.authService.user;
+  selectedAccount = this.accountService.current;
   isMobile = signal(false);
   isCollapsed = signal(false);
 

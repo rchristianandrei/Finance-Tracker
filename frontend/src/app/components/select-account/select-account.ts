@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { AccountService } from '@app/services/account-service';
 
 @Component({
   selector: 'app-select-account',
@@ -23,12 +24,14 @@ import { MatButtonModule } from '@angular/material/button';
 export class SelectAccount {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<SelectAccount>);
+  private accountService = inject(AccountService);
 
   form = this.fb.group({
     account: ['', Validators.required],
   });
 
-  accounts = ['Option 1', 'Option 2', 'Option 3'];
+  accounts = this.accountService.accounts;
+  selected = this.accountService.current;
 
   choose() {
     this.dialogRef.close(this.form.value.account);

@@ -3,9 +3,9 @@
 <form [formGroup]="form" (submit)="choose()" (cancel)="cancel()">
   <mat-dialog-content class="overflow-hidden! py-0!">
     <mat-radio-group formControlName="account" class="flex flex-col!">
-      @for (account of accounts; track $index) {
-        <mat-radio-button [value]="account">
-          {{ account }}
+      @for (account of accounts(); track $index) {
+        <mat-radio-button [value]="account.id" [checked]="account.id === selected()?.id">
+          {{ account.name }}
         </mat-radio-button>
       }
     </mat-radio-group>
