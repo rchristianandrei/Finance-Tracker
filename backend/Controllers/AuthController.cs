@@ -154,7 +154,6 @@ public class AuthController(
         }
     }
 
-    [Authorize]
     [HttpPost("logout")]
     public IActionResult Logout()
     {

@@ -12,7 +12,7 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260418194037_CreateAccount")]
+    [Migration("20260419094717_CreateAccount")]
     partial class CreateAccount
     {
         /// <inheritdoc />
@@ -38,9 +38,6 @@ namespace backend.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -124,6 +121,9 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int?>("DefaultAccountId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -135,6 +135,8 @@ namespace backend.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultAccountId");
 
                     b.ToTable("Users");
                 });
@@ -197,6 +199,16 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.User", b =>
+                {
+                    b.HasOne("backend.Models.Account", "DefaultAccount")
+                        .WithMany()
+                        .HasForeignKey("DefaultAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("DefaultAccount");
                 });
 
             modelBuilder.Entity("backend.Models.VerifyAccount", b =>

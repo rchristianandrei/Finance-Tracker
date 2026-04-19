@@ -13,6 +13,10 @@ public class User
     [MaxLength(25)]
     public string LastName { get; set; } = string.Empty;
 
+    public int? DefaultAccountId { get; set; }
+    [JsonIgnore]
+    public Account DefaultAccount { get; set; } = null!;
+
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     [JsonIgnore]

@@ -23,10 +23,11 @@ public class UserRepo(ApplicationDbContext _context, IAccountRepo _accountRepo) 
             Owner = user,
             Name = "Default Account",
             Balance = 0,
-            IsDefault = true
         };
         await _accountRepo.Create(account);
 
+        user.DefaultAccountId = account.Id;
+        await _context.SaveChangesAsync();
     }
 
     public async Task Update(User user)

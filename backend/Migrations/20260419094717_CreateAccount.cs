@@ -12,6 +12,12 @@ namespace backend.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<int>(
+                name: "DefaultAccountId",
+                table: "Users",
+                type: "int",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "Accounts",
                 columns: table => new
@@ -22,7 +28,6 @@ namespace backend.Migrations
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Balance = table.Column<int>(type: "int", nullable: false),
-                    IsDefault = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
@@ -39,16 +44,41 @@ namespace backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_DefaultAccountId",
+                table: "Users",
+                column: "DefaultAccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Accounts_OwnerId",
                 table: "Accounts",
                 column: "OwnerId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Users_Accounts_DefaultAccountId",
+                table: "Users",
+                column: "DefaultAccountId",
+                principalTable: "Accounts",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Users_Accounts_DefaultAccountId",
+                table: "Users");
+
             migrationBuilder.DropTable(
                 name: "Accounts");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Users_DefaultAccountId",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "DefaultAccountId",
+                table: "Users");
         }
     }
 }

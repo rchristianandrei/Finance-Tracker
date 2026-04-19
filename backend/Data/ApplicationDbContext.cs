@@ -30,6 +30,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasMany(u => u.Accounts)
             .WithOne(a => a.Owner)
             .HasForeignKey(a => a.OwnerId);
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.DefaultAccount)
+            .WithMany() // no back-reference for default
+            .HasForeignKey(u => u.DefaultAccountId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<LocalCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<LocalCredential>().HasIndex(u => u.Email).IsUnique();
