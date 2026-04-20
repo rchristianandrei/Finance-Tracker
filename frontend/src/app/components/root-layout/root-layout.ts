@@ -45,6 +45,7 @@ export class RootLayout {
   navigations = [
     { icon: 'dashboard', feature: 'Dashboard', route: '/' },
     { icon: 'payment', feature: 'Transactions', route: '/transactions' },
+    { icon: 'account_balance', feature: 'Accounts', route: '/accounts' },
     { icon: 'people', feature: 'Users', route: '/users' },
     { icon: 'settings', feature: 'Settings', route: '/settings' },
   ];
