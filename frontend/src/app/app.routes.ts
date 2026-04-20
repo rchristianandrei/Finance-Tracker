@@ -6,6 +6,8 @@ export const routes: Routes = [
   {
     path: '',
     canActivateChild: [authGuard],
+    loadComponent: () =>
+      import('./components/layouts/private-layout/private-layout').then((c) => c.PrivateLayout),
     children: [
       {
         path: '',
@@ -26,6 +28,8 @@ export const routes: Routes = [
   {
     path: '',
     canActivateChild: [guestGuard],
+    loadComponent: () =>
+      import('./components/layouts/public-layout/public-layout').then((c) => c.PublicLayout),
     children: [
       {
         path: 'login',

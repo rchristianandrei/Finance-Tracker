@@ -9,7 +9,7 @@ public class Account
 
     public string Name { get; set; } = null!;
 
-    public int Balance { get; set; }
+    public double Balance { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 

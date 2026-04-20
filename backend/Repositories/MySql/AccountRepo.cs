@@ -20,4 +20,15 @@ public class AccountRepo(ApplicationDbContext _context) : IAccountRepo
             .ToListAsync();
         return accounts;
     }
+
+    public async Task<Account?> GetById(int id)
+    {
+        return await _context.Accounts.FindAsync(id);
+    }
+
+    public async Task Update(Account account)
+    {
+        _context.Accounts.Update(account);
+        await _context.SaveChangesAsync();
+    }
 }
