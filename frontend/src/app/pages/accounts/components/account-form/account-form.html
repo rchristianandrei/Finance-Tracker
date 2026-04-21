@@ -9,6 +9,7 @@
         <mat-error> Account name is required </mat-error>
       }
     </mat-form-field>
+    <mat-checkbox formControlName="isDefault"> Set as default account </mat-checkbox>
     @if (data.errorMessage()) {
       <mat-error>{{ data.errorMessage() }}</mat-error>
     }

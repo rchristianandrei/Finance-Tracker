@@ -24,6 +24,7 @@ export class AccountService {
     effect(() => {
       const user = this.authService.user();
       if (!user) return;
+
       this.getAccounts().subscribe({
         next: (accounts) => {
           this.acounts.set(accounts);
@@ -50,12 +51,21 @@ export class AccountService {
     );
   }
 
-  public updateAccount(account: Account) {
-    return this.httpClient.put(`${this.baseUrl}/${account.id}`, { name: account.name }).pipe(
-      tap(() => {
-        this.acounts.update((accounts) => accounts.map((a) => (a.id === account.id ? account : a)));
-      }),
-    );
+  public updateAccount(body: { id: number; name: string; isDefault: boolean }) {
+    return this.httpClient
+      .put(`${this.baseUrl}/${body.id}`, { name: body.name, isDefault: body.isDefault })
+      .pipe(
+        tap(() => {
+          this.acounts.update((accounts) =>
+            accounts.map((a) =>
+              a.id === body.id ? { ...a, name: body.name, isDefault: body.isDefault } : a,
+            ),
+          );
+          if (body.isDefault) {
+            this.currentAccount.set(this.acounts().find((a) => a.id === body.id) || null);
+          }
+        }),
+      );
   }
 
   public deleteAccount(accountId: number) {

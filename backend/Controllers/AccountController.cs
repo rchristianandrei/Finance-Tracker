@@ -1,5 +1,6 @@
 using backend.Dtos;
 using backend.Interfaces;
+using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Mappers;
 using backend.Models;
@@ -13,7 +14,7 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class AccountController(
     ICurrentUserService _currentUserService,
-    IUserRepo _userRepo,
+    IUserCache _userCache,
     IAccountRepo _accountRepo
 ) : ControllerBase
 {
@@ -52,6 +53,15 @@ public class AccountController(
         if (account.OwnerId != userId) return Forbid();
 
         account.Name = dto.Name;
+
+        if (dto.IsDefault)
+        {
+            var user = await _userCache.GetById(userId);
+            if (user == null) return NotFound();
+
+            user.DefaultAccountId = account.Id;
+            await _userCache.Update(user);
+        }
         await _accountRepo.Update(account);
 
         return Ok(account.ToDto());
@@ -61,7 +71,7 @@ public class AccountController(
     public async Task<IActionResult> DeleteAccount(int id)
     {
         var userId = _currentUserService.Id();
-        var user = await _userRepo.GetById(userId);
+        var user = await _userCache.GetById(userId);
         if (user == null) return NotFound();
 
         var account = await _accountRepo.GetById(id);

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,8 @@ import { UpdateAccount } from './components/update-account/update-account';
 import { DeleteAccount } from './components/delete-account/delete-account';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastService } from '@app/services/toast-service';
+import { AuthService } from '@app/services/auth-service';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-accounts',
@@ -24,16 +26,19 @@ import { ToastService } from '@app/services/toast-service';
     MatButtonModule,
     CreateAccount,
     UpdateAccount,
+    MatChipsModule,
   ],
   templateUrl: './accounts.html',
 })
 export class Accounts {
+  private authService = inject(AuthService);
   private accountsService = inject(AccountService);
   private dialog = inject(MatDialog);
   private toastService = inject(ToastService);
 
   accounts = this.accountsService.accounts;
 
+  currentAccount = this.accountsService.current;
   isCreateOpen = signal(false);
   isDeleteOpen = signal(false);
   updateEvent = signal<Account | null>(null);
@@ -64,5 +69,10 @@ export class Accounts {
     dialogRef.afterClosed().subscribe(() => {
       this.isDeleteOpen.set(false);
     });
+  }
+
+  isDefault(account: Account) {
+    const currentUser = this.authService.user();
+    return currentUser ? account.id === currentUser.defaultAccountId : false;
   }
 }

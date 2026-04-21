@@ -29,8 +29,12 @@ export class UpdateAccount {
       },
     });
 
-    dialogRef.componentInstance.onConfirm.subscribe((accountName: string) => {
-      const accountToUpdate = { ...this.account(), name: accountName };
+    dialogRef.componentInstance.onConfirm.subscribe((account) => {
+      const accountToUpdate = {
+        ...this.account(),
+        name: account.name,
+        isDefault: account.isDefault,
+      };
       this.accountService.updateAccount(accountToUpdate).subscribe({
         next: () => {
           dialogRef.close();

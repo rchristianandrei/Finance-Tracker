@@ -26,8 +26,8 @@ export class CreateAccount implements OnInit {
       },
     });
 
-    dialogRef.componentInstance.onConfirm.subscribe((accountName: string) => {
-      this.accountService.createAccount(accountName).subscribe({
+    dialogRef.componentInstance.onConfirm.subscribe((account) => {
+      this.accountService.createAccount(account.name).subscribe({
         next: () => {
           dialogRef.close();
         },
