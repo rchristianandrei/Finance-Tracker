@@ -1,18 +1,20 @@
-import { Component, inject, OnInit, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AccountForm, AccountFormData } from '../account-form/account-form';
 import { AccountService } from '@app/services/account-service';
 import { resolveHttpError } from '@app/utils/http-error.util';
+import { AccountForm, AccountFormData } from '../account-form/account-form';
+import { Account } from '@app/types/account';
 
 @Component({
-  selector: 'app-create-account',
+  selector: 'app-update-account',
   imports: [],
-  templateUrl: './create-account.html',
+  templateUrl: './update-account.html',
 })
-export class CreateAccount implements OnInit {
+export class UpdateAccount {
   private dialog = inject(MatDialog);
   private accountService = inject(AccountService);
 
+  account = input.required<Account>();
   onClose = output();
 
   createErrorMessage = signal('');
@@ -20,9 +22,10 @@ export class CreateAccount implements OnInit {
   ngOnInit(): void {
     const dialogRef = this.dialog.open<AccountForm, AccountFormData>(AccountForm, {
       data: {
-        heading: 'Create Account',
+        heading: 'Update Account',
+        account: this.account(),
         errorMessage: this.createErrorMessage.asReadonly(),
-        confirmButtonText: 'Create',
+        confirmButtonText: 'Update',
       },
     });
 

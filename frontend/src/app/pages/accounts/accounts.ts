@@ -8,6 +8,7 @@ import { DecimalPipe } from '@angular/common';
 import { AccountService } from '@app/services/account-service';
 import { MatButtonModule } from '@angular/material/button';
 import { CreateAccount } from './components/create-account/create-account';
+import { UpdateAccount } from './components/update-account/update-account';
 
 @Component({
   selector: 'app-accounts',
@@ -19,6 +20,7 @@ import { CreateAccount } from './components/create-account/create-account';
     DecimalPipe,
     MatButtonModule,
     CreateAccount,
+    UpdateAccount,
   ],
   templateUrl: './accounts.html',
 })
@@ -28,10 +30,10 @@ export class Accounts {
   accounts = this.accountsService.accounts;
 
   isCreateOpen = signal(false);
+  updateEvent = signal<Account | null>(null);
 
   onEdit(account: Account) {
-    console.log('Edit', account);
-    // open edit dialog
+    this.updateEvent.set(account);
   }
 
   onDelete(account: Account) {

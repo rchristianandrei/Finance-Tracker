@@ -54,3 +54,10 @@
 @if (isCreateOpen()) {
   <app-create-account (onClose)="isCreateOpen.set(false)"></app-create-account>
 }
+
+@if (updateEvent()) {
+  <app-update-account
+    [account]="updateEvent()!"
+    (onClose)="updateEvent.set(null)"
+  ></app-update-account>
+}
