@@ -1,8 +1,9 @@
-import { Component, inject, output, Signal } from '@angular/core';
+import { Component, inject, output, signal, Signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 export type AccountFormData = {
   errorMessage: Signal<string>;
@@ -10,7 +11,13 @@ export type AccountFormData = {
 
 @Component({
   selector: 'app-account-form',
-  imports: [ReactiveFormsModule, MatDialogModule, MatInputModule, MatButtonModule],
+  imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './account-form.html',
 })
 export class AccountForm {
@@ -21,17 +28,25 @@ export class AccountForm {
 
   onCreate = output<string>();
 
+  isLoading = signal(false);
+
   form = this.fb.group({
     name: ['', Validators.required],
   });
 
   submit() {
-    if (this.form.invalid) return;
-    const accountName = this.form.value.name;
-    this.onCreate.emit(accountName!);
+    if (this.form.invalid || this.isLoading()) return;
+
+    this.isLoading.set(true);
+    this.onCreate.emit(this.form.value.name!);
   }
 
   cancel() {
+    if (this.isLoading()) return;
     this.dialogRef.close();
+  }
+
+  doneLoading() {
+    this.isLoading.set(false);
   }
 }

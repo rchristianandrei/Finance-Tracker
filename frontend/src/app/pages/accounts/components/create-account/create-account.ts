@@ -31,6 +31,7 @@ export class CreateAccount implements OnInit {
         },
         error: (err) => {
           this.createErrorMessage.set(resolveHttpError(err));
+          dialogRef.componentInstance.doneLoading();
         },
       });
     });
