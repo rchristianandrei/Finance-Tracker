@@ -9,4 +9,5 @@ public interface IAccountRepo
     Task<List<Account>> GetAccountsAsNoTracking(int userId);
     Task<Account?> GetById(int id);
     Task Update(Account account);
+    Task Delete(Account account);
 }

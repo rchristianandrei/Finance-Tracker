@@ -40,4 +40,10 @@ public class AccountRepo(ApplicationDbContext _context) : IAccountRepo
         _context.Accounts.Update(account);
         await _context.SaveChangesAsync();
     }
+
+    public async Task Delete(Account account)
+    {
+        _context.Accounts.Remove(account);
+        await _context.SaveChangesAsync();
+    }
 }

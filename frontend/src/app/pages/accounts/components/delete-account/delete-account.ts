@@ -4,6 +4,9 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AccountService } from '@app/services/account-service';
 import { Account } from '@app/types/account';
+import { resolveHttpError } from '@app/utils/http-error.util';
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
 
 export type DeleteAccountData = {
   account?: Account;
@@ -11,7 +14,13 @@ export type DeleteAccountData = {
 
 @Component({
   selector: 'app-delete-account',
-  imports: [MatDialogModule, MatProgressSpinnerModule, MatButtonModule],
+  imports: [
+    MatDialogModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatInputModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './delete-account.html',
 })
 export class DeleteAccount {
@@ -20,13 +29,24 @@ export class DeleteAccount {
 
   data = inject<DeleteAccountData>(MAT_DIALOG_DATA);
 
+  errorMessage = signal<string>('');
   isLoading = signal(false);
 
   delete() {
     if (this.isLoading()) return;
 
     this.isLoading.set(true);
-    console.log('Deleting account with id:', this.data.account?.id);
+    this.errorMessage.set('');
+
+    this.accountService.deleteAccount(this.data.account!.id).subscribe({
+      next: () => {
+        this.dialogRef.close(true);
+      },
+      error: (err) => {
+        this.errorMessage.set(resolveHttpError(err));
+        this.isLoading.set(false);
+      },
+    });
   }
 
   cancel() {

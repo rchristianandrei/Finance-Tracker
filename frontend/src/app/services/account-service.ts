@@ -57,4 +57,12 @@ export class AccountService {
       }),
     );
   }
+
+  public deleteAccount(accountId: number) {
+    return this.httpClient.delete(`${this.baseUrl}/${accountId}`).pipe(
+      tap(() => {
+        this.acounts.update((accounts) => accounts.filter((a) => a.id !== accountId));
+      }),
+    );
+  }
 }
