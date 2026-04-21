@@ -30,7 +30,7 @@ export class AccountForm {
 
   data = inject<AccountFormData>(MAT_DIALOG_DATA);
 
-  onCreate = output<string>();
+  onConfirm = output<string>();
 
   isLoading = signal(false);
 
@@ -42,7 +42,7 @@ export class AccountForm {
     if (this.form.invalid || this.isLoading()) return;
 
     this.isLoading.set(true);
-    this.onCreate.emit(this.form.value.name!);
+    this.onConfirm.emit(this.form.value.name!);
   }
 
   cancel() {

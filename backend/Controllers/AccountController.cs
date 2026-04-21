@@ -35,8 +35,20 @@ public class AccountController(
     public async Task<IActionResult> GetAccounts()
     {
         var userId = _currentUserService.Id();
-        var accounts = await _accountRepo.GetAccounts(userId);
+        var accounts = await _accountRepo.GetAccountsAsNoTracking(userId);
         var dtos = accounts.Select(a => a.ToDto());
         return Ok(dtos);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAccount(int id, [FromBody] UpdateAccountDto dto)
+    {
+        var account = await _accountRepo.GetById(id);
+        if (account == null) return NotFound();
+
+        account.Name = dto.Name;
+        await _accountRepo.Update(account);
+
+        return Ok(account.ToDto());
     }
 }

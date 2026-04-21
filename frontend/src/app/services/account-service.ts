@@ -49,4 +49,12 @@ export class AccountService {
       }),
     );
   }
+
+  public updateAccount(account: Account) {
+    return this.httpClient.put(`${this.baseUrl}/${account.id}`, { name: account.name }).pipe(
+      tap(() => {
+        this.acounts.update((accounts) => accounts.map((a) => (a.id === account.id ? account : a)));
+      }),
+    );
+  }
 }

@@ -17,25 +17,26 @@ export class UpdateAccount {
   account = input.required<Account>();
   onClose = output();
 
-  createErrorMessage = signal('');
+  errorMessage = signal('');
 
   ngOnInit(): void {
     const dialogRef = this.dialog.open<AccountForm, AccountFormData>(AccountForm, {
       data: {
         heading: 'Update Account',
         account: this.account(),
-        errorMessage: this.createErrorMessage.asReadonly(),
+        errorMessage: this.errorMessage.asReadonly(),
         confirmButtonText: 'Update',
       },
     });
 
-    dialogRef.componentInstance.onCreate.subscribe((accountName: string) => {
-      this.accountService.createAccount(accountName).subscribe({
+    dialogRef.componentInstance.onConfirm.subscribe((accountName: string) => {
+      const accountToUpdate = { ...this.account(), name: accountName };
+      this.accountService.updateAccount(accountToUpdate).subscribe({
         next: () => {
           dialogRef.close();
         },
         error: (err) => {
-          this.createErrorMessage.set(resolveHttpError(err));
+          this.errorMessage.set(resolveHttpError(err));
           dialogRef.componentInstance.doneLoading();
         },
       });
