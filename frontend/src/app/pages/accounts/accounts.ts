@@ -9,6 +9,8 @@ import { AccountService } from '@app/services/account-service';
 import { MatButtonModule } from '@angular/material/button';
 import { CreateAccount } from './components/create-account/create-account';
 import { UpdateAccount } from './components/update-account/update-account';
+import { DeleteAccount } from './components/delete-account/delete-account';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-accounts',
@@ -26,10 +28,12 @@ import { UpdateAccount } from './components/update-account/update-account';
 })
 export class Accounts {
   private accountsService = inject(AccountService);
+  private dialog = inject(MatDialog);
 
   accounts = this.accountsService.accounts;
 
   isCreateOpen = signal(false);
+  isDeleteOpen = signal(false);
   updateEvent = signal<Account | null>(null);
 
   onEdit(account: Account) {
@@ -37,7 +41,17 @@ export class Accounts {
   }
 
   onDelete(account: Account) {
-    console.log('Delete', account);
-    // this.accounts.update((accs) => accs.filter((a) => a.id !== account.id));
+    if (this.isDeleteOpen()) return;
+    this.isDeleteOpen.set(true);
+
+    const dialogRef = this.dialog.open(DeleteAccount, {
+      data: {
+        account,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.isDeleteOpen.set(false);
+    });
   }
 }
