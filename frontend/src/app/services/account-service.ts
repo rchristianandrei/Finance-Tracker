@@ -3,6 +3,7 @@ import { AuthService } from './auth-service';
 import { Account } from '@app/types/account';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
+import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -39,5 +40,13 @@ export class AccountService {
 
   private getAccounts() {
     return this.httpClient.get<Account[]>(`${this.baseUrl}`);
+  }
+
+  public createAccount(name: string) {
+    return this.httpClient.post<Account>(`${this.baseUrl}`, { name }).pipe(
+      tap((account) => {
+        this.acounts.update((accounts) => [...accounts, account]);
+      }),
+    );
   }
 }
