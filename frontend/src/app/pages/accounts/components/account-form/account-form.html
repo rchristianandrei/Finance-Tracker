@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Create Account</h2>
+
+<form [formGroup]="form" (submit)="submit()" (cancel)="cancel()">
+  <mat-dialog-content class="overflow-hidden! py-0!">
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Account Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter account name" />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <mat-error> Account name is required </mat-error>
+      }
+    </mat-form-field>
+    @if (data.errorMessage()) {
+      <mat-error>{{ data.errorMessage() }}</mat-error>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-raised-button type="submit" color="primary" [disabled]="form.invalid">
+      Submit
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,10 +7,19 @@ import { Account } from '@app/types/account';
 import { DecimalPipe } from '@angular/common';
 import { AccountService } from '@app/services/account-service';
 import { MatButtonModule } from '@angular/material/button';
+import { CreateAccount } from './components/create-account/create-account';
 
 @Component({
   selector: 'app-accounts',
-  imports: [RootLayout, MatCardModule, MatIconModule, MatMenuModule, DecimalPipe, MatButtonModule],
+  imports: [
+    RootLayout,
+    MatCardModule,
+    MatIconModule,
+    MatMenuModule,
+    DecimalPipe,
+    MatButtonModule,
+    CreateAccount,
+  ],
   templateUrl: './accounts.html',
 })
 export class Accounts {
@@ -18,10 +27,7 @@ export class Accounts {
 
   accounts = this.accountsService.accounts;
 
-  onCreate() {
-    console.log('Create account');
-    // open dialog or navigate
-  }
+  isCreateOpen = signal(false);
 
   onEdit(account: Account) {
     console.log('Edit', account);
