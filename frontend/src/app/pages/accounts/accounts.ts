@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,7 +12,6 @@ import { UpdateAccount } from './components/update-account/update-account';
 import { DeleteAccount } from './components/delete-account/delete-account';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastService } from '@app/services/toast-service';
-import { AuthService } from '@app/services/auth-service';
 import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
@@ -31,7 +30,6 @@ import { MatChipsModule } from '@angular/material/chips';
   templateUrl: './accounts.html',
 })
 export class Accounts {
-  private authService = inject(AuthService);
   private accountsService = inject(AccountService);
   private dialog = inject(MatDialog);
   private toastService = inject(ToastService);
@@ -72,7 +70,6 @@ export class Accounts {
   }
 
   isDefault(account: Account) {
-    const currentUser = this.authService.user();
-    return currentUser ? account.id === currentUser.defaultAccountId : false;
+    return this.currentAccount()?.id === account.id;
   }
 }
