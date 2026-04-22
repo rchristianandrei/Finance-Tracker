@@ -27,14 +27,17 @@ export class SelectAccount {
   private accountService = inject(AccountService);
 
   form = this.fb.group({
-    account: ['', Validators.required],
+    accountId: ['', Validators.required],
   });
 
   accounts = this.accountService.accounts;
-  selected = this.accountService.default;
+  selected = this.accountService.selected;
 
   choose() {
-    this.dialogRef.close(this.form.value.account);
+    if (this.form.invalid) return;
+    if (isNaN(Number(this.form.value.accountId))) return;
+    this.accountService.selectAccount(Number(this.form.value.accountId));
+    this.dialogRef.close(this.form.value.accountId);
   }
 
   cancel() {

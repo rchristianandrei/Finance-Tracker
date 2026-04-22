@@ -2,7 +2,7 @@
 
 <form [formGroup]="form" (submit)="choose()" (cancel)="cancel()">
   <mat-dialog-content class="overflow-hidden! py-0!">
-    <mat-radio-group formControlName="account" class="flex flex-col!">
+    <mat-radio-group formControlName="accountId" class="flex flex-col!">
       @for (account of accounts(); track $index) {
         <mat-radio-button [value]="account.id" [checked]="account.id === selected()?.id">
           {{ account.name }}
@@ -12,7 +12,7 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button>Cancel</button>
+    <button mat-button (click)="cancel()">Cancel</button>
     <button mat-raised-button type="submit" color="primary" [disabled]="form.invalid">
       Choose
     </button>

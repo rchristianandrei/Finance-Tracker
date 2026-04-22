@@ -1,9 +1,9 @@
 import { RouterModule } from '@angular/router';
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal, ViewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -33,12 +33,13 @@ import { AccountService } from '@app/services/account-service';
   templateUrl: './root-layout.html',
 })
 export class RootLayout {
+  @ViewChild('sidenav') sidenav!: MatSidenav;
+
   private breakpointObserver = inject(BreakpointObserver);
   private authService = inject(AuthService);
   private accountService = inject(AccountService);
   private toastService = inject(ToastService);
-  private logoutDialog = inject(MatDialog);
-  private accountDialog = inject(MatDialog);
+  private dialog = inject(MatDialog);
 
   heading = input.required();
 
@@ -51,7 +52,7 @@ export class RootLayout {
   ];
 
   user = this.authService.user;
-  selectedAccount = this.accountService.default;
+  selectedAccount = this.accountService.selected;
   isMobile = signal(false);
   isCollapsed = signal(false);
 
@@ -72,13 +73,10 @@ export class RootLayout {
   }
 
   selectAccount() {
-    const dialogRef = this.accountDialog.open(SelectAccount);
-
+    const dialogRef = this.dialog.open(SelectAccount);
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        console.log('Selected:', result);
-      } else {
-        console.log('Cancelled');
+        this.sidenav.close();
       }
     });
   }
@@ -92,7 +90,7 @@ export class RootLayout {
       cancelText: 'Cancel',
     };
 
-    this.logoutDialog
+    this.dialog
       .open(ConfirmDialog, { data, width: '400px' })
       .afterClosed()
       .subscribe((result: boolean) => {

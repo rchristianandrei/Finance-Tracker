@@ -11,7 +11,8 @@ import { resolveHttpError } from '@app/utils/http-error.util';
   providedIn: 'root',
 })
 export class AccountService {
-  private baseUrl = `${environment.apiUrl}/account`;
+  private readonly baseUrl = `${environment.apiUrl}/account`;
+  private readonly storageKey = 'selectedAccount';
 
   private authService = inject(AuthService);
   private httpClient = inject(HttpClient);
@@ -38,7 +39,14 @@ export class AccountService {
         .pipe(finalize(() => this._isLoading.set(false)))
         .subscribe({
           next: (accounts) => {
-            this._selected.set(accounts.defaultAccount);
+            const storedAccount = sessionStorage.getItem(this.storageKey);
+            if (storedAccount) {
+              const { accountId } = JSON.parse(storedAccount);
+              const account = accounts.accounts.find((a) => a.id === accountId) || null;
+              this._selected.set(account);
+            } else {
+              this._selected.set(accounts.defaultAccount);
+            }
             this._default.set(accounts.defaultAccount);
             this._accounts.set(accounts.accounts);
           },
@@ -53,6 +61,12 @@ export class AccountService {
     return this.httpClient.get<{ accounts: Account[]; defaultAccount: Account | null }>(
       `${this.baseUrl}`,
     );
+  }
+
+  public selectAccount(accountId: number) {
+    const account = this._accounts().find((a) => a.id === accountId) || null;
+    sessionStorage.setItem(this.storageKey, JSON.stringify({ accountId }));
+    this._selected.set(account);
   }
 
   public createAccount(name: string) {

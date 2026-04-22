@@ -13,7 +13,7 @@ export class TransactionService {
   private http = inject(HttpClient);
   private accountService = inject(AccountService);
 
-  private account = this.accountService.default;
+  private account = this.accountService.selected;
   url = `${environment.apiUrl}/transaction`;
 
   addExpense(expense: {
@@ -40,17 +40,20 @@ export class TransactionService {
     return this.http.put(`${this.url}/${transaction.id}`, body);
   }
 
-  getDashboardData() {
-    return this.http.get<DashboardType>(`${this.url}/dashboard/${this.account()?.id}`);
+  getDashboardData(accountId: number) {
+    return this.http.get<DashboardType>(`${this.url}/dashboard/${accountId}`);
   }
 
-  getTransactions(filter?: {
-    search?: string;
-    startDate?: Date;
-    endDate?: Date;
-    pageSize?: number;
-    page?: number;
-  }) {
+  getTransactions(
+    accountId: number,
+    filter?: {
+      search?: string;
+      startDate?: Date;
+      endDate?: Date;
+      pageSize?: number;
+      page?: number;
+    },
+  ) {
     let params = new HttpParams();
 
     if (filter?.search) {
@@ -76,7 +79,7 @@ export class TransactionService {
     return this.http.get<{
       totalCount: number;
       data: Transaction[];
-    }>(`${this.url}/${this.account()?.id}`, { params });
+    }>(`${this.url}/${accountId}`, { params });
     // .pipe(
     //   map((paginatedData) => ({
     //     ...paginatedData,

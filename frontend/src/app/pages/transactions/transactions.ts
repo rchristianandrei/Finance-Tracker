@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatCardModule } from '@angular/material/card';
@@ -17,6 +17,7 @@ import { Transaction } from '@app/types/transaction';
 import { AddTransaction } from '@app/components/add-transaction/add-transaction';
 import { DeleteTransaction } from './components/delete-transaction/delete-transaction';
 import { UpdateTransaction } from './components/update-transaction/update-transaction';
+import { AccountService } from '@app/services/account-service';
 
 @Component({
   selector: 'app-transactions',
@@ -40,19 +41,22 @@ import { UpdateTransaction } from './components/update-transaction/update-transa
   templateUrl: './transactions.html',
   styleUrl: './transactions.css',
 })
-export class Transactions implements OnInit {
+export class Transactions {
   private fb = inject(FormBuilder);
+  private accountService = inject(AccountService);
   private transactionService = inject(TransactionService);
 
   // Events
   deleteEvent = signal<Transaction | null>(null);
   updateEvent = signal<Transaction | null>(null);
 
+  private today = new Date();
+  private last30Days = new Date();
   filterForm = this.fb.group({
     searchTerm: [''],
     dateRange: this.fb.group({
-      start: new FormControl(new Date(), Validators.required),
-      end: new FormControl(new Date(), Validators.required),
+      start: new FormControl(this.last30Days, Validators.required),
+      end: new FormControl(this.today, Validators.required),
     }),
   });
 
@@ -62,6 +66,7 @@ export class Transactions implements OnInit {
 
   displayedColumns: string[] = ['date', 'category', 'description', 'amount', 'actions'];
 
+  totalTransactions = signal(0);
   paginationDetails = signal({
     page: 0,
     pageSize: 10,
@@ -70,8 +75,11 @@ export class Transactions implements OnInit {
 
   dataSource = signal<Transaction[]>([]);
 
-  ngOnInit(): void {
-    this.loadTransactions();
+  constructor() {
+    this.last30Days.setDate(this.today.getDate() - 30);
+    effect(() => {
+      this.loadTransactions();
+    });
   }
 
   applyFilters() {
@@ -94,6 +102,9 @@ export class Transactions implements OnInit {
   }
 
   loadTransactions() {
+    const accountId = this.accountService.selected()?.id;
+    if (!accountId) return;
+
     let filter = {
       search: this.f.searchTerm.value ?? undefined,
       startDate: this.f.dateRange.controls.start.value ?? undefined,
@@ -102,10 +113,10 @@ export class Transactions implements OnInit {
       page: this.paginationDetails().page + 1,
     };
 
-    this.transactionService.getTransactions(filter).subscribe({
+    this.transactionService.getTransactions(accountId, filter).subscribe({
       next: (value) => {
         this.dataSource.set(value.data);
-        this.paginationDetails.update((p) => ({ ...p, totalItems: value.totalCount }));
+        this.totalTransactions.set(value.totalCount);
       },
     });
   }
