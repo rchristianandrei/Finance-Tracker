@@ -43,8 +43,8 @@ export class AccountForm {
     name: [this.data.account?.name || '', Validators.required],
     isDefault: [
       {
-        value: this.data.account?.id === this.accountService.current()?.id,
-        disabled: this.data.account?.id === this.accountService.current()?.id,
+        value: this.data.account?.id === this.accountService.default()?.id,
+        disabled: this.data.account?.id === this.accountService.default()?.id,
       },
     ],
   });

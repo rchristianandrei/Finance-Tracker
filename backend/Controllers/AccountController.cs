@@ -39,9 +39,18 @@ public class AccountController(
     public async Task<IActionResult> GetAccounts()
     {
         var userId = _currentUserService.Id();
+        var user = await _userCache.GetById(userId);
+        if (user == null) return NotFound();
+
         var accounts = await _accountRepo.GetAccountsAsNoTracking(userId);
         var dtos = accounts.Select(a => a.ToDto());
-        return Ok(dtos);
+        var output = new
+        {
+            Accounts = dtos,
+            DefaultAccount = dtos.FirstOrDefault(a => a.Id == user.DefaultAccountId)
+        };
+
+        return Ok(output);
     }
 
     [HttpPut("{id}")]

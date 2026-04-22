@@ -1,4 +1,4 @@
-@if (!account()) {
+@if (isLoading()) {
   <p>Loading...</p>
 } @else {
   <router-outlet></router-outlet>

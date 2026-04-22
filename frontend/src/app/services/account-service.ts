@@ -3,7 +3,9 @@ import { AuthService } from './auth-service';
 import { Account } from '@app/types/account';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
+import { ToastService } from './toast-service';
+import { resolveHttpError } from '@app/utils/http-error.util';
 
 @Injectable({
   providedIn: 'root',
@@ -13,40 +15,50 @@ export class AccountService {
 
   private authService = inject(AuthService);
   private httpClient = inject(HttpClient);
+  private toastService = inject(ToastService);
 
-  private currentAccount = signal<Account | null>(null);
-  private acounts = signal<Account[]>([]);
+  private _isLoading = signal(true);
+  private _selected = signal<Account | null>(null);
+  private _default = signal<Account | null>(null);
+  private _accounts = signal<Account[]>([]);
 
-  public readonly current = this.currentAccount.asReadonly();
-  public readonly accounts = this.acounts.asReadonly();
+  public readonly isLoading = this._isLoading.asReadonly();
+  public readonly selected = this._selected.asReadonly();
+  public readonly default = this._default.asReadonly();
+  public readonly accounts = this._accounts.asReadonly();
 
   constructor() {
     effect(() => {
       const user = this.authService.user();
       if (!user) return;
 
-      this.getAccounts().subscribe({
-        next: (accounts) => {
-          this.acounts.set(accounts);
-          this.currentAccount.set(
-            accounts.find((account) => account.id === user.defaultAccountId) || null,
-          );
-        },
-        error: (err) => {
-          console.error('Failed to fetch accounts', err);
-        },
-      });
+      this._isLoading.set(true);
+
+      this.getAccounts()
+        .pipe(finalize(() => this._isLoading.set(false)))
+        .subscribe({
+          next: (accounts) => {
+            this._selected.set(accounts.defaultAccount);
+            this._default.set(accounts.defaultAccount);
+            this._accounts.set(accounts.accounts);
+          },
+          error: (err) => {
+            this.toastService.error(resolveHttpError(err) || 'Failed to load accounts');
+          },
+        });
     });
   }
 
   private getAccounts() {
-    return this.httpClient.get<Account[]>(`${this.baseUrl}`);
+    return this.httpClient.get<{ accounts: Account[]; defaultAccount: Account | null }>(
+      `${this.baseUrl}`,
+    );
   }
 
   public createAccount(name: string) {
     return this.httpClient.post<Account>(`${this.baseUrl}`, { name }).pipe(
       tap((account) => {
-        this.acounts.update((accounts) => [...accounts, account]);
+        this._accounts.update((accounts) => [...accounts, account]);
       }),
     );
   }
@@ -56,13 +68,13 @@ export class AccountService {
       .put(`${this.baseUrl}/${body.id}`, { name: body.name, isDefault: body.isDefault })
       .pipe(
         tap(() => {
-          this.acounts.update((accounts) =>
+          this._accounts.update((accounts) =>
             accounts.map((a) =>
               a.id === body.id ? { ...a, name: body.name, isDefault: body.isDefault } : a,
             ),
           );
           if (body.isDefault) {
-            this.currentAccount.set(this.acounts().find((a) => a.id === body.id) || null);
+            this._default.set(this._accounts().find((a) => a.id === body.id) || null);
           }
         }),
       );
@@ -71,7 +83,7 @@ export class AccountService {
   public deleteAccount(accountId: number) {
     return this.httpClient.delete(`${this.baseUrl}/${accountId}`).pipe(
       tap(() => {
-        this.acounts.update((accounts) => accounts.filter((a) => a.id !== accountId));
+        this._accounts.update((accounts) => accounts.filter((a) => a.id !== accountId));
       }),
     );
   }

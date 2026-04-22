@@ -36,7 +36,7 @@ export class Accounts {
 
   accounts = this.accountsService.accounts;
 
-  currentAccount = this.accountsService.current;
+  currentAccount = this.accountsService.default;
   isCreateOpen = signal(false);
   isDeleteOpen = signal(false);
   updateEvent = signal<Account | null>(null);

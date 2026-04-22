@@ -31,7 +31,7 @@ export class SelectAccount {
   });
 
   accounts = this.accountService.accounts;
-  selected = this.accountService.current;
+  selected = this.accountService.default;
 
   choose() {
     this.dialogRef.close(this.form.value.account);

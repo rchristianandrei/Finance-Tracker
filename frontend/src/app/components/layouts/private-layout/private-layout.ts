@@ -11,5 +11,5 @@ import { AccountService } from '@app/services/account-service';
 export class PrivateLayout {
   private accountService = inject(AccountService);
 
-  account = this.accountService.current;
+  isLoading = this.accountService.isLoading;
 }

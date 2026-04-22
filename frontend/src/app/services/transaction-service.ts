@@ -13,7 +13,7 @@ export class TransactionService {
   private http = inject(HttpClient);
   private accountService = inject(AccountService);
 
-  private account = this.accountService.current;
+  private account = this.accountService.default;
   url = `${environment.apiUrl}/transaction`;
 
   addExpense(expense: {

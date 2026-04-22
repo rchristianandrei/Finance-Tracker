@@ -51,7 +51,7 @@ export class RootLayout {
   ];
 
   user = this.authService.user;
-  selectedAccount = this.accountService.current;
+  selectedAccount = this.accountService.default;
   isMobile = signal(false);
   isCollapsed = signal(false);
 
