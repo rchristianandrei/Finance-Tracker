@@ -26,11 +26,11 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         return await _entities.Find(t => t.Id == id).FirstOrDefaultAsync();
     }
 
-    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query)
+    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query)
     {
         var builder = Builders<Transaction>.Filter;
 
-        var filter = builder.Eq(t => t.UserId, userId);
+        var filter = builder.Eq(t => t.AccountId, accountId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
@@ -62,12 +62,12 @@ public class TransactionService(IMongoDatabase database) : ITransactionService
         return (transactions, count);
     }
 
-    public async Task<IEnumerable<Transaction>> GetLastDays(int userId, int days)
+    public async Task<IEnumerable<Transaction>> GetLastDays(int accountId, int days)
     {
         var now = DateTime.UtcNow;
         var thirtyDaysAgo = DateTime.UtcNow.AddDays(-days);
         var filter = Builders<Transaction>.Filter.And(
-            Builders<Transaction>.Filter.Eq(t => t.UserId, userId),
+            Builders<Transaction>.Filter.Eq(t => t.AccountId, accountId),
             Builders<Transaction>.Filter.Gte(t => t.CreatedAt, thirtyDaysAgo),
             Builders<Transaction>.Filter.Lte(t => t.CreatedAt, now)
         );

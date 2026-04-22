@@ -1,9 +1,9 @@
 import { RouterModule } from '@angular/router';
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal, ViewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -14,6 +14,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '@app/services/auth-service';
 import { ToastService } from '@app/services/toast-service';
 import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog/confirm-dialog';
+import { SelectAccount } from '../select-account/select-account';
+import { AccountService } from '@app/services/account-service';
 
 @Component({
   selector: 'app-root-layout',
@@ -31,8 +33,11 @@ import { ConfirmDialog, ConfirmDialogData } from '@app/components/confirm-dialog
   templateUrl: './root-layout.html',
 })
 export class RootLayout {
+  @ViewChild('sidenav') sidenav!: MatSidenav;
+
   private breakpointObserver = inject(BreakpointObserver);
   private authService = inject(AuthService);
+  private accountService = inject(AccountService);
   private toastService = inject(ToastService);
   private dialog = inject(MatDialog);
 
@@ -41,11 +46,13 @@ export class RootLayout {
   navigations = [
     { icon: 'dashboard', feature: 'Dashboard', route: '/' },
     { icon: 'payment', feature: 'Transactions', route: '/transactions' },
+    { icon: 'account_balance', feature: 'Accounts', route: '/accounts' },
     { icon: 'people', feature: 'Users', route: '/users' },
     { icon: 'settings', feature: 'Settings', route: '/settings' },
   ];
 
   user = this.authService.user;
+  selectedAccount = this.accountService.selected;
   isMobile = signal(false);
   isCollapsed = signal(false);
 
@@ -63,6 +70,15 @@ export class RootLayout {
     if (this.isMobile()) {
       sidenav.close();
     }
+  }
+
+  selectAccount() {
+    const dialogRef = this.dialog.open(SelectAccount);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.sidenav.close();
+      }
+    });
   }
 
   logout() {

@@ -4,7 +4,7 @@ using backend.Models;
 
 namespace backend.Repositories.MySql;
 
-public class UserRepo(ApplicationDbContext _context) : IUserRepo
+public class UserRepo(ApplicationDbContext _context, IAccountRepo _accountRepo) : IUserRepo
 {
     public async Task<User?> GetById(int id)
     {
@@ -15,6 +15,18 @@ public class UserRepo(ApplicationDbContext _context) : IUserRepo
     public async Task Create(User user)
     {
         await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        var account = new Account
+        {
+            OwnerId = user.Id,
+            Owner = user,
+            Name = "Default Account",
+            Balance = 0,
+        };
+        await _accountRepo.Create(account);
+
+        user.DefaultAccountId = account.Id;
         await _context.SaveChangesAsync();
     }
 

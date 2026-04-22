@@ -1,5 +1,5 @@
 import { DecimalPipe, DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -11,6 +11,7 @@ import { AddTransaction } from '@app/components/add-transaction/add-transaction'
 
 import { TransactionService } from '@app/services/transaction-service';
 import { DashboardType } from '@app/types/dashboard';
+import { AccountService } from '@app/services/account-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +27,8 @@ import { DashboardType } from '@app/types/dashboard';
   ],
   templateUrl: './dashboard.html',
 })
-export class Dashboard implements OnInit {
+export class Dashboard {
+  private accountService = inject(AccountService);
   private transactionService = inject(TransactionService);
 
   public dashboardData = signal<DashboardType>({
@@ -47,12 +49,16 @@ export class Dashboard implements OnInit {
     return { labels, data };
   });
 
-  ngOnInit(): void {
-    this.loadDashboard();
+  constructor() {
+    effect(() => {
+      this.loadDashboard();
+    });
   }
 
   loadDashboard() {
-    this.transactionService.getDashboardData().subscribe({
+    const accountId = this.accountService.selected()?.id;
+    if (!accountId) return;
+    this.transactionService.getDashboardData(accountId).subscribe({
       next: (value) => {
         this.dashboardData.set(value);
       },

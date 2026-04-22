@@ -1,0 +1,5 @@
+@if (authService.isLoading | async) {
+  <p>Loading...</p>
+} @else {
+  <router-outlet></router-outlet>
+}

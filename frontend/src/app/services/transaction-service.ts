@@ -1,16 +1,19 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 
 import { DashboardType } from '@app/types/dashboard';
 import { Transaction, TransactionType } from '@app/types/transaction';
 import { environment } from '@env/environment';
+import { AccountService } from './account-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionService {
   private http = inject(HttpClient);
+  private accountService = inject(AccountService);
 
+  private account = this.accountService.selected;
   url = `${environment.apiUrl}/transaction`;
 
   addExpense(expense: {
@@ -25,7 +28,7 @@ export class TransactionService {
       date: expense.date.toISOString(),
       type: expense.type === 'EXPENSE' ? 1 : 2,
     };
-    return this.http.post(`${this.url}`, body);
+    return this.http.post(`${this.url}/${this.account()?.id}`, body);
   }
 
   update(transaction: Transaction) {
@@ -37,17 +40,20 @@ export class TransactionService {
     return this.http.put(`${this.url}/${transaction.id}`, body);
   }
 
-  getDashboardData() {
-    return this.http.get<DashboardType>(`${this.url}/dashboard`);
+  getDashboardData(accountId: number) {
+    return this.http.get<DashboardType>(`${this.url}/dashboard/${accountId}`);
   }
 
-  getTransactions(filter?: {
-    search?: string;
-    startDate?: Date;
-    endDate?: Date;
-    pageSize?: number;
-    page?: number;
-  }) {
+  getTransactions(
+    accountId: number,
+    filter?: {
+      search?: string;
+      startDate?: Date;
+      endDate?: Date;
+      pageSize?: number;
+      page?: number;
+    },
+  ) {
     let params = new HttpParams();
 
     if (filter?.search) {
@@ -73,7 +79,7 @@ export class TransactionService {
     return this.http.get<{
       totalCount: number;
       data: Transaction[];
-    }>(this.url, { params });
+    }>(`${this.url}/${accountId}`, { params });
     // .pipe(
     //   map((paginatedData) => ({
     //     ...paginatedData,

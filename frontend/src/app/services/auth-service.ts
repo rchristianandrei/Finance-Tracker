@@ -41,7 +41,7 @@ export class AuthService {
   logout() {
     return this.httpClient.post(`${environment.apiUrl}/auth/logout`, {}).pipe(
       tap(async () => {
-        await this.socialAuthService.signOut();
+        this.socialAuthService.signOut().catch(() => {});
         this._user.set(null);
         this.router.navigate(['/login']);
       }),

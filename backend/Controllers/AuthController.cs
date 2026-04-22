@@ -5,6 +5,7 @@ using backend.Interfaces;
 using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Interfaces.Utils;
+using backend.Mappers;
 using backend.Models;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -97,7 +98,7 @@ public class AuthController(
         var authToken = _jwtService.GenerateToken(user);
         _authCookiesService.AttachAuthCookies(authToken);
 
-        return Ok(new { user.Id, user.FirstName, user.LastName });
+        return Ok(user.ToDto());
     }
 
     [Transaction]
@@ -146,7 +147,7 @@ public class AuthController(
             var token = _jwtService.GenerateToken(user);
             _authCookiesService.AttachAuthCookies(token);
 
-            return Ok(new { user.Id, user.FirstName, user.LastName });
+            return Ok(user.ToDto());
         }
         catch (InvalidJwtException)
         {
@@ -154,7 +155,6 @@ public class AuthController(
         }
     }
 
-    [Authorize]
     [HttpPost("logout")]
     public IActionResult Logout()
     {
@@ -209,9 +209,7 @@ public class AuthController(
         var user = await _userCache.GetById(id);
         if (user == null) return Unauthorized();
 
-        var dto = new { user.Id, user.FirstName, user.LastName };
-
-        return Ok(dto);
+        return Ok(user.ToDto());
     }
 
     [HttpGet("verify-token/{token}")]

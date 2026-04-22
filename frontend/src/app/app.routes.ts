@@ -6,6 +6,8 @@ export const routes: Routes = [
   {
     path: '',
     canActivateChild: [authGuard],
+    loadComponent: () =>
+      import('./components/layouts/private-layout/private-layout').then((c) => c.PrivateLayout),
     children: [
       {
         path: '',
@@ -20,12 +22,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/transactions/transactions').then((c) => c.Transactions),
       },
+      {
+        path: 'accounts',
+        title: 'Accounts',
+        canActivate: [authGuard],
+        loadComponent: () => import('./pages/accounts/accounts').then((c) => c.Accounts),
+      },
     ],
   },
 
   {
     path: '',
     canActivateChild: [guestGuard],
+    loadComponent: () =>
+      import('./components/layouts/public-layout/public-layout').then((c) => c.PublicLayout),
     children: [
       {
         path: 'login',

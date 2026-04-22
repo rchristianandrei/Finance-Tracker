@@ -1,6 +1,7 @@
 using backend.Dtos;
 using backend.Enums;
 using backend.Interfaces;
+using backend.Interfaces.MySql;
 using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -16,18 +17,18 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class TransactionController(
     ITransactionService _transactionService,
-    ICurrentUserService _currentUserService) : ControllerBase
+    ICurrentUserService _currentUserService,
+    IAccountRepo _accountRepo
+) : ControllerBase
 {
-    [HttpGet("dashboard")]
-    public async Task<IActionResult> Dashboard()
+    [HttpGet("dashboard/{accountId}")]
+    public async Task<IActionResult> Dashboard(int accountId)
     {
-        var id = _currentUserService.Id();
-
         var expensesBreakdown = new Dictionary<string, double>();
         var expenses = 0.00;
         var income = 0.00;
 
-        var transactions = await _transactionService.GetLastDays(id, 30);
+        var transactions = await _transactionService.GetLastDays(accountId, 30);
 
         foreach (var transaction in transactions)
         {
@@ -58,11 +59,10 @@ public class TransactionController(
         });
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] TransactionQueryParameters query)
+    [HttpGet("{accountId}")]
+    public async Task<IActionResult> Get(int accountId, [FromQuery] TransactionQueryParameters query)
     {
-        var id = _currentUserService.Id();
-        var (transactions, count) = await _transactionService.GetAll(id, query);
+        var (transactions, count) = await _transactionService.GetAll(accountId, query);
         var dto = transactions.Select(t => t.ToDto());
         return Ok(new
         {
@@ -71,14 +71,21 @@ public class TransactionController(
         });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Add([FromBody] AddTransactionDto value)
+    [HttpPost("{accountId}")]
+    public async Task<IActionResult> Add(int accountId, [FromBody] AddTransactionDto value)
     {
         var id = _currentUserService.Id();
+
+        var account = await _accountRepo.GetById(accountId);
+        if (account == null) return NotFound("Account not found");
+
+        account.Balance += value.Type == TransactionType.INCOME ? value.Amount : -value.Amount;
+        await _accountRepo.Update(account);
 
         var transaction = new Transaction
         {
             UserId = id,
+            AccountId = accountId,
             Type = value.Type,
             Category = value.Category,
             Amount = value.Amount,
@@ -103,7 +110,6 @@ public class TransactionController(
         transaction.Category = value.Category;
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
-        // TODO - Separate Created at and date of transaction
         transaction.Date = value.Date;
         transaction.LastUpdated = DateTime.Now;
 

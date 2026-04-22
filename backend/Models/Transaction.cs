@@ -12,8 +12,10 @@ public class Transaction
     public string? Id { get; set; }
 
     [Required]
-    [MaxLength(30)]
     public int UserId { get; set; }
+
+    [Required]
+    public int AccountId { get; set; }
 
     [Required]
     public TransactionType Type { get; set; }

@@ -13,10 +13,16 @@ public class User
     [MaxLength(25)]
     public string LastName { get; set; } = string.Empty;
 
+    public int? DefaultAccountId { get; set; }
+    [JsonIgnore]
+    public Account DefaultAccount { get; set; } = null!;
+
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     [JsonIgnore]
     public LocalCredential? LocalCredential { get; set; }
     [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
+    [JsonIgnore]
+    public ICollection<Account> Accounts { get; set; } = [];
 }
