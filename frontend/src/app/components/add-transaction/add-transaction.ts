@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { ToastService } from '@app/services/toast-service';
 import { resolveHttpError } from '@app/utils/http-error.util';
 import { TransactionType } from '@app/types/transaction';
+import { AccountService } from '@app/services/account-service';
 
 @Component({
   selector: 'app-add-transaction',
@@ -14,6 +15,7 @@ import { TransactionType } from '@app/types/transaction';
   templateUrl: './add-transaction.html',
 })
 export class AddTransaction {
+  private accountService = inject(AccountService);
   private transactionService = inject(TransactionService);
   private toastService = inject(ToastService);
 
@@ -42,8 +44,15 @@ export class AddTransaction {
   }) {
     this.isLoading.set(true);
 
+    const accountId = this.accountService.selected()?.id;
+    if (!accountId) {
+      this.errorMessage.set('No account selected');
+      this.isLoading.set(false);
+      return;
+    }
+
     this.transactionService
-      .addExpense(value)
+      .addExpense(accountId, value)
       .pipe(
         finalize(() => {
           this.isLoading.set(false);

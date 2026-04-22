@@ -1,34 +1,33 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { computed, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { DashboardType } from '@app/types/dashboard';
 import { Transaction, TransactionType } from '@app/types/transaction';
 import { environment } from '@env/environment';
-import { AccountService } from './account-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TransactionService {
   private http = inject(HttpClient);
-  private accountService = inject(AccountService);
-
-  private account = this.accountService.selected;
   url = `${environment.apiUrl}/transaction`;
 
-  addExpense(expense: {
-    type: TransactionType;
-    category: string;
-    amount: number;
-    description: string;
-    date: Date;
-  }) {
+  addExpense(
+    accountId: number,
+    expense: {
+      type: TransactionType;
+      category: string;
+      amount: number;
+      description: string;
+      date: Date;
+    },
+  ) {
     const body = {
       ...expense,
       date: expense.date.toISOString(),
       type: expense.type === 'EXPENSE' ? 1 : 2,
     };
-    return this.http.post(`${this.url}/${this.account()?.id}`, body);
+    return this.http.post(`${this.url}/${accountId}`, body);
   }
 
   update(transaction: Transaction) {
