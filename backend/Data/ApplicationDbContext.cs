@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<GoogleCredential> GoogleCredentials { get; set; }
     public DbSet<VerifyAccount> VerifyAccounts { get; set; }
     public DbSet<Account> Accounts { get; set; }
+    public DbSet<DefaultAccount> DefaultAccounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,9 +33,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasForeignKey(a => a.OwnerId);
         modelBuilder.Entity<User>()
             .HasOne(u => u.DefaultAccount)
-            .WithMany() // no back-reference for default
-            .HasForeignKey(u => u.DefaultAccountId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithOne(d => d.User)
+            .HasForeignKey<DefaultAccount>(l => l.UserId);
 
         modelBuilder.Entity<LocalCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<LocalCredential>().HasIndex(u => u.Email).IsUnique();
@@ -52,5 +52,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<VerifyAccount>().HasIndex(v => v.Token).IsUnique();
 
         modelBuilder.Entity<Account>().HasKey(a => a.Id);
+        modelBuilder.Entity<Account>()
+            .HasOne(u => u.DefaultAccount)
+            .WithOne(d => d.Account)
+            .HasForeignKey<DefaultAccount>(l => l.UserId);
+
+        modelBuilder.Entity<DefaultAccount>()
+            .HasKey(d => d.UserId);
     }
 }
