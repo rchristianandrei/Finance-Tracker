@@ -1,3 +1,4 @@
+using backend.Attributes;
 using backend.Dtos;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
@@ -14,15 +15,16 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class AccountController(
     ICurrentUserService _currentUserService,
-    IUserCache _userCache,
-    IAccountRepo _accountRepo
+    IAccountCacheService _accountCache,
+    IDefaultAccountRepo _defaultAccountRepo
 ) : ControllerBase
 {
+    [Transaction]
     [HttpPost]
     public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto dto)
     {
         var userId = _currentUserService.Id();
-        var accounts = await _accountRepo.GetAccountsAsNoTracking(userId);
+        var accounts = await _accountCache.GetAccounts(userId);
         if (accounts.Count >= 5) return BadRequest("You already have a maximum of 5 accounts");
 
         var account = new Account
@@ -30,7 +32,7 @@ public class AccountController(
             Name = dto.Name,
             OwnerId = userId
         };
-        await _accountRepo.Create(account);
+        await _accountCache.Create(account);
 
         return Ok(account.ToDto());
     }
@@ -39,25 +41,26 @@ public class AccountController(
     public async Task<IActionResult> GetAccounts()
     {
         var userId = _currentUserService.Id();
-        var user = await _userCache.GetById(userId);
-        if (user == null) return NotFound();
+        var defaultAccount = await _defaultAccountRepo.GetById(userId);
 
-        var accounts = await _accountRepo.GetAccountsAsNoTracking(userId);
+        var accounts = await _accountCache.GetAccounts(userId);
         var dtos = accounts.Select(a => a.ToDto());
         var output = new
         {
             Accounts = dtos,
-            DefaultAccount = dtos.FirstOrDefault(a => a.Id == user.DefaultAccountId)
+            DefaultAccount = dtos.FirstOrDefault(a => a.Id == defaultAccount?.AccountId)
         };
 
         return Ok(output);
     }
 
+    [Transaction]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAccount(int id, [FromBody] UpdateAccountDto dto)
     {
         var userId = _currentUserService.Id();
-        var account = await _accountRepo.GetById(id);
+
+        var account = await _accountCache.GetById(id);
         if (account == null) return NotFound();
         if (account.OwnerId != userId) return Forbid();
 
@@ -65,13 +68,23 @@ public class AccountController(
 
         if (dto.IsDefault)
         {
-            var user = await _userCache.GetById(userId);
-            if (user == null) return NotFound();
-
-            user.DefaultAccountId = account.Id;
-            await _userCache.Update(user);
+            var defaultAccount = await _defaultAccountRepo.GetById(userId);
+            if (defaultAccount == null)
+            {
+                defaultAccount = new DefaultAccount
+                {
+                    UserId = userId,
+                    AccountId = account.Id
+                };
+                await _defaultAccountRepo.Create(defaultAccount);
+            }
+            else
+            {
+                defaultAccount.AccountId = account.Id;
+                await _defaultAccountRepo.Update(defaultAccount);
+            }
         }
-        await _accountRepo.Update(account);
+        await _accountCache.Update(account);
 
         return Ok(account.ToDto());
     }
@@ -80,19 +93,17 @@ public class AccountController(
     public async Task<IActionResult> DeleteAccount(int id)
     {
         var userId = _currentUserService.Id();
-        var user = await _userCache.GetById(userId);
-        if (user == null) return NotFound();
+        var defaultAccount = await _defaultAccountRepo.GetById(userId);
+        if (defaultAccount == null) return NotFound("Default account not found");
 
-        var account = await _accountRepo.GetById(id);
+        var account = await _accountCache.GetById(id);
         if (account == null) return NotFound();
         if (account.OwnerId != userId) return Forbid();
 
-        if (user.DefaultAccountId == account.Id)
-        {
+        if (defaultAccount.AccountId == account.Id)
             return BadRequest("Cannot delete default account");
-        }
 
-        await _accountRepo.Delete(account);
+        await _accountCache.Delete(account);
 
         return Ok();
     }

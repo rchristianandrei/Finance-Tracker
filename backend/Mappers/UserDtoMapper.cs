@@ -12,7 +12,6 @@ public static class UserDtoMapper
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            DefaultAccountId = user.DefaultAccountId ?? 0
         };
     }
 }

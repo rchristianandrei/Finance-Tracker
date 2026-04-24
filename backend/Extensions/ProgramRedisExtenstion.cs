@@ -15,6 +15,7 @@ public static class ProgramRedisExtenstion
         });
         services.AddSingleton<ICacheService, RedisCacheService>();
         services.AddScoped<IUserCache, UserCache>();
+        services.AddScoped<IAccountCacheService, AccountCacheService>();
         return services;
     }
 }

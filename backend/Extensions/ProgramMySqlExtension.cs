@@ -17,6 +17,7 @@ public static class ProgramMySqlExtension
         services.AddScoped<ILocalCredentialRepo, LocalCredentialRepo>();
         services.AddScoped<IVerifyAccountRepo, VerifyAccountRepo>();
         services.AddScoped<IAccountRepo, AccountRepo>();
+        services.AddScoped<IDefaultAccountRepo, DefaultAccountRepo>();
 
         return services;
     }

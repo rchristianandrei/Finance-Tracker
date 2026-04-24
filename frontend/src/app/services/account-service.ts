@@ -39,13 +39,13 @@ export class AccountService {
         .pipe(finalize(() => this._isLoading.set(false)))
         .subscribe({
           next: (accounts) => {
-            const storedAccount = sessionStorage.getItem(this.storageKey);
-            if (storedAccount) {
-              const { accountId } = JSON.parse(storedAccount);
-              const account = accounts.accounts.find((a) => a.id === accountId) || null;
+            const accountId = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null');
+            const account = accounts.accounts.find((a) => a.id === accountId) || null;
+            if (account) {
               this._selected.set(account);
             } else {
               this._selected.set(accounts.defaultAccount);
+              this.setSelectedAccount(accounts.defaultAccount?.id ?? 0);
             }
             this._default.set(accounts.defaultAccount);
             this._accounts.set(accounts.accounts);
@@ -63,9 +63,13 @@ export class AccountService {
     );
   }
 
+  private setSelectedAccount(accountId: number) {
+    sessionStorage.setItem(this.storageKey, JSON.stringify({ accountId }));
+  }
+
   public selectAccount(accountId: number) {
     const account = this._accounts().find((a) => a.id === accountId) || null;
-    sessionStorage.setItem(this.storageKey, JSON.stringify({ accountId }));
+    this.setSelectedAccount(accountId);
     this._selected.set(account);
   }
 

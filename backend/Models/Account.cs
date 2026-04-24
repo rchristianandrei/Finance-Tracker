@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace backend.Models;
 
 public class Account
@@ -14,4 +16,7 @@ public class Account
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+    [JsonIgnore]
+    public DefaultAccount? DefaultAccount { get; set; }
 }
