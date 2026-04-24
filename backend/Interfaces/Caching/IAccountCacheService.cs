@@ -7,9 +7,9 @@ public interface IAccountCacheService
     Task<Account?> GetById(int id);
     Task<ICollection<Account>> GetAccounts(int userId);
 
-    Task Create(Account account);
+    Task Create(int userId, Account account);
 
-    Task Update(Account account);
+    Task Update(int userId, Account account);
 
-    Task Delete(Account account);
+    Task Delete(int userId, Account account);
 }

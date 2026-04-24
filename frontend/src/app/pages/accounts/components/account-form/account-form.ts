@@ -6,13 +6,13 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AccountService } from '@app/services/account-service';
-import { AuthService } from '@app/services/auth-service';
 import { Account } from '@app/types/account';
 
 export type AccountFormData = {
   heading?: string;
   account?: Account;
   errorMessage: Signal<string>;
+  hideAccountDefaultField?: boolean;
   confirmButtonText?: string;
 };
 

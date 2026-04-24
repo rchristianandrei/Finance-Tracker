@@ -23,6 +23,7 @@ export class CreateAccount implements OnInit {
         heading: 'Create Account',
         errorMessage: this.createErrorMessage.asReadonly(),
         confirmButtonText: 'Create',
+        hideAccountDefaultField: true,
       },
     });
 

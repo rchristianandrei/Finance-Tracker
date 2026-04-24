@@ -17,14 +17,6 @@ public class AccountRepo(ApplicationDbContext _context) : IAccountRepo
     {
         var accounts = await _context.Accounts
             .Where(a => a.OwnerId == userId)
-            .ToListAsync();
-        return accounts;
-    }
-
-    public async Task<List<Account>> GetAccountsAsNoTracking(int userId)
-    {
-        var accounts = await _context.Accounts
-            .Where(a => a.OwnerId == userId)
             .AsNoTracking()
             .ToListAsync();
         return accounts;

@@ -32,7 +32,7 @@ public class AccountController(
             Name = dto.Name,
             OwnerId = userId
         };
-        await _accountCache.Create(account);
+        await _accountCache.Create(userId, account);
 
         return Ok(account.ToDto());
     }
@@ -84,7 +84,7 @@ public class AccountController(
                 await _defaultAccountRepo.Update(defaultAccount);
             }
         }
-        await _accountCache.Update(account);
+        await _accountCache.Update(userId, account);
 
         return Ok(account.ToDto());
     }
@@ -103,7 +103,7 @@ public class AccountController(
         if (defaultAccount.AccountId == account.Id)
             return BadRequest("Cannot delete default account");
 
-        await _accountCache.Delete(account);
+        await _accountCache.Delete(userId, account);
 
         return Ok();
     }
