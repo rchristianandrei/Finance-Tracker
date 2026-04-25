@@ -19,4 +19,6 @@ public class Account
 
     [JsonIgnore]
     public DefaultAccount? DefaultAccount { get; set; }
+    [JsonIgnore]
+    public ICollection<Category> Categories { get; set; } = [];
 }

@@ -5,7 +5,10 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransactionTypeField } from '@app/components/input/transaction-type-field/transaction-type-field';
+import { CategoryService } from '@app/services/category-service';
+import { ToastService } from '@app/services/toast-service';
 import { TransactionType } from '@app/types/transaction';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-add-category',
@@ -23,6 +26,8 @@ import { TransactionType } from '@app/types/transaction';
 export class AddCategory {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<AddCategory>);
+  private categoryService = inject(CategoryService);
+  private toastService = inject(ToastService);
 
   form = this.fb.group({
     name: ['', Validators.required],
@@ -32,8 +37,21 @@ export class AddCategory {
   isLoading = signal(false);
 
   submit() {
-    console.log('Submit');
-    this.dialogRef.close();
+    if (this.isLoading() || this.form.invalid) return;
+    this.isLoading.set(true);
+
+    this.categoryService
+      .Create({
+        type: this.form.controls.type.value!,
+        name: this.form.controls.name.value!,
+      })
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.toastService.success('Created a category');
+          this.dialogRef.close();
+        },
+      });
   }
 
   cancel() {
