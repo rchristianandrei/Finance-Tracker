@@ -7,13 +7,17 @@
 
     <!-- EXPENSE -->
     <app-section
+      heading="Expense"
       [categories]="expenseCategories()"
       [displayedColumns]="displayedColumns"
+      (onDelete)="onDelete($event, 'EXPENSE')"
     ></app-section>
     <!-- INCOME -->
     <app-section
+      heading="Income"
       [categories]="incomeCategories()"
       [displayedColumns]="displayedColumns"
+      (onDelete)="onDelete($event, 'INCOME')"
     ></app-section>
   </div>
 </app-root-layout>

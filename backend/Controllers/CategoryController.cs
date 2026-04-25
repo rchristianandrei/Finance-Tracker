@@ -61,4 +61,22 @@ public class CategoryController(ApplicationDbContext _context, ICurrentUserServi
             Income = income
         });
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var category = await _context.Categories
+            .Include(c => c.Account)
+            .AsNoTracking()
+            .FirstOrDefaultAsync((c) => c.Id == id);
+        if (category == null) return NotFound("Category do not exist");
+
+        var userId = _currentUser.Id();
+        if (category.Account.OwnerId != userId) return Forbid();
+
+        _context.Categories.Remove(category);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

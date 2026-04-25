@@ -67,4 +67,21 @@ export class CategoryService {
       expense: Category[];
     }>(`${this.baseUrl}/${this.accountService.selected()?.id ?? 0}`);
   }
+
+  public delete(categoryId: number, type: TransactionType) {
+    return this.httpClient.delete(`${this.baseUrl}/${categoryId}`).pipe(
+      tap(() => {
+        let category: WritableSignal<Category[]>;
+        switch (type) {
+          case 'EXPENSE':
+            category = this._expenseCategories;
+            break;
+          case 'INCOME':
+            category = this._incomeCategories;
+            break;
+        }
+        category.update((old) => old.filter((c) => c.id !== categoryId));
+      }),
+    );
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,13 @@ import { Category } from '@app/types/category';
   styleUrl: './section.css',
 })
 export class Section {
+  heading = input.required<string>();
   categories = input.required<Category[]>();
   displayedColumns = input.required<string[]>();
+
+  onDelete = output<Category>();
+
+  Delete(category: Category) {
+    this.onDelete.emit(category);
+  }
 }

@@ -10,6 +10,8 @@ import { AddCategory } from './components/add-category/add-category';
 import { finalize } from 'rxjs';
 import { CategoryService } from '@app/services/category-service';
 import { Category } from '@app/types/category';
+import { DeleteCategory, DeleteCategoryData } from './components/delete-category/delete-category';
+import { TransactionType } from '@app/types/transaction';
 
 @Component({
   selector: 'app-categories',
@@ -24,19 +26,34 @@ export class Categories {
 
   readonly expenseCategories = this.categoryService.ExpenseCategories;
   readonly incomeCategories = this.categoryService.IncomeCategories;
-  readonly isCreateOpen = signal(false);
+  readonly isDialogOpen = signal(false);
 
   onCreate() {
-    if (this.isCreateOpen()) return;
-    this.isCreateOpen.set(true);
+    if (this.isDialogOpen()) return;
+    this.isDialogOpen.set(true);
 
     const createDialog = this.dialog.open(AddCategory);
 
     createDialog
       .afterClosed()
-      .pipe(finalize(() => this.isCreateOpen.set(false)))
-      .subscribe({
-        next: () => {},
-      });
+      .pipe(finalize(() => this.isDialogOpen.set(false)))
+      .subscribe();
+  }
+
+  onDelete(category: Category, type: TransactionType) {
+    if (this.isDialogOpen()) return;
+    this.isDialogOpen.set(true);
+
+    const deleteDialog = this.dialog.open<DeleteCategory, DeleteCategoryData>(DeleteCategory, {
+      data: {
+        category: category,
+        type: type,
+      },
+    });
+
+    deleteDialog
+      .afterClosed()
+      .pipe(finalize(() => this.isDialogOpen.set(false)))
+      .subscribe();
   }
 }
