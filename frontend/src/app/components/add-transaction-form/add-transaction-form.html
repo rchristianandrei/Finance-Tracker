@@ -16,24 +16,10 @@
     <!-- Form -->
     <form [formGroup]="form()" (ngSubmit)="submit()" class="flex flex-col gap-4">
       <!-- Type (Income / Expense) -->
-      <mat-radio-group formControlName="type" class="flex gap-4">
-        <mat-radio-button
-          value="EXPENSE"
-          class="pr-2.5 rounded-full p-2!"
-          [class]="f.type.value === 'EXPENSE' ? 'bg-red-300' : ''"
-          [disabled]="!!transaction()"
-        >
-          <p class="text-red-600 font-semibold">Expense</p>
-        </mat-radio-button>
-        <mat-radio-button
-          value="INCOME"
-          class="pr-2.5 rounded-full p-2!"
-          [class]="f.type.value === 'INCOME' ? 'bg-green-300' : ''"
-          [disabled]="!!transaction()"
-        >
-          <p class="text-green-600 font-semibold">Income</p>
-        </mat-radio-button>
-      </mat-radio-group>
+      <app-transaction-type-field
+        formControlName="type"
+        [formControl]="f.type"
+      ></app-transaction-type-field>
 
       <!-- Category -->
       <mat-form-field appearance="outline">

@@ -1,5 +1,5 @@
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Component, computed, inject, input, output, Signal, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,6 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { CategoryService } from '@app/services/category-service';
 import { Transaction, TransactionType } from '@app/types/transaction';
+import { TransactionTypeField } from '../input/transaction-type-field/transaction-type-field';
 
 @Component({
   selector: 'app-add-transaction-form',
@@ -28,9 +29,9 @@ import { Transaction, TransactionType } from '@app/types/transaction';
     MatButtonModule,
     MatIconModule,
     ReactiveFormsModule,
+    TransactionTypeField,
   ],
   templateUrl: './add-transaction-form.html',
-  styleUrl: './add-transaction-form.css',
 })
 export class AddExpenseForm {
   private fb = inject(FormBuilder);
@@ -50,8 +51,6 @@ export class AddExpenseForm {
     date: Date;
   }>();
 
-  categories = ['Food', 'Transportation', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Other'];
-
   typeSignal: Signal<TransactionType | null>;
   category = computed(() => {
     switch (this.transaction()?.type ?? this.typeSignal()) {
@@ -68,7 +67,7 @@ export class AddExpenseForm {
 
   form = computed(() =>
     this.fb.group({
-      type: new FormControl<'EXPENSE' | 'INCOME'>(
+      type: new FormControl<TransactionType>(
         this.transaction()?.type ?? 'EXPENSE',
         Validators.required,
       ),
@@ -87,6 +86,11 @@ export class AddExpenseForm {
     this.typeSignal = toSignal(this.form().get('type')!.valueChanges, {
       initialValue: this.form().get('type')!.value,
     });
+
+    effect(() => {
+      this.category();
+      this.f.category.setValue(null);
+    }, {});
   }
 
   getNow(): string {

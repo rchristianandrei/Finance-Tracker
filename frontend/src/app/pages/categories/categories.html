@@ -1,0 +1,19 @@
+<app-root-layout heading="Categories">
+  <div class="flex flex-col gap-6 md:h-full">
+    <!-- Header -->
+    <div class="flex justify-end">
+      <button mat-raised-button color="primary" (click)="onCreate()">Create Category</button>
+    </div>
+
+    <!-- EXPENSE -->
+    <app-section
+      [categories]="expenseCategories()"
+      [displayedColumns]="displayedColumns"
+    ></app-section>
+    <!-- INCOME -->
+    <app-section
+      [categories]="incomeCategories()"
+      [displayedColumns]="displayedColumns"
+    ></app-section>
+  </div>
+</app-root-layout>

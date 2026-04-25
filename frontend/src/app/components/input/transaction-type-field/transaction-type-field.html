@@ -1,0 +1,18 @@
+<mat-radio-group class="flex gap-4" (change)="onChange($event.value)">
+  <mat-radio-button
+    value="EXPENSE"
+    class="pr-2.5 rounded-full p-2!"
+    [class]="formControl().value === 'EXPENSE' ? 'bg-red-300' : ''"
+    [disabled]="disabled()"
+  >
+    <p class="text-red-600 font-semibold">Expense</p>
+  </mat-radio-button>
+  <mat-radio-button
+    value="INCOME"
+    class="pr-2.5 rounded-full p-2!"
+    [class]="formControl().value === 'INCOME' ? 'bg-green-300' : ''"
+    [disabled]="disabled()"
+  >
+    <p class="text-green-600 font-semibold">Income</p>
+  </mat-radio-button>
+</mat-radio-group>

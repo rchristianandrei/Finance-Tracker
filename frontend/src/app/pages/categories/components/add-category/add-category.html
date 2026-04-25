@@ -1,20 +1,21 @@
-<h2 mat-dialog-title>{{ data.heading ?? 'Account' }}</h2>
+<h2 mat-dialog-title>Create Category</h2>
 
 <form [formGroup]="form" (submit)="submit()" (cancel)="cancel()">
-  <mat-dialog-content class="overflow-hidden! py-1!">
+  <mat-dialog-content class="overflow-hidden! py-1! gap-4! flex! flex-col!">
+    <app-transaction-type-field
+      formControlName="type"
+      [formControl]="form.controls.type"
+    ></app-transaction-type-field>
     <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Account Name</mat-label>
+      <mat-label>Category Name</mat-label>
       <input matInput formControlName="name" />
       @if (form.get('name')?.invalid && form.get('name')?.touched) {
-        <mat-error> Account name is required </mat-error>
+        <mat-error> Category name is required </mat-error>
       }
     </mat-form-field>
-    @if (!data.hideAccountDefaultField) {
-      <mat-checkbox formControlName="isDefault"> Set as default account </mat-checkbox>
-    }
-    @if (data.errorMessage()) {
+    <!-- @if (data.errorMessage()) {
       <mat-error class="text-center">{{ data.errorMessage() }}</mat-error>
-    }
+    } -->
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
@@ -28,7 +29,7 @@
       @if (isLoading()) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {
-        {{ data.confirmButtonText ?? 'Confirm' }}
+        Create
       }
     </button>
   </mat-dialog-actions>

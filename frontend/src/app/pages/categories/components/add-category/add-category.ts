@@ -1,0 +1,43 @@
+import { Component, inject, signal } from '@angular/core';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TransactionTypeField } from '@app/components/input/transaction-type-field/transaction-type-field';
+import { TransactionType } from '@app/types/transaction';
+
+@Component({
+  selector: 'app-add-category',
+  imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    TransactionTypeField,
+  ],
+  templateUrl: './add-category.html',
+  styleUrl: './add-category.scss',
+})
+export class AddCategory {
+  private fb = inject(FormBuilder);
+  private dialogRef = inject(MatDialogRef<AddCategory>);
+
+  form = this.fb.group({
+    name: ['', Validators.required],
+    type: new FormControl<TransactionType>('EXPENSE', Validators.required),
+  });
+
+  isLoading = signal(false);
+
+  submit() {
+    console.log('Submit');
+    this.dialogRef.close();
+  }
+
+  cancel() {
+    console.log('cancel');
+    this.dialogRef.close();
+  }
+}
