@@ -55,7 +55,6 @@ export class AddCategory {
   }
 
   cancel() {
-    console.log('cancel');
     this.dialogRef.close();
   }
 }

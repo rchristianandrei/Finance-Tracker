@@ -3,6 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { Category } from '@app/types/category';
 
 @Component({
   selector: 'app-section',
@@ -11,6 +12,6 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './section.css',
 })
 export class Section {
-  categories = input.required<{ name: string }[]>();
+  categories = input.required<Category[]>();
   displayedColumns = input.required<string[]>();
 }

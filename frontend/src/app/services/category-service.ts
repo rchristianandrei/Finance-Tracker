@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { TransactionType } from '@app/types/transaction';
 import { environment } from '@env/environment';
 import { AccountService } from './account-service';
+import { finalize, tap } from 'rxjs';
+import { Category } from '@app/types/category';
 
 @Injectable({
   providedIn: 'root',
@@ -13,25 +15,56 @@ export class CategoryService {
   private httpClient = inject(HttpClient);
   private accountService = inject(AccountService);
 
-  private _expenseCategories = signal<string[]>([
-    'Food',
-    'Transportation',
-    'Bills',
-    'Shopping',
-    'Entertainment',
-    'Health',
-    'Other',
-  ]);
-  private _incomeCategories = signal<string[]>(['Salary', 'Other']);
+  private _isLoading = signal(true);
+  private _expenseCategories = signal<Category[]>([]);
+  private _incomeCategories = signal<Category[]>([]);
 
+  public isLoading = this._isLoading.asReadonly();
   public ExpenseCategories = this._expenseCategories.asReadonly();
   public IncomeCategories = this._incomeCategories.asReadonly();
 
-  public Create(body: { type: TransactionType; name: string }) {
-    return this.httpClient.post(`${this.baseUrl}`, {
-      ...body,
-      type: body.type === 'EXPENSE' ? 1 : 2,
-      accountId: this.accountService.selected()?.id ?? 0,
+  constructor() {
+    effect(() => {
+      const account = this.accountService.selected();
+      if (!account) return;
+      this.GetAll()
+        .pipe(finalize(() => this._isLoading.set(false)))
+        .subscribe({
+          next: (value) => {
+            this._expenseCategories.set(value.expense);
+            this._incomeCategories.set(value.income);
+          },
+        });
     });
+  }
+
+  public Create(body: { type: TransactionType; name: string }) {
+    return this.httpClient
+      .post<Category>(`${this.baseUrl}`, {
+        ...body,
+        type: body.type === 'EXPENSE' ? 1 : 2,
+        accountId: this.accountService.selected()?.id ?? 0,
+      })
+      .pipe(
+        tap((value) => {
+          let category: WritableSignal<Category[]>;
+          switch (body.type) {
+            case 'EXPENSE':
+              category = this._expenseCategories;
+              break;
+            case 'INCOME':
+              category = this._incomeCategories;
+              break;
+          }
+          category.update((old) => [...old, value].sort((a, b) => a.name.localeCompare(b.name)));
+        }),
+      );
+  }
+
+  public GetAll() {
+    return this.httpClient.get<{
+      income: Category[];
+      expense: Category[];
+    }>(`${this.baseUrl}/${this.accountService.selected()?.id ?? 0}`);
   }
 }

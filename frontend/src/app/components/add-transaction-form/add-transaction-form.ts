@@ -35,7 +35,7 @@ import { TransactionTypeField } from '../input/transaction-type-field/transactio
 })
 export class AddExpenseForm {
   private fb = inject(FormBuilder);
-  private categoryService = inject(CategoryService);
+  protected categoryService = inject(CategoryService);
 
   heading = input('Transaction');
   transaction = input<Transaction>();

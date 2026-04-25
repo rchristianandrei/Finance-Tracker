@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,8 @@ import { Section } from './components/section/section';
 import { MatDialog } from '@angular/material/dialog';
 import { AddCategory } from './components/add-category/add-category';
 import { finalize } from 'rxjs';
+import { CategoryService } from '@app/services/category-service';
+import { Category } from '@app/types/category';
 
 @Component({
   selector: 'app-categories',
@@ -16,43 +18,13 @@ import { finalize } from 'rxjs';
 })
 export class Categories {
   private dialog = inject(MatDialog);
+  private categoryService = inject(CategoryService);
 
   displayedColumns = ['name', 'actions'];
 
-  expenseCategories = signal([
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-  ]);
-  incomeCategories = signal([
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Income' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-    { name: 'Others' },
-  ]);
-
-  isCreateOpen = signal(false);
+  readonly expenseCategories = this.categoryService.ExpenseCategories;
+  readonly incomeCategories = this.categoryService.IncomeCategories;
+  readonly isCreateOpen = signal(false);
 
   onCreate() {
     if (this.isCreateOpen()) return;
@@ -64,9 +36,7 @@ export class Categories {
       .afterClosed()
       .pipe(finalize(() => this.isCreateOpen.set(false)))
       .subscribe({
-        next: () => {
-          console.log('Closed');
-        },
+        next: () => {},
       });
   }
 }
