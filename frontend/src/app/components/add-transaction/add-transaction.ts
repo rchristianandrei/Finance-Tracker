@@ -6,8 +6,8 @@ import { TransactionService } from '@app/services/transaction-service';
 import { finalize } from 'rxjs';
 import { ToastService } from '@app/services/toast-service';
 import { resolveHttpError } from '@app/utils/http-error.util';
-import { TransactionType } from '@app/types/transaction';
 import { AccountService } from '@app/services/account-service';
+import { TransactionType } from '@app/types/category';
 
 @Component({
   selector: 'app-add-transaction',
@@ -25,7 +25,7 @@ export class AddTransaction {
   isLoading = signal(false);
   errorMessage = signal('');
 
-  openTransactionForm = signal<TransactionType>('EXPENSE');
+  openTransactionForm = signal<TransactionType>(1);
 
   toggleMenu() {
     this.isOpen.update((prev) => !prev);

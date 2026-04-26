@@ -2,7 +2,7 @@ import { Component, inject, input, output, signal } from '@angular/core';
 import { AddExpenseForm } from '@app/components/add-transaction-form/add-transaction-form';
 import { ToastService } from '@app/services/toast-service';
 import { TransactionService } from '@app/services/transaction-service';
-import { Transaction, TransactionType } from '@app/types/transaction';
+import { Transaction } from '@app/types/transaction';
 import { resolveHttpError } from '@app/utils/http-error.util';
 import { finalize } from 'rxjs';
 

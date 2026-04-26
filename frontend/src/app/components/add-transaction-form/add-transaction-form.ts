@@ -1,5 +1,5 @@
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Component, computed, inject, input, output, Signal, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,7 +13,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { CategoryService } from '@app/services/category-service';
-import { Transaction, TransactionType } from '@app/types/transaction';
+import { Transaction } from '@app/types/transaction';
+import { TransactionTypeField } from '../input/transaction-type-field/transaction-type-field';
+import { TransactionType } from '@app/types/category';
 
 @Component({
   selector: 'app-add-transaction-form',
@@ -28,13 +30,13 @@ import { Transaction, TransactionType } from '@app/types/transaction';
     MatButtonModule,
     MatIconModule,
     ReactiveFormsModule,
+    TransactionTypeField,
   ],
   templateUrl: './add-transaction-form.html',
-  styleUrl: './add-transaction-form.css',
 })
 export class AddExpenseForm {
   private fb = inject(FormBuilder);
-  private categoryService = inject(CategoryService);
+  protected categoryService = inject(CategoryService);
 
   heading = input('Transaction');
   transaction = input<Transaction>();
@@ -50,28 +52,16 @@ export class AddExpenseForm {
     date: Date;
   }>();
 
-  categories = ['Food', 'Transportation', 'Bills', 'Shopping', 'Entertainment', 'Health', 'Other'];
-
   typeSignal: Signal<TransactionType | null>;
   category = computed(() => {
-    switch (this.transaction()?.type ?? this.typeSignal()) {
-      case 'EXPENSE':
-        return this.categoryService.ExpenseCategories();
-
-      case 'INCOME':
-        return this.categoryService.IncomeCategories();
-
-      default:
-        return [];
-    }
+    return this.categoryService.groupedCategories()[
+      this.transaction()?.type ?? this.typeSignal() ?? 1
+    ];
   });
 
   form = computed(() =>
     this.fb.group({
-      type: new FormControl<'EXPENSE' | 'INCOME'>(
-        this.transaction()?.type ?? 'EXPENSE',
-        Validators.required,
-      ),
+      type: new FormControl<TransactionType>(this.transaction()?.type ?? 1, Validators.required),
       category: [this.transaction()?.category ?? '', Validators.required],
       description: [this.transaction()?.description ?? ''],
       amount: [this.transaction()?.amount ?? null, [Validators.required, Validators.min(1)]],
@@ -87,6 +77,11 @@ export class AddExpenseForm {
     this.typeSignal = toSignal(this.form().get('type')!.valueChanges, {
       initialValue: this.form().get('type')!.value,
     });
+
+    effect(() => {
+      this.category();
+      this.f.category.setValue(null);
+    }, {});
   }
 
   getNow(): string {

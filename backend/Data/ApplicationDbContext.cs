@@ -11,6 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<VerifyAccount> VerifyAccounts { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<DefaultAccount> DefaultAccounts { get; set; }
+    public DbSet<Category> Categories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,8 +57,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(u => u.DefaultAccount)
             .WithOne(d => d.Account)
             .HasForeignKey<DefaultAccount>(l => l.UserId);
+        modelBuilder.Entity<Account>()
+            .HasMany(u => u.Categories)
+            .WithOne(d => d.Account)
+            .HasForeignKey(l => l.AccountId);
 
-        modelBuilder.Entity<DefaultAccount>()
-            .HasKey(d => d.UserId);
+        modelBuilder.Entity<DefaultAccount>().HasKey(d => d.UserId);
+
+        modelBuilder.Entity<Category>().HasKey(d => d.Id);
     }
 }

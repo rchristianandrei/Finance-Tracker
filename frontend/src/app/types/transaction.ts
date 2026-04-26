@@ -1,4 +1,4 @@
-export type TransactionType = 'EXPENSE' | 'INCOME';
+import { TransactionType } from './category';
 
 export type Transaction = {
   id: string;

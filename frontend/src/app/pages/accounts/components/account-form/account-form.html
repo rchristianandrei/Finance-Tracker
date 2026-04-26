@@ -1,10 +1,10 @@
 <h2 mat-dialog-title>{{ data.heading ?? 'Account' }}</h2>
 
 <form [formGroup]="form" (submit)="submit()" (cancel)="cancel()">
-  <mat-dialog-content class="overflow-hidden! py-0!">
-    <mat-form-field appearance="fill" class="w-full">
+  <mat-dialog-content class="overflow-hidden! py-1!">
+    <mat-form-field appearance="outline" class="w-full">
       <mat-label>Account Name</mat-label>
-      <input matInput formControlName="name" placeholder="Enter account name" />
+      <input matInput formControlName="name" />
       @if (form.get('name')?.invalid && form.get('name')?.touched) {
         <mat-error> Account name is required </mat-error>
       }
