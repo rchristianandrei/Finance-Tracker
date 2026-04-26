@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, signal } from '@angular/core';
+import { Component, effect, forwardRef, input, signal } from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
@@ -6,8 +6,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
-import { TransactionType } from '@app/types/transaction';
 import { MatSelectModule } from '@angular/material/select';
+import { TransactionType } from '@app/types/category';
 
 @Component({
   selector: 'app-transaction-type-field',
@@ -25,7 +25,7 @@ import { MatSelectModule } from '@angular/material/select';
 export class TransactionTypeField implements ControlValueAccessor {
   formControl = input.required<FormControl<TransactionType | null>>();
 
-  readonly value = signal<TransactionType>('EXPENSE');
+  readonly value = signal<TransactionType>(1);
   readonly disabled = signal(false);
 
   onChange = (_: any) => {};

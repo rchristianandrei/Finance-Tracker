@@ -5,7 +5,6 @@ import { CategoryService } from '@app/services/category-service';
 import { finalize } from 'rxjs';
 import { ToastService } from '@app/services/toast-service';
 import { Category } from '@app/types/category';
-import { TransactionType } from '@app/types/transaction';
 
 @Injectable({
   providedIn: 'root',
@@ -36,12 +35,11 @@ export class SaveCategoryService {
     return createDialog;
   }
 
-  showUpdateDialog(category: Category, type: TransactionType) {
+  showUpdateDialog(category: Category) {
     const updateDialog = this.dialog.open<AddCategory, CategoryFormData>(AddCategory, {
       data: {
         heading: 'Update Category',
         category: category,
-        type: type,
         confirmButtonText: 'Save',
       },
     });
@@ -49,7 +47,7 @@ export class SaveCategoryService {
 
     instance.onSubmit.subscribe((value) => {
       this.categoryService
-        .update({ category: { ...category, name: value.name }, type: value.type })
+        .update({ ...category, name: value.name, type: value.type })
         .pipe(finalize(() => instance.stopLoading()))
         .subscribe({
           next: () => {

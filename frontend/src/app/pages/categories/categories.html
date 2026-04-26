@@ -8,18 +8,18 @@
     <!-- EXPENSE -->
     <app-section
       heading="Expense"
-      [categories]="expenseCategories()"
+      [categories]="groupedCategories()[1]"
       [displayedColumns]="displayedColumns"
-      (onEdit)="onUpdate($event, 'EXPENSE')"
-      (onDelete)="onDelete($event, 'EXPENSE')"
+      (onEdit)="onUpdate($event)"
+      (onDelete)="onDelete($event)"
     ></app-section>
     <!-- INCOME -->
     <app-section
       heading="Income"
-      [categories]="incomeCategories()"
+      [categories]="groupedCategories()[2]"
       [displayedColumns]="displayedColumns"
-      (onEdit)="onUpdate($event, 'INCOME')"
-      (onDelete)="onDelete($event, 'INCOME')"
+      (onEdit)="onUpdate($event)"
+      (onDelete)="onDelete($event)"
     ></app-section>
   </div>
 </app-root-layout>

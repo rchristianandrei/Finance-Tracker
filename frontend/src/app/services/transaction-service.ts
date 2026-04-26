@@ -1,8 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { TransactionType } from '@app/types/category';
 
 import { DashboardType } from '@app/types/dashboard';
-import { Transaction, TransactionType } from '@app/types/transaction';
+import { Transaction } from '@app/types/transaction';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -25,7 +26,7 @@ export class TransactionService {
     const body = {
       ...expense,
       date: expense.date.toISOString(),
-      type: expense.type === 'EXPENSE' ? 1 : 2,
+      type: expense.type,
     };
     return this.http.post(`${this.url}/${accountId}`, body);
   }
@@ -34,7 +35,7 @@ export class TransactionService {
     const body = {
       ...transaction,
       date: transaction.date.toISOString(),
-      type: transaction.type === 'EXPENSE' ? 1 : 2,
+      type: transaction.type,
     };
     return this.http.put(`${this.url}/${transaction.id}`, body);
   }

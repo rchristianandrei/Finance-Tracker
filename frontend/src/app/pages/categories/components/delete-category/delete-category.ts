@@ -5,12 +5,10 @@ import { MatError } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CategoryService } from '@app/services/category-service';
 import { Category } from '@app/types/category';
-import { TransactionType } from '@app/types/transaction';
 import { resolveHttpError } from '@app/utils/http-error.util';
 
 export type DeleteCategoryData = {
   category: Category;
-  type: TransactionType;
 };
 
 @Component({
@@ -33,7 +31,7 @@ export class DeleteCategory {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.categoryService.delete(this.data.category.id, this.data.type).subscribe({
+    this.categoryService.delete(this.data.category.id).subscribe({
       next: () => {
         this.dialogRef.close(true);
       },

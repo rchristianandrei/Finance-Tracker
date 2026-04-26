@@ -13,8 +13,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 
 import { CategoryService } from '@app/services/category-service';
-import { Transaction, TransactionType } from '@app/types/transaction';
+import { Transaction } from '@app/types/transaction';
 import { TransactionTypeField } from '../input/transaction-type-field/transaction-type-field';
+import { TransactionType } from '@app/types/category';
 
 @Component({
   selector: 'app-add-transaction-form',
@@ -53,24 +54,14 @@ export class AddExpenseForm {
 
   typeSignal: Signal<TransactionType | null>;
   category = computed(() => {
-    switch (this.transaction()?.type ?? this.typeSignal()) {
-      case 'EXPENSE':
-        return this.categoryService.ExpenseCategories();
-
-      case 'INCOME':
-        return this.categoryService.IncomeCategories();
-
-      default:
-        return [];
-    }
+    return this.categoryService.groupedCategories()[
+      this.transaction()?.type ?? this.typeSignal() ?? 1
+    ];
   });
 
   form = computed(() =>
     this.fb.group({
-      type: new FormControl<TransactionType>(
-        this.transaction()?.type ?? 'EXPENSE',
-        Validators.required,
-      ),
+      type: new FormControl<TransactionType>(this.transaction()?.type ?? 1, Validators.required),
       category: [this.transaction()?.category ?? '', Validators.required],
       description: [this.transaction()?.description ?? ''],
       amount: [this.transaction()?.amount ?? null, [Validators.required, Validators.min(1)]],

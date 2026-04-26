@@ -5,13 +5,11 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransactionTypeField } from '@app/components/input/transaction-type-field/transaction-type-field';
-import { Category } from '@app/types/category';
-import { TransactionType } from '@app/types/transaction';
+import { Category, TransactionType } from '@app/types/category';
 
 export type CategoryFormData = {
   heading: string;
   category?: Category;
-  type?: TransactionType;
   errorMessage?: Signal<string>;
   confirmButtonText?: string;
 };
@@ -36,7 +34,7 @@ export class AddCategory {
 
   form = this.fb.group({
     name: [this.data.category?.name ?? '', Validators.required],
-    type: new FormControl<TransactionType>(this.data.type ?? 'EXPENSE', Validators.required),
+    type: new FormControl<TransactionType>(this.data.category?.type ?? 1, Validators.required),
   });
 
   onSubmit = output<{ type: TransactionType; name: string }>();

@@ -19,6 +19,7 @@ public class CategoryController(ApplicationDbContext _context, ICurrentUserServi
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
+        // TODO - Add a limit
         var userId = _currentUser.Id();
         var account = await _accountCache.GetById(dto.AccountId);
         if (account == null) return NotFound("Account Not Found");
@@ -47,19 +48,7 @@ public class CategoryController(ApplicationDbContext _context, ICurrentUserServi
 
         var categories = await _context.Categories.Where(c => c.AccountId == accountId).OrderBy(c => c.Name).ToListAsync();
 
-        var dict = categories
-            .GroupBy(c => c.Type)
-            .ToDictionary(g => g.Key, g => g.Select(g => g.ToDto())
-            .ToList());
-
-        dict.TryGetValue(TransactionType.EXPENSE, out var expense);
-        dict.TryGetValue(TransactionType.INCOME, out var income);
-
-        return Ok(new
-        {
-            Expense = expense,
-            Income = income
-        });
+        return Ok(categories.Select(c => c.ToDto()));
     }
 
     [HttpPut("{id}")]

@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,9 +9,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddCategory } from './components/add-category/add-category';
 import { finalize } from 'rxjs';
 import { CategoryService } from '@app/services/category-service';
-import { Category } from '@app/types/category';
+import { Category, TransactionType } from '@app/types/category';
 import { DeleteCategory, DeleteCategoryData } from './components/delete-category/delete-category';
-import { TransactionType } from '@app/types/transaction';
 import { SaveCategoryService } from './services/add-category-service';
 
 @Component({
@@ -27,8 +26,7 @@ export class Categories {
 
   displayedColumns = ['name', 'actions'];
 
-  readonly expenseCategories = this.categoryService.ExpenseCategories;
-  readonly incomeCategories = this.categoryService.IncomeCategories;
+  readonly groupedCategories = this.categoryService.groupedCategories;
   readonly isDialogOpen = signal(false);
 
   onCreate() {
@@ -43,11 +41,11 @@ export class Categories {
       .subscribe();
   }
 
-  onUpdate(category: Category, type: TransactionType) {
+  onUpdate(category: Category) {
     if (this.isDialogOpen()) return;
     this.isDialogOpen.set(true);
 
-    const createDialog = this.addCategory.showUpdateDialog(category, type);
+    const createDialog = this.addCategory.showUpdateDialog(category);
 
     createDialog
       .afterClosed()
@@ -55,14 +53,13 @@ export class Categories {
       .subscribe();
   }
 
-  onDelete(category: Category, type: TransactionType) {
+  onDelete(category: Category) {
     if (this.isDialogOpen()) return;
     this.isDialogOpen.set(true);
 
     const deleteDialog = this.dialog.open<DeleteCategory, DeleteCategoryData>(DeleteCategory, {
       data: {
         category: category,
-        type: type,
       },
     });
 
