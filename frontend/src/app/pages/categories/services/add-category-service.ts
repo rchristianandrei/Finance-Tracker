@@ -49,7 +49,7 @@ export class SaveCategoryService {
 
     instance.onSubmit.subscribe((value) => {
       this.categoryService
-        .Create(value)
+        .update({ category: { ...category, name: value.name }, type: value.type })
         .pipe(finalize(() => instance.stopLoading()))
         .subscribe({
           next: () => {

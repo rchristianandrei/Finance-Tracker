@@ -27,7 +27,6 @@ export type CategoryFormData = {
     TransactionTypeField,
   ],
   templateUrl: './add-category.html',
-  styleUrl: './add-category.scss',
 })
 export class AddCategory {
   private fb = inject(FormBuilder);

@@ -62,6 +62,24 @@ public class CategoryController(ApplicationDbContext _context, ICurrentUserServi
         });
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
+    {
+        var category = await _context.Categories.Include(c => c.Account).AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+        if (category == null) return NotFound("Category not found");
+
+        var userId = _currentUser.Id();
+        if (category.Account.OwnerId != userId) return Forbid();
+
+        category.Type = dto.Type;
+        category.Name = dto.Name;
+
+        _context.Categories.Update(category);
+        await _context.SaveChangesAsync();
+
+        return Ok(category.ToDto());
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

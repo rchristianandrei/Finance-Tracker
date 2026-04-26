@@ -27,7 +27,7 @@ export class CategoryService {
     effect(() => {
       const account = this.accountService.selected();
       if (!account) return;
-      this.GetAll()
+      this.getAll()
         .pipe(finalize(() => this._isLoading.set(false)))
         .subscribe({
           next: (value) => {
@@ -61,11 +61,34 @@ export class CategoryService {
       );
   }
 
-  public GetAll() {
+  public getAll() {
     return this.httpClient.get<{
       income: Category[];
       expense: Category[];
     }>(`${this.baseUrl}/${this.accountService.selected()?.id ?? 0}`);
+  }
+
+  public update({ category, type }: { category: Category; type: TransactionType }) {
+    return this.httpClient
+      .put(`${this.baseUrl}/${category.id}`, {
+        id: category.id,
+        type: type === 'EXPENSE' ? 1 : 2,
+        name: category.name,
+      })
+      .pipe(
+        tap(() => {
+          let list: WritableSignal<Category[]>;
+          switch (type) {
+            case 'EXPENSE':
+              list = this._expenseCategories;
+              break;
+            case 'INCOME':
+              list = this._incomeCategories;
+              break;
+          }
+          list.update((old) => old.map((c) => (c.id === category.id ? category : c)));
+        }),
+      );
   }
 
   public delete(categoryId: number, type: TransactionType) {
