@@ -51,6 +51,10 @@ export class SaveCategoryService {
         });
     });
 
+    createDialog.afterClosed().subscribe(() => {
+      this.errorMessage.set('');
+    });
+
     return createDialog;
   }
 
@@ -87,6 +91,10 @@ export class SaveCategoryService {
             this.errorMessage.set(resolveHttpError(err));
           },
         });
+    });
+
+    updateDialog.afterClosed().subscribe(() => {
+      this.errorMessage.set('');
     });
 
     return updateDialog;
