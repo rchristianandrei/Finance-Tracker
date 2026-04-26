@@ -12,15 +12,18 @@ import { CategoryService } from '@app/services/category-service';
 import { Category } from '@app/types/category';
 import { DeleteCategory, DeleteCategoryData } from './components/delete-category/delete-category';
 import { TransactionType } from '@app/types/transaction';
+import { AddCategoryService } from './services/add-category-service';
 
 @Component({
   selector: 'app-categories',
   imports: [RootLayout, MatCardModule, MatButtonModule, MatTableModule, MatIconModule, Section],
   templateUrl: './categories.html',
+  providers: [AddCategory],
 })
 export class Categories {
   private dialog = inject(MatDialog);
   private categoryService = inject(CategoryService);
+  private addCategory = inject(AddCategoryService);
 
   displayedColumns = ['name', 'actions'];
 
@@ -32,7 +35,7 @@ export class Categories {
     if (this.isDialogOpen()) return;
     this.isDialogOpen.set(true);
 
-    const createDialog = this.dialog.open(AddCategory);
+    const createDialog = this.addCategory.showDialog();
 
     createDialog
       .afterClosed()
