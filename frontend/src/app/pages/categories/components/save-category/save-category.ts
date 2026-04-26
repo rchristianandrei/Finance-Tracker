@@ -24,11 +24,11 @@ export type CategoryFormData = {
     MatButtonModule,
     TransactionTypeField,
   ],
-  templateUrl: './add-category.html',
+  templateUrl: './save-category.html',
 })
-export class AddCategory {
+export class SaveCategory {
   private fb = inject(FormBuilder);
-  private dialogRef = inject(MatDialogRef<AddCategory>);
+  private dialogRef = inject(MatDialogRef<SaveCategory>);
 
   data = inject<CategoryFormData>(MAT_DIALOG_DATA);
 

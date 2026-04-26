@@ -6,18 +6,18 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { Section } from './components/section/section';
 import { MatDialog } from '@angular/material/dialog';
-import { AddCategory } from './components/add-category/add-category';
+import { SaveCategory } from './components/save-category/save-category';
 import { finalize } from 'rxjs';
 import { CategoryService } from '@app/services/category-service';
 import { Category, TransactionType } from '@app/types/category';
 import { DeleteCategory, DeleteCategoryData } from './components/delete-category/delete-category';
-import { SaveCategoryService } from './services/add-category-service';
+import { SaveCategoryService } from './services/save-category-service';
 
 @Component({
   selector: 'app-categories',
   imports: [RootLayout, MatCardModule, MatButtonModule, MatTableModule, MatIconModule, Section],
   templateUrl: './categories.html',
-  providers: [AddCategory],
+  providers: [SaveCategory],
 })
 export class Categories {
   private dialog = inject(MatDialog);

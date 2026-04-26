@@ -13,9 +13,9 @@
         <mat-error> Category name is required </mat-error>
       }
     </mat-form-field>
-    <!-- @if (data.errorMessage()) {
-      <mat-error class="text-center">{{ data.errorMessage() }}</mat-error>
-    } -->
+    @if (data.errorMessage?.()) {
+      <mat-error class="text-center">{{ data.errorMessage?.() }}</mat-error>
+    }
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">

@@ -19,11 +19,15 @@ public class CategoryController(ApplicationDbContext _context, ICurrentUserServi
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
-        // TODO - Add a limit
         var userId = _currentUser.Id();
         var account = await _accountCache.GetById(dto.AccountId);
         if (account == null) return NotFound("Account Not Found");
         if (account.OwnerId != userId) Forbid();
+
+        var categories = await _context.Categories
+            .Where(c => c.AccountId == dto.AccountId && c.Type == dto.Type)
+            .ToListAsync();
+        if (categories.Count >= 10) return BadRequest("You're exceeding the max limit of 10");
 
         var category = new Category
         {
