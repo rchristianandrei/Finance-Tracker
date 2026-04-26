@@ -35,7 +35,6 @@ export class TransactionService {
     const body = {
       ...transaction,
       date: transaction.date.toISOString(),
-      type: transaction.type,
     };
     return this.http.put(`${this.url}/${transaction.id}`, body);
   }

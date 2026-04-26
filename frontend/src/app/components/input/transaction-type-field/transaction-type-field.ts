@@ -26,7 +26,6 @@ export class TransactionTypeField implements ControlValueAccessor {
   formControl = input.required<FormControl<TransactionType | null>>();
 
   readonly value = signal<TransactionType>(1);
-  readonly disabled = signal(false);
 
   onChange = (_: any) => {};
   onTouched = () => {};
@@ -39,8 +38,5 @@ export class TransactionTypeField implements ControlValueAccessor {
   }
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
-  }
-  setDisabledState?(isDisabled: boolean): void {
-    this.disabled.set(isDisabled);
   }
 }

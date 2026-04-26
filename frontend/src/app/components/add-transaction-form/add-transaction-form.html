@@ -14,7 +14,7 @@
     </div>
 
     <!-- Form -->
-    <form [formGroup]="form()" (ngSubmit)="submit()" class="flex flex-col gap-4">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
       <!-- Type (Income / Expense) -->
       <app-transaction-type-field
         formControlName="type"
@@ -87,7 +87,7 @@
           mat-raised-button
           color="warn"
           type="submit"
-          [disabled]="form().invalid || isLoading()"
+          [disabled]="form.invalid || isLoading()"
         >
           @if (isLoading()) {
             <mat-spinner diameter="20"></mat-spinner>

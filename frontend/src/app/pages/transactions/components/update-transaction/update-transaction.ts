@@ -1,14 +1,15 @@
 import { Component, inject, input, output, signal } from '@angular/core';
-import { AddExpenseForm } from '@app/components/add-transaction-form/add-transaction-form';
+import { AddTransactionForm } from '@app/components/add-transaction-form/add-transaction-form';
 import { ToastService } from '@app/services/toast-service';
 import { TransactionService } from '@app/services/transaction-service';
+import { TransactionType } from '@app/types/category';
 import { Transaction } from '@app/types/transaction';
 import { resolveHttpError } from '@app/utils/http-error.util';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-update-transaction',
-  imports: [AddExpenseForm],
+  imports: [AddTransactionForm],
   templateUrl: './update-transaction.html',
   styleUrl: './update-transaction.scss',
 })
@@ -23,7 +24,13 @@ export class UpdateTransaction {
   isLoading = signal(false);
   errorMessage = signal('');
 
-  onSubmit(transaction: { category: string; amount: number; description: string; date: Date }) {
+  onSubmit(transaction: {
+    category: string;
+    amount: number;
+    description: string;
+    date: Date;
+    type: TransactionType;
+  }) {
     if (this.isLoading()) return;
     this.isLoading.set(true);
     this.errorMessage.set('');
@@ -35,6 +42,7 @@ export class UpdateTransaction {
         description: transaction.description,
         amount: transaction.amount,
         date: transaction.date,
+        type: transaction.type,
       })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({

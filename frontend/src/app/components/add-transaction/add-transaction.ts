@@ -1,7 +1,7 @@
 import { Component, inject, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AddExpenseForm } from '@app/components/add-transaction-form/add-transaction-form';
+import { AddTransactionForm } from '@app/components/add-transaction-form/add-transaction-form';
 import { TransactionService } from '@app/services/transaction-service';
 import { finalize } from 'rxjs';
 import { ToastService } from '@app/services/toast-service';
@@ -11,7 +11,7 @@ import { TransactionType } from '@app/types/category';
 
 @Component({
   selector: 'app-add-transaction',
-  imports: [MatIconModule, MatButtonModule, AddExpenseForm],
+  imports: [MatIconModule, MatButtonModule, AddTransactionForm],
   templateUrl: './add-transaction.html',
 })
 export class AddTransaction {

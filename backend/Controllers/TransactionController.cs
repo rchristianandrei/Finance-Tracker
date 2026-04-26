@@ -107,6 +107,7 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
+        transaction.Type = value.Type;
         transaction.Category = value.Category;
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;

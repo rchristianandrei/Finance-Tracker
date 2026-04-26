@@ -1,5 +1,4 @@
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Component, computed, effect, inject, input, output, Signal, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,7 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { CategoryService } from '@app/services/category-service';
 import { Transaction } from '@app/types/transaction';
 import { TransactionTypeField } from '../input/transaction-type-field/transaction-type-field';
-import { TransactionType } from '@app/types/category';
+import { Category, TransactionType } from '@app/types/category';
 
 @Component({
   selector: 'app-add-transaction-form',
@@ -34,7 +33,7 @@ import { TransactionType } from '@app/types/category';
   ],
   templateUrl: './add-transaction-form.html',
 })
-export class AddExpenseForm {
+export class AddTransactionForm {
   private fb = inject(FormBuilder);
   protected categoryService = inject(CategoryService);
 
@@ -52,36 +51,57 @@ export class AddExpenseForm {
     date: Date;
   }>();
 
-  typeSignal: Signal<TransactionType | null>;
-  category = computed(() => {
-    return this.categoryService.groupedCategories()[
-      this.transaction()?.type ?? this.typeSignal() ?? 1
-    ];
+  category = signal<Category[]>([]);
+
+  form = this.fb.group({
+    type: new FormControl<TransactionType>(this.transaction()?.type ?? 1, Validators.required),
+    category: [this.transaction()?.category ?? '', Validators.required],
+    description: [this.transaction()?.description ?? ''],
+    amount: [this.transaction()?.amount ?? null, [Validators.required, Validators.min(1)]],
+    date: new FormControl<Date | null>(new Date(), Validators.required),
   });
 
-  form = computed(() =>
-    this.fb.group({
-      type: new FormControl<TransactionType>(this.transaction()?.type ?? 1, Validators.required),
-      category: [this.transaction()?.category ?? '', Validators.required],
-      description: [this.transaction()?.description ?? ''],
-      amount: [this.transaction()?.amount ?? null, [Validators.required, Validators.min(1)]],
-      date: new FormControl<Date | null>(new Date(), Validators.required),
-    }),
-  );
-
   get f() {
-    return this.form().controls;
+    return this.form.controls;
   }
 
   constructor() {
-    this.typeSignal = toSignal(this.form().get('type')!.valueChanges, {
-      initialValue: this.form().get('type')!.value,
+    effect(() => {
+      this.category.set(this.categoryService.groupedCategories()[this.transaction()?.type ?? 1]);
     });
 
     effect(() => {
-      this.category();
-      this.f.category.setValue(null);
-    }, {});
+      const t = this.transaction();
+      if (!t) return;
+
+      this.form.patchValue(
+        {
+          type: t.type,
+          category: t.category,
+          description: t.description,
+          amount: t.amount,
+          date: t.date ? new Date(t.date) : new Date(),
+        },
+        { emitEvent: false },
+      );
+    });
+
+    this.f.type.valueChanges.subscribe((value) => {
+      const list = this.categoryService.groupedCategories()[value ?? 1];
+      this.category.set(list);
+      if (list.some((c) => c.name === this.f.category.value)) return;
+      this.f.category.setValue('');
+    });
+
+    this.f.category.valueChanges.subscribe((value) => {
+      const list = this.category(); // safe read
+
+      const exists = list.some((c) => c.name === value);
+
+      if (!exists && value !== null) {
+        this.f.category.setValue(null, { emitEvent: false });
+      }
+    });
   }
 
   getNow(): string {
@@ -96,7 +116,7 @@ export class AddExpenseForm {
   }
 
   submit() {
-    if (this.form().invalid || this.isLoading()) return;
+    if (this.form.invalid || this.isLoading()) return;
 
     this.onSubmit.emit({
       type: this.f.type.value!,
