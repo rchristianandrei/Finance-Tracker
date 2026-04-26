@@ -80,7 +80,11 @@ export class CategoryService {
       })
       .pipe(
         tap(() => {
-          this._categories.update((old) => old.map((c) => (c.id === category.id ? category : c)));
+          this._categories.update((old) =>
+            old
+              .map((c) => (c.id === category.id ? category : c))
+              .sort((a, b) => a.name.localeCompare(b.name)),
+          );
         }),
       );
   }
