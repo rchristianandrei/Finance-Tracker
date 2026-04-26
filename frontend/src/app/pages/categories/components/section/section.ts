@@ -16,9 +16,14 @@ export class Section {
   categories = input.required<Category[]>();
   displayedColumns = input.required<string[]>();
 
+  onEdit = output<Category>();
   onDelete = output<Category>();
 
-  Delete(category: Category) {
+  delete(category: Category) {
     this.onDelete.emit(category);
+  }
+
+  edit(category: Category) {
+    this.onEdit.emit(category);
   }
 }

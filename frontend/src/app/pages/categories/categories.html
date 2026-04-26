@@ -10,6 +10,7 @@
       heading="Expense"
       [categories]="expenseCategories()"
       [displayedColumns]="displayedColumns"
+      (onEdit)="onUpdate($event, 'EXPENSE')"
       (onDelete)="onDelete($event, 'EXPENSE')"
     ></app-section>
     <!-- INCOME -->
@@ -17,6 +18,7 @@
       heading="Income"
       [categories]="incomeCategories()"
       [displayedColumns]="displayedColumns"
+      (onEdit)="onUpdate($event, 'INCOME')"
       (onDelete)="onDelete($event, 'INCOME')"
     ></app-section>
   </div>

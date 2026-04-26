@@ -12,7 +12,7 @@ import { CategoryService } from '@app/services/category-service';
 import { Category } from '@app/types/category';
 import { DeleteCategory, DeleteCategoryData } from './components/delete-category/delete-category';
 import { TransactionType } from '@app/types/transaction';
-import { AddCategoryService } from './services/add-category-service';
+import { SaveCategoryService } from './services/add-category-service';
 
 @Component({
   selector: 'app-categories',
@@ -23,7 +23,7 @@ import { AddCategoryService } from './services/add-category-service';
 export class Categories {
   private dialog = inject(MatDialog);
   private categoryService = inject(CategoryService);
-  private addCategory = inject(AddCategoryService);
+  private addCategory = inject(SaveCategoryService);
 
   displayedColumns = ['name', 'actions'];
 
@@ -35,7 +35,19 @@ export class Categories {
     if (this.isDialogOpen()) return;
     this.isDialogOpen.set(true);
 
-    const createDialog = this.addCategory.showDialog();
+    const createDialog = this.addCategory.showCreateDialog();
+
+    createDialog
+      .afterClosed()
+      .pipe(finalize(() => this.isDialogOpen.set(false)))
+      .subscribe();
+  }
+
+  onUpdate(category: Category, type: TransactionType) {
+    if (this.isDialogOpen()) return;
+    this.isDialogOpen.set(true);
+
+    const createDialog = this.addCategory.showUpdateDialog(category, type);
 
     createDialog
       .afterClosed()

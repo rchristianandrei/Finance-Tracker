@@ -9,7 +9,9 @@ import { Category } from '@app/types/category';
 import { TransactionType } from '@app/types/transaction';
 
 export type CategoryFormData = {
+  heading: string;
   category?: Category;
+  type?: TransactionType;
   errorMessage?: Signal<string>;
   confirmButtonText?: string;
 };
@@ -34,8 +36,8 @@ export class AddCategory {
   data = inject<CategoryFormData>(MAT_DIALOG_DATA);
 
   form = this.fb.group({
-    name: ['', Validators.required],
-    type: new FormControl<TransactionType>('EXPENSE', Validators.required),
+    name: [this.data.category?.name ?? '', Validators.required],
+    type: new FormControl<TransactionType>(this.data.type ?? 'EXPENSE', Validators.required),
   });
 
   onSubmit = output<{ type: TransactionType; name: string }>();

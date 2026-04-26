@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Create Category</h2>
+<h2 mat-dialog-title>{{ data.heading }}</h2>
 
 <form [formGroup]="form" (submit)="submit()" (cancel)="close()">
   <mat-dialog-content class="overflow-hidden! py-1! gap-4! flex! flex-col!">
@@ -29,7 +29,7 @@
       @if (isLoading()) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {
-        Create
+        {{ data.confirmButtonText ?? 'Submit' }}
       }
     </button>
   </mat-dialog-actions>
