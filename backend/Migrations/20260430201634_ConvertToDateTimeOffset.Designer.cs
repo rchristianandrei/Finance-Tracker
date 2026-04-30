@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430201634_ConvertToDateTimeOffset")]
+    partial class ConvertToDateTimeOffset
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,33 +131,6 @@ namespace backend.Migrations
                     b.ToTable("GoogleCredentials");
                 });
 
-            modelBuilder.Entity("backend.Models.LocalCredential", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("LocalCredentials");
-                });
-
             modelBuilder.Entity("backend.Models.Transaction", b =>
                 {
                     b.Property<long>("Id")
@@ -229,33 +205,6 @@ namespace backend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("backend.Models.VerifyAccount", b =>
-                {
-                    b.Property<string>("Email")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Otp")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Email");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.ToTable("VerifyAccounts");
-                });
-
             modelBuilder.Entity("backend.Models.Account", b =>
                 {
                     b.HasOne("backend.Models.User", "Owner")
@@ -308,29 +257,6 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("backend.Models.LocalCredential", b =>
-                {
-                    b.HasOne("backend.Models.User", "User")
-                        .WithOne("LocalCredential")
-                        .HasForeignKey("backend.Models.LocalCredential", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("backend.Models.VerifyAccount", b =>
-                {
-                    b.HasOne("backend.Models.LocalCredential", "LocalCredential")
-                        .WithOne("VerifyAccount")
-                        .HasForeignKey("backend.Models.VerifyAccount", "Email")
-                        .HasPrincipalKey("backend.Models.LocalCredential", "Email")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LocalCredential");
-                });
-
             modelBuilder.Entity("backend.Models.Transaction", b =>
                 {
                     b.HasOne("backend.Models.Account", "Account")
@@ -359,11 +285,6 @@ namespace backend.Migrations
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("backend.Models.LocalCredential", b =>
-                {
-                    b.Navigation("VerifyAccount");
-                });
-
             modelBuilder.Entity("backend.Models.User", b =>
                 {
                     b.Navigation("Accounts");
@@ -371,8 +292,6 @@ namespace backend.Migrations
                     b.Navigation("DefaultAccount");
 
                     b.Navigation("GoogleCredential");
-
-                    b.Navigation("LocalCredential");
 
                     b.Navigation("Transactions");
                 });

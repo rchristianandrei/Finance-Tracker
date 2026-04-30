@@ -99,7 +99,7 @@ public class TransactionController(
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] UpdateTransactionDto value)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateTransactionDto value)
     {
         var userId = _currentUserService.Id();
 
@@ -112,7 +112,7 @@ public class TransactionController(
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
         transaction.Date = value.Date;
-        transaction.LastUpdated = DateTime.Now;
+        transaction.LastUpdated = DateTime.UtcNow;
 
         await _transactionService.Update(transaction);
 
@@ -120,7 +120,7 @@ public class TransactionController(
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(long id)
     {
         var userId = _currentUserService.Id();
 
@@ -128,7 +128,7 @@ public class TransactionController(
         if (transaction == null) return NoContent();
 
         if (transaction.UserId != userId) return Forbid();
-        await _transactionService.Delete(id);
+        await _transactionService.Delete(transaction);
 
         return NoContent();
     }

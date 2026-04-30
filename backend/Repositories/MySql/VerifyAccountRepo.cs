@@ -34,16 +34,12 @@ public class VerifyAccountRepo(
     public async Task<VerifyAccount?> GetByEmail(string email)
     {
         var verify = await _context.VerifyAccounts.FindAsync(email);
-        if (verify != null)
-            verify.ExpiresAt = DateTime.SpecifyKind(verify.ExpiresAt, DateTimeKind.Utc);
         return verify;
     }
 
     public async Task<VerifyAccount?> GetByToken(string token)
     {
         var verify = await _context.VerifyAccounts.FirstOrDefaultAsync(v => v.Token == token);
-        if (verify != null)
-            verify.ExpiresAt = DateTime.SpecifyKind(verify.ExpiresAt, DateTimeKind.Utc);
         return verify;
     }
 

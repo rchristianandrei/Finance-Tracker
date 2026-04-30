@@ -5,6 +5,7 @@ import { TransactionType } from '@app/types/category';
 import { DashboardType } from '@app/types/dashboard';
 import { Transaction } from '@app/types/transaction';
 import { environment } from '@env/environment';
+import { map, pipe } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -75,24 +76,20 @@ export class TransactionService {
       params = params.set('Page', filter.page);
     }
 
-    return this.http.get<{
-      totalCount: number;
-      data: Transaction[];
-    }>(`${this.url}/${accountId}`, { params });
-    // .pipe(
-    //   map((paginatedData) => ({
-    //     ...paginatedData,
-    //     data: paginatedData.data.map((t) => {
-    //       const utcDate = new Date(t.date); // parse string to Date
-    //       const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
-
-    //       return {
-    //         ...t,
-    //         date: localDate,
-    //       };
-    //     }),
-    //   })),
-    // );
+    return this.http
+      .get<{
+        totalCount: number;
+        data: Transaction[];
+      }>(`${this.url}/${accountId}`, { params })
+      .pipe(
+        map((res) => ({
+          ...res,
+          data: res.data.map((t) => ({
+            ...t,
+            date: new Date(t.date),
+          })),
+        })),
+      );
   }
 
   delete(id: string) {

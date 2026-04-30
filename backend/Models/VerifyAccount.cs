@@ -11,9 +11,9 @@ public class VerifyAccount
 
     public string Otp { get; set; } = string.Empty;
 
-    public DateTime ExpiresAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
     public LocalCredential LocalCredential { get; set; } = null!;
 }

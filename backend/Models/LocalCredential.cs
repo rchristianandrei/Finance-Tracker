@@ -16,7 +16,7 @@ public class LocalCredential
 
     public bool IsVerified { get; set; } = false;
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
     public VerifyAccount? VerifyAccount { get; set; }
 }

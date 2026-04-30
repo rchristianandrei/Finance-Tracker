@@ -70,7 +70,6 @@ export class Transactions {
   paginationDetails = signal({
     page: 0,
     pageSize: 10,
-    totalItems: 0,
   });
 
   dataSource = signal<Transaction[]>([]);
