@@ -8,5 +8,5 @@ public class DefaultAccount
     public int AccountId { get; set; }
     public Account Account { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 }

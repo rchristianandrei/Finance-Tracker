@@ -12,5 +12,5 @@ public class GoogleCredential
 
     public string Subject { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -7,7 +7,7 @@ namespace backend.Dtos;
 public class UpdateTransactionDto
 {
     [Required]
-    public string Id { get; set; } = string.Empty;
+    public long Id { get; set; }
 
     [Required]
     public TransactionType Type { get; set; }

@@ -20,7 +20,7 @@ builder.Services
     .AddJwt(builder.Configuration)
     .AddMySql(builder.Configuration)
     .AddRedis(builder.Configuration)
-    .AddMongoDb(builder.Configuration)
+    // .AddMongoDb(builder.Configuration)
     .AddRateLimiting();
 
 // Identity
