@@ -9,16 +9,9 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '@app/services/auth-service';
 import { resolveHttpError } from '@app/utils/http-error.util';
@@ -33,25 +26,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
-  imports: [
-    GoogleSigninButtonModule,
-    SocialLoginModule,
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatIconModule,
-  ],
+  imports: [GoogleSigninButtonModule, SocialLoginModule, RouterModule, MatProgressSpinnerModule],
   templateUrl: './login.html',
 })
 export class Login implements OnInit {
   private destroyRef = inject(DestroyRef);
   private socialAuthService = inject(SocialAuthService);
-  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
   private toastService = inject(ToastService);
@@ -61,15 +41,6 @@ export class Login implements OnInit {
   googleBtnWidth = signal(300);
   showGoogleBtn = signal(true);
 
-  loginForm = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
-  });
-  get f() {
-    return this.loginForm.controls;
-  }
-
-  hidePassword = signal(true);
   isLoading = signal(false);
   errorMessage = signal('');
 
@@ -81,7 +52,21 @@ export class Login implements OnInit {
       this.authService
         .googleLogin({ idToken: user.idToken })
         .pipe(finalize(() => this.isLoading.set(false)))
-        .subscribe(this.loginReaction());
+        .subscribe({
+          next: () => {
+            this.toastService.success('Login successful!');
+            this.router.navigate(['/']);
+          },
+          error: (err: any) => {
+            if (err.status === 403) {
+              const { message, token } = err.error;
+              this.errorMessage.set(message);
+              this.router.navigate(['/verify-account', token]);
+            } else {
+              this.errorMessage.set(resolveHttpError(err));
+            }
+          },
+        });
     });
   }
 
@@ -94,38 +79,5 @@ export class Login implements OnInit {
     this.showGoogleBtn.set(false);
     this.googleBtnWidth.set(this.googleBtn.nativeElement.clientWidth);
     setTimeout(() => this.showGoogleBtn.set(true), 0);
-  }
-
-  onSubmit(): void {
-    if (this.isLoading() || this.loginForm.invalid) return;
-
-    this.isLoading.set(true);
-    this.errorMessage.set('');
-
-    this.authService
-      .login({
-        email: this.loginForm.value.email!,
-        password: this.loginForm.value.password!,
-      })
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe(this.loginReaction());
-  }
-
-  loginReaction() {
-    return {
-      next: () => {
-        this.toastService.success('Login successful!');
-        this.router.navigate(['/']);
-      },
-      error: (err: any) => {
-        if (err.status === 403) {
-          const { message, token } = err.error;
-          this.errorMessage.set(message);
-          this.router.navigate(['/verify-account', token]);
-        } else {
-          this.errorMessage.set(resolveHttpError(err));
-        }
-      },
-    };
   }
 }

@@ -26,20 +26,14 @@ export class AuthService {
     this.getMe();
   }
 
-  login(body: { email: string; password: string }) {
-    return this.httpClient
-      .post<User>(`${environment.apiUrl}/auth/login`, body)
-      .pipe(tap((user) => this._user.set(user)));
-  }
-
   googleLogin(body: { idToken?: string }) {
     return this.httpClient
-      .post<User>(`${environment.apiUrl}/auth/google`, body)
+      .post<User>(`${this.baseUrl}/google`, body)
       .pipe(tap((user) => this._user.set(user)));
   }
 
   logout() {
-    return this.httpClient.post(`${environment.apiUrl}/auth/logout`, {}).pipe(
+    return this.httpClient.post(`${this.baseUrl}/logout`, {}).pipe(
       tap(async () => {
         this.socialAuthService.signOut().catch(() => {});
         this._user.set(null);
@@ -48,19 +42,9 @@ export class AuthService {
     );
   }
 
-  register(body: { email: string; password: string }) {
-    return this.httpClient.post(`${environment.apiUrl}/auth/register`, body);
-  }
-
-  getVerifyAccountByToken(token: string) {
-    return this.httpClient.get<{ email: string; expiresAt: string }>(
-      `${this.baseUrl}/verify-token/${token}`,
-    );
-  }
-
   getMe() {
     this.httpClient
-      .get<User>(`${environment.apiUrl}/auth/me`)
+      .get<User>(`${this.baseUrl}/me`)
       .pipe(finalize(() => this._isLoading.next(false)))
       .subscribe({
         next: (user) => {
@@ -68,13 +52,5 @@ export class AuthService {
         },
         error: () => {},
       });
-  }
-
-  renewOtp(token: string) {
-    return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/renew-otp/${token}`, {});
-  }
-
-  verifyAccount(body: { token: string; otp: string }) {
-    return this.httpClient.put<{ expiresAt: string }>(`${this.baseUrl}/verify-account/`, body);
   }
 }
