@@ -49,23 +49,6 @@ export const routes: Routes = [
         canActivate: [guestGuard],
         loadComponent: () => import('./pages/login/login').then((c) => c.Login),
       },
-      {
-        path: 'register',
-        title: 'Register',
-        loadComponent: () => import('./pages/register/register').then((c) => c.Register),
-      },
-      {
-        path: 'verify-account/:token',
-        title: 'Verify Account',
-        loadComponent: () =>
-          import('./pages/verify-account/verify-account').then((c) => c.VerifyAccount),
-      },
-      {
-        path: 'forgot-password',
-        title: 'Forgot Password',
-        loadComponent: () =>
-          import('./pages/forgot-password/forgot-password').then((c) => c.ForgotPassword),
-      },
     ],
   },
 ];
