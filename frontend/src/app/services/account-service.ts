@@ -31,7 +31,12 @@ export class AccountService {
   constructor() {
     effect(() => {
       const user = this.authService.user();
-      if (!user) return;
+      if (!user) {
+        this._selected.set(null);
+        this._default.set(null);
+        this._accounts.set([]);
+        return;
+      }
 
       this._isLoading.set(true);
 
@@ -39,8 +44,8 @@ export class AccountService {
         .pipe(finalize(() => this._isLoading.set(false)))
         .subscribe({
           next: (accounts) => {
-            const accountId = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null');
-            const account = accounts.accounts.find((a) => a.id === accountId) || null;
+            const { accountId } = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null');
+            const account = accounts.accounts.find((a) => a.id === Number(accountId)) || null;
             if (account) {
               this._selected.set(account);
             } else {
