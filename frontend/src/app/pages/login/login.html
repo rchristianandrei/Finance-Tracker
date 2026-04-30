@@ -3,7 +3,7 @@
     <h1 class="text-3xl text-center">Welcome Back</h1>
 
     @if (errorMessage()) {
-      <mat-error class="text-center">{{ errorMessage() }}</mat-error>
+      <div class="text-center text-red-600">{{ errorMessage() }}</div>
     }
 
     @if (isLoading()) {
