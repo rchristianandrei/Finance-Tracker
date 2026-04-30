@@ -13,7 +13,7 @@ public class User
     [MaxLength(25)]
     public string LastName { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
@@ -21,4 +21,6 @@ public class User
     public ICollection<Account> Accounts { get; set; } = [];
     [JsonIgnore]
     public DefaultAccount? DefaultAccount { get; set; }
+    [JsonIgnore]
+    public ICollection<Transaction> Transactions { get; set; } = [];
 }

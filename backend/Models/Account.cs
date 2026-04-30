@@ -13,12 +13,14 @@ public class Account
 
     public double Balance { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonIgnore]
     public DefaultAccount? DefaultAccount { get; set; }
     [JsonIgnore]
     public ICollection<Category> Categories { get; set; } = [];
+    [JsonIgnore]
+    public ICollection<Transaction> Transactions { get; set; } = [];
 }

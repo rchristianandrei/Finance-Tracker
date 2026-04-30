@@ -1,20 +1,19 @@
 using backend.Dtos;
 using backend.Models;
-using MongoDB.Driver;
 
-namespace backend.Interfaces;
+namespace backend.Interfaces.MySql;
 
 public interface ITransactionService
 {
     Task Create(Transaction entity);
 
-    Task<ReplaceOneResult?> Update(Transaction entity);
+    Task Update(Transaction entity);
 
-    Task<Transaction?> GetById(string id);
+    Task<Transaction?> GetById(long id);
 
     Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query);
 
     Task<IEnumerable<Transaction>> GetLastDays(int accountId, int days);
 
-    Task<DeleteResult?> Delete(string id);
+    Task Delete(Transaction transaction);
 }

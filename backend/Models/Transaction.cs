@@ -1,21 +1,19 @@
 using System.ComponentModel.DataAnnotations;
 using backend.Enums;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace backend.Models;
 
 public class Transaction
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string? Id { get; set; }
+    public long Id { get; set; }
 
     [Required]
     public int UserId { get; set; }
+    public User User { get; set; } = null!;
 
     [Required]
     public int AccountId { get; set; }
+    public Account Account { get; set; } = null!;
 
     [Required]
     public TransactionType Type { get; set; }
@@ -31,12 +29,9 @@ public class Transaction
     [MaxLength(30)]
     public string Description { get; set; } = string.Empty;
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime Date { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset Date { get; set; } = DateTime.UtcNow;
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset LastUpdated { get; set; } = DateTime.UtcNow;
 }

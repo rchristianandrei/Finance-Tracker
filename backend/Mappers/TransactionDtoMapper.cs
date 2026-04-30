@@ -9,7 +9,7 @@ public static class TransactionDtoMapper
     {
         return new TransactionDto
         {
-            Id = t.Id!,
+            Id = t.Id,
             Date = t.Date,
             Type = t.Type,
             Category = t.Category,

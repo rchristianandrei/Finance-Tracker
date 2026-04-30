@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Account> Accounts { get; set; }
     public DbSet<DefaultAccount> DefaultAccounts { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +31,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(u => u.DefaultAccount)
             .WithOne(d => d.User)
             .HasForeignKey<DefaultAccount>(l => l.UserId);
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Transactions)
+            .WithOne(a => a.User)
+            .HasForeignKey(a => a.UserId);
 
         modelBuilder.Entity<GoogleCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Email).IsUnique();
@@ -44,9 +49,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasMany(u => u.Categories)
             .WithOne(d => d.Account)
             .HasForeignKey(l => l.AccountId);
+        modelBuilder.Entity<Account>()
+            .HasMany(u => u.Transactions)
+            .WithOne(d => d.Account)
+            .HasForeignKey(l => l.AccountId);
 
         modelBuilder.Entity<DefaultAccount>().HasKey(d => d.UserId);
 
         modelBuilder.Entity<Category>().HasKey(d => d.Id);
+
+        modelBuilder.Entity<Transaction>().HasKey(d => d.Id);
     }
 }

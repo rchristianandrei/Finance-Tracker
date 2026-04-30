@@ -44,8 +44,16 @@ export class AccountService {
         .pipe(finalize(() => this._isLoading.set(false)))
         .subscribe({
           next: (accounts) => {
-            const { accountId } = JSON.parse(sessionStorage.getItem(this.storageKey) || 'null');
-            const account = accounts.accounts.find((a) => a.id === Number(accountId)) || null;
+            let rawAccount: Account | null = null;
+            const stored = sessionStorage.getItem(this.storageKey);
+            if (stored) {
+              try {
+                rawAccount = JSON.parse(stored) as Account;
+              } catch {
+                rawAccount = null; // or handle cleanup
+              }
+            }
+            const account = accounts.accounts.find((a) => a.id === Number(rawAccount?.id)) || null;
             if (account) {
               this._selected.set(account);
             } else {
