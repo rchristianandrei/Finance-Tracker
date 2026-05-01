@@ -31,7 +31,12 @@ export class AccountService {
   constructor() {
     effect(() => {
       const user = this.authService.user();
-      if (!user) return;
+      if (!user) {
+        this._selected.set(null);
+        this._default.set(null);
+        this._accounts.set([]);
+        return;
+      }
 
       this._isLoading.set(true);
 

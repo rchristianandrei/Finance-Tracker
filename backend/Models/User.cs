@@ -18,8 +18,6 @@ public class User
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonIgnore]
-    public LocalCredential? LocalCredential { get; set; }
-    [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
     [JsonIgnore]
     public ICollection<Account> Accounts { get; set; } = [];
