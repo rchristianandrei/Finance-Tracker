@@ -1,4 +1,4 @@
-<app-root-layout heading="Transactions">
+<app-root-layout heading="Users">
   <div class="flex flex-col gap-6 md:h-full">
     <!-- Search + Filters -->
     <mat-card class="p-4 shadow-md rounded-2xl">
@@ -40,59 +40,30 @@
         </div>
       </form>
     </mat-card>
-
     <!-- Transactions Table -->
     <mat-card class="md:flex-1 md:overflow-auto p-4 shadow-md rounded-2xl">
-      <div class="text-lg font-semibold mb-3">Transaction History</div>
+      <div class="text-lg font-semibold mb-3">Current Users</div>
 
       <div class="flex-1 overflow-auto">
         <table mat-table [dataSource]="dataSource()" class="w-full">
-          <!-- Date -->
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Date</th>
+          <!-- Id -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Id</th>
             <td mat-cell *matCellDef="let t">
-              {{ t.date | date: 'MMM d' }}
+              {{ t.id }}
             </td>
           </ng-container>
 
-          <!-- Category -->
-          <ng-container matColumnDef="category">
-            <th mat-header-cell *matHeaderCellDef>Category</th>
-            <td mat-cell *matCellDef="let t">{{ t.category }}</td>
+          <!-- First Name -->
+          <ng-container matColumnDef="firstName">
+            <th mat-header-cell *matHeaderCellDef>First Name</th>
+            <td mat-cell *matCellDef="let t">{{ t.firstName }}</td>
           </ng-container>
 
-          <!-- Description -->
-          <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>Description</th>
-            <td mat-cell *matCellDef="let t">{{ t.description }}</td>
-          </ng-container>
-
-          <!-- Type -->
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let t">
-              <span
-                class="px-2 py-1 rounded-full text-xs font-medium"
-                [class]="t.type === 2 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'"
-              >
-                {{ t.type }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Amount -->
-          <ng-container matColumnDef="amount">
-            <th mat-header-cell *matHeaderCellDef class="text-center!">Amount</th>
-            <td
-              mat-cell
-              *matCellDef="let t"
-              [class]="t.type === 2 ? 'text-green-600' : 'text-red-500'"
-            >
-              <div class="flex justify-between items-center">
-                <span>₱</span>
-                <span>{{ t.amount | number: '1.2-2' }}</span>
-              </div>
-            </td>
+          <!-- Last Name -->
+          <ng-container matColumnDef="lastName">
+            <th mat-header-cell *matHeaderCellDef>Last Name</th>
+            <td mat-cell *matCellDef="let t">{{ t.lastName }}</td>
           </ng-container>
 
           <!-- Actions -->
@@ -100,10 +71,7 @@
             <th mat-header-cell *matHeaderCellDef class="text-end!">Actions</th>
             <td mat-cell *matCellDef="let t">
               <div class="flex justify-end gap-2">
-                <button mat-icon-button class="text-blue-600!" (click)="onStartUpdate(t)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button class="text-red-600!" (click)="onStartDelete(t)">
+                <button mat-icon-button class="text-red-600!">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -119,7 +87,7 @@
       <!-- Pagination -->
       <div class="flex justify-center">
         <mat-paginator
-          [length]="totalTransactions()"
+          [length]="totalItems()"
           [pageSize]="paginationDetails().pageSize"
           [pageIndex]="paginationDetails().page"
           [pageSizeOptions]="[5, 10, 20]"
@@ -130,17 +98,4 @@
       </div>
     </mat-card>
   </div>
-  <app-add-transaction (onAddSucess)="loadTransactions()"></app-add-transaction>
-  @if (deleteEvent()) {
-    <app-delete-transaction
-      [transaction]="deleteEvent()!"
-      (onClose)="onEndDelete($event)"
-    ></app-delete-transaction>
-  }
-  @if (updateEvent()) {
-    <app-update-transaction
-      [transaction]="updateEvent()!"
-      (onClose)="onEndUpdate($event)"
-    ></app-update-transaction>
-  }
 </app-root-layout>

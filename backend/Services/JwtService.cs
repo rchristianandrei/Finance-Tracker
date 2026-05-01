@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using backend.Enums;
 using backend.Interfaces;
 using backend.Models;
 using backend.Settings;
@@ -23,10 +24,13 @@ public class JwtService(IOptions<JwtSettings> jwtSettingsAccessor) : IJwtService
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? throw new InvalidOperationException("Missing JWT Key")));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new (JwtRegisteredClaimNames.Sub, user.Id.ToString()),
         };
+
+        if (user.IsAdmin)
+            claims.Add(new(ClaimTypes.Role, Roles.ADMIN.ToString()));
 
         var token = new JwtSecurityToken(
             issuer: issuer,

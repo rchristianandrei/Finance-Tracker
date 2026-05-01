@@ -13,6 +13,8 @@ public class User
     [MaxLength(25)]
     public string LastName { get; set; } = string.Empty;
 
+    public bool IsAdmin { get; set; } = false;
+
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonIgnore]

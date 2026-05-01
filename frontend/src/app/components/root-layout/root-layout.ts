@@ -48,9 +48,10 @@ export class RootLayout {
     { icon: 'payment', feature: 'Transactions', route: '/transactions' },
     { icon: 'account_balance', feature: 'Accounts', route: '/accounts' },
     { icon: 'category', feature: 'Categories', route: '/categories' },
-    { icon: 'people', feature: 'Users', route: '/users' },
     { icon: 'settings', feature: 'Settings', route: '/settings' },
   ];
+
+  adminNav = [{ icon: 'people', feature: 'Users', route: '/users' }];
 
   user = this.authService.user;
   selectedAccount = this.accountService.selected;
