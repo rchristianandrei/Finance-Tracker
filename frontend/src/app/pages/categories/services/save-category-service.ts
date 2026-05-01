@@ -29,12 +29,16 @@ export class SaveCategoryService {
 
     instance.onSubmit.subscribe((value) => {
       this.errorMessage.set('');
+      console.log(value);
 
-      const list = this.categoryService.groupedCategories()[value.type];
-      if (list.some((item) => item.name === value.name)) {
-        this.errorMessage.set('Name already exists');
-        instance.stopLoading();
-        return;
+      const categories = this.categoryService.groupedCategories();
+      if (value.type in categories) {
+        const list = categories[value.type];
+        if (list.some((item) => item.name === value.name)) {
+          this.errorMessage.set('Name already exists');
+          instance.stopLoading();
+          return;
+        }
       }
 
       this.categoryService
@@ -72,11 +76,14 @@ export class SaveCategoryService {
     instance.onSubmit.subscribe((value) => {
       this.errorMessage.set('');
 
-      const list = this.categoryService.groupedCategories()[value.type];
-      if (list.some((item) => item.name === value.name)) {
-        this.errorMessage.set('Name already exists');
-        instance.stopLoading();
-        return;
+      const categories = this.categoryService.groupedCategories();
+      if (value.type in categories) {
+        const list = categories[value.type];
+        if (list.some((item) => item.name === value.name)) {
+          this.errorMessage.set('Name already exists');
+          instance.stopLoading();
+          return;
+        }
       }
 
       this.categoryService
