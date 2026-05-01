@@ -70,7 +70,6 @@ export class Transactions {
   paginationDetails = signal({
     page: 0,
     pageSize: 10,
-    totalItems: 0,
   });
 
   dataSource = signal<Transaction[]>([]);
@@ -115,7 +114,6 @@ export class Transactions {
 
     this.transactionService.getTransactions(accountId, filter).subscribe({
       next: (value) => {
-        console.log(value);
         this.dataSource.set(value.data);
         this.totalTransactions.set(value.totalCount);
       },

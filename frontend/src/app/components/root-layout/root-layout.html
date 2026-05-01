@@ -31,6 +31,21 @@
           </a>
         }
       </nav>
+      @if (user()?.isAdmin) {
+        <nav class="flex flex-col gap-2 px-2 mt-4">
+          @for (path of adminNav; track $index) {
+            <a
+              mat-button
+              [routerLink]="path.route"
+              (click)="sidenav.close()"
+              class="justify-start!"
+            >
+              <mat-icon>{{ path.icon }}</mat-icon>
+              <span class="text-left">{{ path.feature }}</span>
+            </a>
+          }
+        </nav>
+      }
     </div>
   </mat-sidenav>
 

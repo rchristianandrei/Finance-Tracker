@@ -1,8 +1,10 @@
 using System.Text;
+using backend.Enums;
 using backend.Interfaces;
 using backend.Services;
 using backend.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -59,6 +61,9 @@ public static class ProgramJwtExtension
                     }
                 };
             });
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy("AdminOnly", policy => policy.RequireRole(Roles.ADMIN.ToString()));
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();

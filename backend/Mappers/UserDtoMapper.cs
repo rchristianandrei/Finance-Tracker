@@ -10,6 +10,7 @@ public static class UserDtoMapper
         return new UserDto
         {
             Id = user.Id,
+            IsAdmin = user.IsAdmin,
             FirstName = user.FirstName,
             LastName = user.LastName,
         };
