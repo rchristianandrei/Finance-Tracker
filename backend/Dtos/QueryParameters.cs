@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace backend.Dtos;
 
-public class TransactionQueryParameters
+public class QueryParameters
 {
    public string? Search { get; set; } = string.Empty;
 

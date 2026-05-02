@@ -13,6 +13,7 @@ public static class UserDtoMapper
             IsAdmin = user.IsAdmin,
             FirstName = user.FirstName,
             LastName = user.LastName,
+            CreatedAt = user.CreatedAt
         };
     }
 }

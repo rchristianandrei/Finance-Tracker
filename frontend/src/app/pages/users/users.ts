@@ -10,6 +10,7 @@ import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angu
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { UserService } from '@app/services/user-service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-users',
@@ -23,13 +24,14 @@ import { UserService } from '@app/services/user-service';
     MatIconModule,
     MatPaginatorModule,
     MatDatepickerModule,
+    DatePipe,
   ],
   templateUrl: './users.html',
   styleUrl: './users.scss',
   providers: [UserService],
 })
 export class Users {
-  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'actions'];
+  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'createdAt', 'actions'];
 
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
@@ -72,8 +74,9 @@ export class Users {
 
   clearFilters() {
     this.f.searchTerm.reset();
-    this.f.dateRange.controls.start.setValue(new Date());
-    this.f.dateRange.controls.end.setValue(new Date());
+    this.f.dateRange.controls.start.setValue(this.last30Days);
+    this.f.dateRange.controls.end.setValue(this.today);
+    this.loadUsers();
   }
 
   onPageChange(event: any) {
@@ -96,7 +99,8 @@ export class Users {
 
     this.userService.getUsers(filter).subscribe({
       next: (value) => {
-        this.dataSource.set(value);
+        this.dataSource.set(value.data);
+        this.totalItems.set(value.totalCount);
       },
     });
   }

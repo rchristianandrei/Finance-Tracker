@@ -10,4 +10,6 @@ public class UserDto
     public required string FirstName { get; set; } = string.Empty;
 
     public required string LastName { get; set; } = string.Empty;
+
+    public DateTimeOffset CreatedAt { get; set; }
 }

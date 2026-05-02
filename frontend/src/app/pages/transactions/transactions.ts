@@ -87,8 +87,9 @@ export class Transactions {
 
   clearFilters() {
     this.f.searchTerm.reset();
-    this.f.dateRange.controls.start.setValue(new Date());
-    this.f.dateRange.controls.end.setValue(new Date());
+    this.f.dateRange.controls.start.setValue(this.last30Days);
+    this.f.dateRange.controls.end.setValue(this.today);
+    this.loadTransactions();
   }
 
   onPageChange(event: any) {

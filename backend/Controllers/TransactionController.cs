@@ -60,7 +60,7 @@ public class TransactionController(
     }
 
     [HttpGet("{accountId}")]
-    public async Task<IActionResult> Get(int accountId, [FromQuery] TransactionQueryParameters query)
+    public async Task<IActionResult> Get(int accountId, [FromQuery] QueryParameters query)
     {
         var (transactions, count) = await _transactionService.GetAll(accountId, query);
         var dto = transactions.Select(t => t.ToDto());

@@ -26,7 +26,7 @@ public class TransactionService(ApplicationDbContext _context) : ITransactionSer
         return await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query)
+    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, QueryParameters query)
     {
         var queryable = _context.Transactions.Where(t => t.AccountId == accountId);
 

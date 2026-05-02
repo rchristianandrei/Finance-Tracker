@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { User } from '@app/types/user';
 import { environment } from '@env/environment';
+import { map } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -37,6 +38,14 @@ export class UserService {
       params = params.set('Page', filter.page);
     }
 
-    return this.http.get<User[]>(`${this.url}`, { params });
+    return this.http.get<{ data: User[]; totalCount: number }>(`${this.url}`, { params }).pipe(
+      map((res) => ({
+        ...res,
+        data: res.data.map((t) => ({
+          ...t,
+          date: new Date(t.createdAt),
+        })),
+      })),
+    );
   }
 }
