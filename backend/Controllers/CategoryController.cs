@@ -1,4 +1,3 @@
-using backend.Data;
 using backend.Dtos.Category;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
@@ -31,6 +30,9 @@ public class CategoryController(
         var count = await _categoryRepo.GetCountByAccountIdAndType(dto.AccountId, dto.Type);
         if (count >= 10) return BadRequest("You're exceeding the max limit of 10");
 
+        var nameExists = await _categoryRepo.ExistsByNameAndAccountId(dto.Name, dto.AccountId);
+        if (nameExists) return BadRequest("Existsing Category");
+
         var category = new Category
         {
             AccountId = dto.AccountId,
@@ -41,20 +43,6 @@ public class CategoryController(
         await _categoryRepo.Create(category);
 
         return Ok(category.ToDto());
-    }
-
-    [HttpGet("{accountId}")]
-    public async Task<IActionResult> GetAll(int accountId)
-    {
-        var account = await _accountCache.GetById(accountId);
-        if (account == null) return NotFound("Account Not Found");
-
-        var userId = _currentUser.Id();
-        if (account.OwnerId != userId) Forbid();
-
-        var categories = await _categoryRepo.GetByAccountId(accountId);
-
-        return Ok(categories.Select(c => c.ToDto()));
     }
 
     [HttpPut("{id}")]

@@ -8,6 +8,11 @@ namespace backend.Repositories.MySql;
 
 public class CategoryRepo(ApplicationDbContext _context) : ICategoryRepo
 {
+    public async Task<bool> ExistsByNameAndAccountId(string categoryName, int accountId)
+    {
+        return await _context.Categories.AnyAsync(c => c.AccountId == accountId && c.Name == categoryName);
+    }
+
     public async Task Create(Category category)
     {
         await _context.Categories.AddAsync(category);

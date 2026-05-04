@@ -4,13 +4,12 @@ import { environment } from '@env/environment';
 import { AccountService } from './account-service';
 import { finalize, tap } from 'rxjs';
 import { Category, TransactionType } from '@app/types/category';
+import { API_ROUTES } from './_api-routes';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  private readonly baseUrl = `${environment.apiUrl}/category`;
-
   private httpClient = inject(HttpClient);
   private accountService = inject(AccountService);
 
@@ -19,7 +18,7 @@ export class CategoryService {
 
   public readonly isLoading = this._isLoading.asReadonly();
   public readonly categories = this._categories.asReadonly();
-  readonly groupedCategories = computed(() =>
+  public readonly groupedCategories = computed(() =>
     this._categories().reduce(
       (acc, category) => {
         const key = category.type;
@@ -47,7 +46,7 @@ export class CategoryService {
 
   public Create(body: { type: TransactionType; name: string }) {
     return this.httpClient
-      .post<Category>(`${this.baseUrl}`, {
+      .post<Category>(API_ROUTES.category.create(), {
         ...body,
         type: body.type,
         accountId: this.accountService.selected()?.id ?? 0,
@@ -63,7 +62,7 @@ export class CategoryService {
 
   public getAll() {
     return this.httpClient
-      .get<Category[]>(`${this.baseUrl}/${this.accountService.selected()?.id ?? 0}`)
+      .get<Category[]>(API_ROUTES.category.getCategories(this.accountService.selected()?.id ?? 0))
       .pipe(
         tap((value) => {
           this._categories.set(value);
@@ -73,7 +72,7 @@ export class CategoryService {
 
   public update(category: Category) {
     return this.httpClient
-      .put(`${this.baseUrl}/${category.id}`, {
+      .put(API_ROUTES.category.update(category.id), {
         id: category.id,
         type: category.type,
         name: category.name,
@@ -90,7 +89,7 @@ export class CategoryService {
   }
 
   public delete(categoryId: number) {
-    return this.httpClient.delete(`${this.baseUrl}/${categoryId}`).pipe(
+    return this.httpClient.delete(API_ROUTES.category.delete(categoryId)).pipe(
       tap(() => {
         this._categories.update((old) => old.filter((c) => c.id !== categoryId));
       }),

@@ -5,6 +5,7 @@ namespace backend.Interfaces.MySql;
 
 public interface ICategoryRepo
 {
+    Task<bool> ExistsByNameAndAccountId(string categoryName, int accountId);
     Task Create(Category category);
     Task<Category?> GetById(int id, bool includeAccount = false);
     Task<ICollection<Category>> GetByAccountId(int accountId);

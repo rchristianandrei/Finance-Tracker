@@ -18,7 +18,8 @@ namespace backend.Controllers;
 public class AccountController(
     ICurrentUserService _currentUserService,
     IAccountCacheService _accountCache,
-    IDefaultAccountRepo _defaultAccountRepo
+    IDefaultAccountRepo _defaultAccountRepo,
+    ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
     [Transaction]
@@ -54,6 +55,20 @@ public class AccountController(
         };
 
         return Ok(output);
+    }
+
+    [HttpGet("{accountId}/categories")]
+    public async Task<IActionResult> GetCategories(int accountId)
+    {
+        var account = await _accountCache.GetById(accountId);
+        if (account == null) return NotFound("Account Not Found");
+
+        var userId = _currentUserService.Id();
+        if (account.OwnerId != userId) Forbid();
+
+        var categories = await _categoryRepo.GetByAccountId(accountId);
+
+        return Ok(categories.Select(c => c.ToDto()));
     }
 
     [Transaction]
