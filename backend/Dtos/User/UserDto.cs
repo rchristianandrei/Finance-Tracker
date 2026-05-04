@@ -1,5 +1,4 @@
-
-namespace backend.Dtos;
+namespace backend.Dtos.User;
 
 public class UserDto
 {

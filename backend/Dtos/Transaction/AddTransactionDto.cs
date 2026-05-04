@@ -2,12 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using backend.DataAnnotations;
 using backend.Enums;
 
-namespace backend.Dtos;
+namespace backend.Dtos.Transaction;
 
-public class UpdateTransactionDto
+public class AddTransactionDto
 {
-    [Required]
-    public long Id { get; set; }
+    public int AccountId { get; set; }
 
     [Required]
     public TransactionType Type { get; set; }

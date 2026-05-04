@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace backend.Dtos;
+namespace backend.Dtos.Account;
 
 public class AccountDto
 {

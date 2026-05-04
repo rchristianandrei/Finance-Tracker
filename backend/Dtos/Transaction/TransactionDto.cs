@@ -1,6 +1,6 @@
 using backend.Enums;
 
-namespace backend.Dtos;
+namespace backend.Dtos.Transaction;
 
 public class TransactionDto
 {

@@ -1,6 +1,6 @@
 using backend.Attributes;
 using backend.Data;
-using backend.Dtos;
+using backend.Dtos.Auth;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;

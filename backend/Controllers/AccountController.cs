@@ -1,5 +1,6 @@
 using backend.Attributes;
 using backend.Dtos;
+using backend.Dtos.Account;
 using backend.Enums;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
