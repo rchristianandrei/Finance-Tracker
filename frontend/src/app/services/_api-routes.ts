@@ -16,4 +16,15 @@ export const API_ROUTES = {
     update: (categoryId: number) => `${environment.apiUrl}/${CONTROLLERS.category}/${categoryId}`,
     delete: (categoryId: number) => `${environment.apiUrl}/${CONTROLLERS.category}/${categoryId}`,
   },
+  transaction: {
+    create: () => `${environment.apiUrl}/${CONTROLLERS.transaction}`,
+    get: (accountId: number) =>
+      `${environment.apiUrl}/${CONTROLLERS.account}/${accountId}/transactions`,
+    getDashboard: (accountId: number) =>
+      `${environment.apiUrl}/${CONTROLLERS.account}/${accountId}/dashboard`,
+    update: (transactionId: number) =>
+      `${environment.apiUrl}/${CONTROLLERS.transaction}/${transactionId}`,
+    delete: (transactionId: number) =>
+      `${environment.apiUrl}/${CONTROLLERS.transaction}/${transactionId}`,
+  },
 };

@@ -6,6 +6,7 @@ import { DashboardType } from '@app/types/dashboard';
 import { Transaction } from '@app/types/transaction';
 import { environment } from '@env/environment';
 import { map, pipe } from 'rxjs';
+import { API_ROUTES } from './_api-routes';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ export class TransactionService {
   private http = inject(HttpClient);
   url = `${environment.apiUrl}/transaction`;
 
-  addExpense(
+  create(
     accountId: number,
     expense: {
       type: TransactionType;
@@ -28,23 +29,16 @@ export class TransactionService {
       ...expense,
       date: expense.date.toISOString(),
       type: expense.type,
+      accountId: accountId,
     };
-    return this.http.post(`${this.url}/${accountId}`, body);
+    return this.http.post(API_ROUTES.transaction.create(), body);
   }
 
-  update(transaction: Transaction) {
-    const body = {
-      ...transaction,
-      date: transaction.date.toISOString(),
-    };
-    return this.http.put(`${this.url}/${transaction.id}`, body);
+  readDashboardData(accountId: number) {
+    return this.http.get<DashboardType>(API_ROUTES.transaction.getDashboard(accountId));
   }
 
-  getDashboardData(accountId: number) {
-    return this.http.get<DashboardType>(`${this.url}/dashboard/${accountId}`);
-  }
-
-  getTransactions(
+  readTransactions(
     accountId: number,
     filter?: {
       search?: string;
@@ -80,7 +74,7 @@ export class TransactionService {
       .get<{
         totalCount: number;
         data: Transaction[];
-      }>(`${this.url}/${accountId}`, { params })
+      }>(API_ROUTES.transaction.get(accountId), { params })
       .pipe(
         map((res) => ({
           ...res,
@@ -92,7 +86,15 @@ export class TransactionService {
       );
   }
 
-  delete(id: string) {
-    return this.http.delete(`${this.url}/${id}`);
+  update(transaction: Transaction) {
+    const body = {
+      ...transaction,
+      date: transaction.date.toISOString(),
+    };
+    return this.http.put(API_ROUTES.transaction.update(transaction.id), body);
+  }
+
+  delete(id: number) {
+    return this.http.delete(API_ROUTES.transaction.delete(id));
   }
 }

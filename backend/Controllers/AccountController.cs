@@ -1,5 +1,6 @@
 using backend.Attributes;
 using backend.Dtos;
+using backend.Enums;
 using backend.Interfaces;
 using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
@@ -19,7 +20,8 @@ public class AccountController(
     ICurrentUserService _currentUserService,
     IAccountCacheService _accountCache,
     IDefaultAccountRepo _defaultAccountRepo,
-    ICategoryRepo _categoryRepo
+    ICategoryRepo _categoryRepo,
+    ITransactionService _transactionService
 ) : ControllerBase
 {
     [Transaction]
@@ -69,6 +71,56 @@ public class AccountController(
         var categories = await _categoryRepo.GetByAccountId(accountId);
 
         return Ok(categories.Select(c => c.ToDto()));
+    }
+
+    [HttpGet("{accountId}/transactions")]
+    public async Task<IActionResult> Get(int accountId, [FromQuery] QueryParameters query)
+    {
+        var (transactions, count) = await _transactionService.GetAll(accountId, query);
+        var dto = transactions.Select(t => t.ToDto());
+        return Ok(new
+        {
+            totalCount = count,
+            data = dto
+        });
+    }
+
+    [HttpGet("{accountId}/dashboard")]
+    public async Task<IActionResult> Dashboard(int accountId)
+    {
+        var expensesBreakdown = new Dictionary<string, double>();
+        var expenses = 0.00;
+        var income = 0.00;
+
+        var transactions = await _transactionService.GetLastDays(accountId, 30);
+
+        foreach (var transaction in transactions)
+        {
+            if (transaction.Type == TransactionType.INCOME)
+            {
+                income += transaction.Amount;
+            }
+            else if (transaction.Type == TransactionType.EXPENSE)
+            {
+                expenses += transaction.Amount;
+
+                if (!expensesBreakdown.ContainsKey(transaction.Category))
+                    expensesBreakdown.Add(transaction.Category, 0);
+
+                expensesBreakdown[transaction.Category] += transaction.Amount;
+            }
+        }
+
+        var transactionDtos = transactions.Select(t => t.ToDto());
+
+        return Ok(new
+        {
+            Balance = income - expenses,
+            Income = income,
+            Expenses = expenses,
+            ExpensesBreakdown = expensesBreakdown.ToArray(),
+            Transactions = transactionDtos
+        });
     }
 
     [Transaction]

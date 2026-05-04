@@ -58,7 +58,7 @@ export class Dashboard {
   loadDashboard() {
     const accountId = this.accountService.selected()?.id;
     if (!accountId) return;
-    this.transactionService.getDashboardData(accountId).subscribe({
+    this.transactionService.readDashboardData(accountId).subscribe({
       next: (value) => {
         this.dashboardData.set(value);
       },

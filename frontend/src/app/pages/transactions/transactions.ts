@@ -113,7 +113,7 @@ export class Transactions {
       page: this.paginationDetails().page + 1,
     };
 
-    this.transactionService.getTransactions(accountId, filter).subscribe({
+    this.transactionService.readTransactions(accountId, filter).subscribe({
       next: (value) => {
         this.dataSource.set(value.data);
         this.totalTransactions.set(value.totalCount);

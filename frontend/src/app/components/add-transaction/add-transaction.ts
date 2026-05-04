@@ -52,7 +52,7 @@ export class AddTransaction {
     }
 
     this.transactionService
-      .addExpense(accountId, value)
+      .create(accountId, value)
       .pipe(
         finalize(() => {
           this.isLoading.set(false);
