@@ -9,4 +9,6 @@ public interface IUserCache
     Task Create(User user);
 
     Task Update(User user);
+
+    Task Delete(User user);
 }

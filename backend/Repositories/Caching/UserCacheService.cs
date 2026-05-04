@@ -35,4 +35,10 @@ public class UserCache(
         await _userRepo.Update(user);
         await _cacheService.SetAsync(ModifyKey(user.Id), user, TTL);
     }
+
+    public async Task Delete(User user)
+    {
+        await _userRepo.Delete(user);
+        await _cacheService.RemoveAsync(ModifyKey(user.Id));
+    }
 }

@@ -12,4 +12,6 @@ public interface IUserRepo
     Task Update(User user);
 
     Task<(ICollection<User> users, long count)> GetAll(QueryParameters query);
+
+    Task Delete(User user);
 }

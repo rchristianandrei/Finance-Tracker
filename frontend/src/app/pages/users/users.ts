@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { UserService } from '@app/services/user-service';
 import { DatePipe } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { DeleteUser } from './components/delete-user/delete-user';
 
 @Component({
   selector: 'app-users',
@@ -35,7 +37,9 @@ export class Users {
 
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
+  private dialog = inject(MatDialog);
 
+  private isDeleteOpen = signal(false);
   totalItems = signal(0);
   paginationDetails = signal({
     page: 0,
@@ -61,10 +65,6 @@ export class Users {
     this.last30Days.setDate(this.today.getDate() - 30);
     effect(() => {
       this.loadUsers();
-    });
-
-    effect(() => {
-      console.log(this.dataSource());
     });
   }
 
@@ -102,6 +102,23 @@ export class Users {
         this.dataSource.set(value.data);
         this.totalItems.set(value.totalCount);
       },
+    });
+  }
+
+  delete(user: User) {
+    if (this.isDeleteOpen()) return;
+    this.isDeleteOpen.set(true);
+
+    const dialogRef = this.dialog.open(DeleteUser, {
+      data: {
+        user,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((success) => {
+      this.isDeleteOpen.set(false);
+      if (!success) return;
+      this.dataSource.update((users) => users.filter((u) => u.id !== user.id));
     });
   }
 }

@@ -48,4 +48,8 @@ export class UserService {
       })),
     );
   }
+
+  delete(userId: number) {
+    return this.http.delete(`${this.url}/${userId}`);
+  }
 }
