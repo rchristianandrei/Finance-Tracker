@@ -3,11 +3,13 @@ using backend.Interfaces.MySql;
 using backend.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Controllers;
 
-[Authorize(Policy = "AdminOnly")]
 [ApiController]
+[EnableRateLimiting("per-user")]
+[Authorize(Policy = "AdminOnly")]
 [Route("api/[controller]")]
 public class UserController(IUserRepo _userRepo) : ControllerBase
 {

@@ -12,8 +12,8 @@ using Sprache;
 namespace backend.Controllers;
 
 [Authorize]
-[EnableRateLimiting("per-user")]
 [ApiController]
+[EnableRateLimiting("per-user")]
 [Route("api/[controller]")]
 public class TransactionController(
     ITransactionService _transactionService,

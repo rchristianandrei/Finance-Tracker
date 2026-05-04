@@ -7,11 +7,13 @@ using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace backend.Controllers;
 
 [Authorize]
 [ApiController]
+[EnableRateLimiting("per-user")]
 [Route("api/[controller]")]
 public class CategoryController(
     ICurrentUserService _currentUser,
