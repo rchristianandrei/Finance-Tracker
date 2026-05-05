@@ -50,25 +50,21 @@
         }
       </button>
 
-      <div #googleBtn class="w-full">
-        @if (showGoogleBtn()) {
-          <asl-google-signin-button
-            type="standard"
-            size="large"
-            text="continue_with"
-            shape="pill"
-            theme="outline"
-            [width]="googleBtnWidth()"
-          >
-          </asl-google-signin-button>
-        }
-      </div>
-
-      <a mat-button routerLink="/register">Don't have an account? Register</a>
-
-      <a routerLink="/forgot-password" class="text-xs! text-blue-600 hover:opacity-50 text-center">
-        Forgot password?
-      </a>
+      @if (!isLoading()) {
+        <div #googleBtn class="w-full">
+          @if (showGoogleBtn()) {
+            <asl-google-signin-button
+              type="standard"
+              size="large"
+              text="continue_with"
+              shape="pill"
+              theme="outline"
+              [width]="googleBtnWidth()"
+            >
+            </asl-google-signin-button>
+          }
+        </div>
+      }
     </div>
   </form>
 </div>
