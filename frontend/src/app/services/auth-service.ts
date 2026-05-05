@@ -6,6 +6,13 @@ import { User } from '@app/types/user';
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { Router } from '@angular/router';
 
+export type LoginApiResponse =
+  | {
+      status: 1;
+      message: string;
+    }
+  | { status: 2; user: User };
+
 @Injectable({
   providedIn: 'root',
 })
@@ -33,9 +40,12 @@ export class AuthService {
   }
 
   googleLogin(body: { idToken?: string }) {
-    return this.httpClient
-      .post<User>(`${environment.apiUrl}/auth/google`, body)
-      .pipe(tap((user) => this._user.set(user)));
+    return this.httpClient.post<LoginApiResponse>(`${environment.apiUrl}/auth/google`, body).pipe(
+      tap((value) => {
+        if (value.status === 1) return;
+        this._user.set(value.user);
+      }),
+    );
   }
 
   logout() {

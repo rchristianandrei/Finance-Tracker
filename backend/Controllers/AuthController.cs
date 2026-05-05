@@ -66,11 +66,12 @@ public class AuthController(
             }
 
             if (user == null) return BadRequest("User does not exists");
+            if (user.Status == Enums.UserStatus.PENDING) return Accepted(new { status = user.Status, message = "Wait for your registration to be approved" });
 
             var token = _jwtService.GenerateToken(user);
             _authCookiesService.AttachAuthCookies(token);
 
-            return Ok(user.ToDto());
+            return Ok(new { status = user.Status, user = user.ToDto() });
         }
         catch (InvalidJwtException)
         {

@@ -79,7 +79,25 @@ export class Login implements OnInit {
       this.authService
         .googleLogin({ idToken: user.idToken })
         .pipe(finalize(() => this.isLoading.set(false)))
-        .subscribe(this.loginReaction());
+        .subscribe({
+          next: (value) => {
+            if (value.status === 1) {
+              this.errorMessage.set(value.message);
+            } else {
+              this.toastService.success('Login successful!');
+              this.router.navigate(['/']);
+            }
+          },
+          error: (err: any) => {
+            if (err.status === 403) {
+              const { message, token } = err.error;
+              this.errorMessage.set(message);
+              this.router.navigate(['/verify-account', token]);
+            } else {
+              this.errorMessage.set(resolveHttpError(err));
+            }
+          },
+        });
     });
   }
 

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using backend.Enums;
 
 namespace backend.Models;
 
@@ -14,6 +15,8 @@ public class User
     public string LastName { get; set; } = string.Empty;
 
     public bool IsAdmin { get; set; } = false;
+
+    public UserStatus Status { get; set; } = UserStatus.PENDING;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 

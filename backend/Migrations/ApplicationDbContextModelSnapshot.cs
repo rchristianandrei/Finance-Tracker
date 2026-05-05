@@ -133,7 +133,7 @@ namespace backend.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
@@ -227,6 +227,9 @@ namespace backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -237,10 +240,10 @@ namespace backend.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("ExpiresAt")
+                    b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Otp")
@@ -322,18 +325,6 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("backend.Models.VerifyAccount", b =>
-                {
-                    b.HasOne("backend.Models.LocalCredential", "LocalCredential")
-                        .WithOne("VerifyAccount")
-                        .HasForeignKey("backend.Models.VerifyAccount", "Email")
-                        .HasPrincipalKey("backend.Models.LocalCredential", "Email")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LocalCredential");
-                });
-
             modelBuilder.Entity("backend.Models.Transaction", b =>
                 {
                     b.HasOne("backend.Models.Account", "Account")
@@ -351,6 +342,18 @@ namespace backend.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.VerifyAccount", b =>
+                {
+                    b.HasOne("backend.Models.LocalCredential", "LocalCredential")
+                        .WithOne("VerifyAccount")
+                        .HasForeignKey("backend.Models.VerifyAccount", "Email")
+                        .HasPrincipalKey("backend.Models.LocalCredential", "Email")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LocalCredential");
                 });
 
             modelBuilder.Entity("backend.Models.Account", b =>
