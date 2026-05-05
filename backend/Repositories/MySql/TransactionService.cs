@@ -35,9 +35,9 @@ public class TransactionService(ApplicationDbContext _context) : ITransactionSer
             var search = $"%{query.Search}%";
 
             queryable = queryable.Where(t =>
-                EF.Functions.Like(t.Type, search) ||
-                EF.Functions.Like(t.Category, search) ||
-                EF.Functions.Like(t.Description, search)
+                t.Type.ToString().Contains(query.Search) ||
+                t.Category.Contains(query.Search) ||
+                t.Description.Contains(query.Search)
             );
         }
 
