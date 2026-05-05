@@ -18,6 +18,8 @@ import { AddTransaction } from '@app/components/add-transaction/add-transaction'
 import { DeleteTransaction } from './components/delete-transaction/delete-transaction';
 import { UpdateTransaction } from './components/update-transaction/update-transaction';
 import { AccountService } from '@app/services/account-service';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-transactions',
@@ -37,11 +39,12 @@ import { AccountService } from '@app/services/account-service';
     AddTransaction,
     DeleteTransaction,
     UpdateTransaction,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.css',
 })
-export class Transactions {
+export class Transactions implements OnInit {
   private fb = inject(FormBuilder);
   private accountService = inject(AccountService);
   private transactionService = inject(TransactionService);
@@ -69,14 +72,24 @@ export class Transactions {
   totalTransactions = signal(0);
   paginationDetails = signal({
     page: 0,
-    pageSize: 10,
   });
 
   dataSource = signal<Transaction[]>([]);
+  isLoading = signal(false);
 
   constructor() {
     this.last30Days.setDate(this.today.getDate() - 30);
-    effect(() => {
+  }
+
+  ngOnInit(): void {
+    this.loadTransactions();
+
+    this.filterForm.controls.searchTerm.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(() => this.loadTransactions());
+
+    this.filterForm.controls.dateRange.controls.end.valueChanges.subscribe((value) => {
+      if (!value) return;
       this.loadTransactions();
     });
   }
@@ -95,13 +108,16 @@ export class Transactions {
   onPageChange(event: any) {
     this.paginationDetails.update((p) => ({
       ...p,
-      pageSize: event.pageSize,
       page: event.pageIndex,
     }));
     this.loadTransactions();
   }
 
   loadTransactions() {
+    console.log(this.isLoading());
+    if (this.isLoading()) return;
+    this.isLoading.set(true);
+
     const accountId = this.accountService.selected()?.id;
     if (!accountId) return;
 
@@ -109,16 +125,18 @@ export class Transactions {
       search: this.f.searchTerm.value ?? undefined,
       startDate: this.f.dateRange.controls.start.value ?? undefined,
       endDate: this.f.dateRange.controls.end.value ?? undefined,
-      pageSize: this.paginationDetails().pageSize,
       page: this.paginationDetails().page + 1,
     };
 
-    this.transactionService.readTransactions(accountId, filter).subscribe({
-      next: (value) => {
-        this.dataSource.set(value.data);
-        this.totalTransactions.set(value.totalCount);
-      },
-    });
+    this.transactionService
+      .readTransactions(accountId, filter)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (value) => {
+          this.dataSource.set(value.data);
+          this.totalTransactions.set(value.totalCount);
+        },
+      });
   }
 
   onStartDelete(transaction: Transaction) {
