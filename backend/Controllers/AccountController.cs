@@ -3,7 +3,6 @@ using backend.Dtos;
 using backend.Dtos.Account;
 using backend.Enums;
 using backend.Interfaces;
-using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Mappers;
 using backend.Models;
@@ -19,7 +18,7 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class AccountController(
     ICurrentUserService _currentUserService,
-    IAccountCacheService _accountCache,
+    IAccountRepo _accountRepo,
     IDefaultAccountRepo _defaultAccountRepo,
     ICategoryRepo _categoryRepo,
     ITransactionService _transactionService
@@ -30,7 +29,7 @@ public class AccountController(
     public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto dto)
     {
         var userId = _currentUserService.Id();
-        var accounts = await _accountCache.GetAccounts(userId);
+        var accounts = await _accountRepo.GetAccounts(userId);
         if (accounts.Count >= 5) return BadRequest("You already have a maximum of 5 accounts");
 
         var account = new Account
@@ -38,7 +37,7 @@ public class AccountController(
             Name = dto.Name,
             OwnerId = userId
         };
-        await _accountCache.Create(userId, account);
+        await _accountRepo.Create(account);
 
         return Ok(account.ToDto());
     }
@@ -49,7 +48,7 @@ public class AccountController(
         var userId = _currentUserService.Id();
         var defaultAccount = await _defaultAccountRepo.GetById(userId);
 
-        var accounts = await _accountCache.GetAccounts(userId);
+        var accounts = await _accountRepo.GetAccounts(userId);
         var dtos = accounts.Select(a => a.ToDto());
         var output = new
         {
@@ -63,7 +62,7 @@ public class AccountController(
     [HttpGet("{accountId}/categories")]
     public async Task<IActionResult> GetCategories(int accountId)
     {
-        var account = await _accountCache.GetById(accountId);
+        var account = await _accountRepo.GetById(accountId);
         if (account == null) return NotFound("Account Not Found");
 
         var userId = _currentUserService.Id();
@@ -130,7 +129,7 @@ public class AccountController(
     {
         var userId = _currentUserService.Id();
 
-        var account = await _accountCache.GetById(id);
+        var account = await _accountRepo.GetById(id);
         if (account == null) return NotFound();
         if (account.OwnerId != userId) return Forbid();
 
@@ -154,7 +153,7 @@ public class AccountController(
                 await _defaultAccountRepo.Update(defaultAccount);
             }
         }
-        await _accountCache.Update(userId, account);
+        await _accountRepo.Update(account);
 
         return Ok(account.ToDto());
     }
@@ -166,14 +165,14 @@ public class AccountController(
         var defaultAccount = await _defaultAccountRepo.GetById(userId);
         if (defaultAccount == null) return NotFound("Default account not found");
 
-        var account = await _accountCache.GetById(id);
+        var account = await _accountRepo.GetById(id);
         if (account == null) return NotFound();
         if (account.OwnerId != userId) return Forbid();
 
         if (defaultAccount.AccountId == account.Id)
             return BadRequest("Cannot delete default account");
 
-        await _accountCache.Delete(userId, account);
+        await _accountRepo.Delete(account);
 
         return Ok();
     }

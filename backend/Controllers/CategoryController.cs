@@ -1,6 +1,5 @@
 using backend.Dtos.Category;
 using backend.Interfaces;
-using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Mappers;
 using backend.Models;
@@ -17,13 +16,13 @@ namespace backend.Controllers;
 public class CategoryController(
     ICurrentUserService _currentUser,
     ICategoryRepo _categoryRepo,
-    IAccountCacheService _accountCache) : ControllerBase
+    IAccountRepo _accountRepo) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
         var userId = _currentUser.Id();
-        var account = await _accountCache.GetById(dto.AccountId);
+        var account = await _accountRepo.GetById(dto.AccountId);
         if (account == null) return NotFound("Account Not Found");
         if (account.OwnerId != userId) Forbid();
 

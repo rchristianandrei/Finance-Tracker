@@ -1,6 +1,5 @@
 using backend.Dtos;
 using backend.Interfaces;
-using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Mappers;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +12,7 @@ namespace backend.Controllers;
 [EnableRateLimiting("per-user")]
 [Authorize(Policy = "AdminOnly")]
 [Route("api/[controller]")]
-public class UserController(IUserRepo _userRepo, IUserCache _userCache, ICurrentUserService _currentUserService) : ControllerBase
+public class UserController(IUserRepo _userRepo, ICurrentUserService _currentUserService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] QueryParameters query)
@@ -27,12 +26,12 @@ public class UserController(IUserRepo _userRepo, IUserCache _userCache, ICurrent
     {
         var currentUserId = _currentUserService.Id();
 
-        var user = await _userCache.GetById(id);
+        var user = await _userRepo.GetById(id);
         if (user == null) return NotFound();
 
         if (user.Id == currentUserId) return BadRequest();
 
-        await _userCache.Delete(user);
+        await _userRepo.Delete(user);
         return NoContent();
     }
 }

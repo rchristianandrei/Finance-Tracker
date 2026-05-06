@@ -1,7 +1,6 @@
 using backend.Attributes;
 using backend.Dtos.Auth;
 using backend.Interfaces;
-using backend.Interfaces.Caching;
 using backend.Interfaces.MySql;
 using backend.Mappers;
 using backend.Models;
@@ -16,12 +15,12 @@ namespace backend.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/[controller]")]
 public class AuthController(
-    IUserCache _userCache,
     IGoogleCredentialRepo _googleCredRepo,
     IConfiguration _config,
     IJwtService _jwtService,
     ICurrentUserService _currentUserService,
-    IAuthCookiesService _authCookiesService
+    IAuthCookiesService _authCookiesService,
+    IUserRepo _userRepo
 ) : ControllerBase
 {
     [Transaction]
@@ -48,7 +47,7 @@ public class AuthController(
                     FirstName = payload.GivenName,
                     LastName = payload.FamilyName
                 };
-                await _userCache.Create(user);
+                await _userRepo.Create(user);
 
                 // Create AuthProvider
                 var sub = payload.Subject;
@@ -62,7 +61,7 @@ public class AuthController(
             }
             else
             {
-                user = await _userCache.GetById(existingAcc.UserId);
+                user = await _userRepo.GetById(existingAcc.UserId);
             }
 
             if (user == null) return BadRequest("User does not exists");
@@ -93,7 +92,7 @@ public class AuthController(
     {
         var id = _currentUserService.Id();
 
-        var user = await _userCache.GetById(id);
+        var user = await _userRepo.GetById(id);
         if (user == null) return Unauthorized();
 
         return Ok(user.ToDto());
