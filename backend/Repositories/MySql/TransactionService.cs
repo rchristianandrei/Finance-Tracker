@@ -3,7 +3,6 @@ using backend.Dtos;
 using backend.Interfaces.MySql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 
 namespace backend.Repositories.MySql;
 

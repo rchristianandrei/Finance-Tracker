@@ -32,25 +32,9 @@ services:
     networks:
       - finance_tracker_network
 
-  mongodb:
-    image: mongo:7
-    container_name: mongodb
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secret
-      MONGO_INITDB_DATABASE: FinanceTracker
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - finance_tracker_network
-
 volumes:
   mysql_data:
   redis_data:
-  mongodb_data:
 
 networks:
   finance_tracker_network:
