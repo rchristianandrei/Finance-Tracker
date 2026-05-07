@@ -1,6 +1,6 @@
 using backend.Dtos;
-using backend.Interfaces;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
+using backend.Interfaces.Utils;
 using backend.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

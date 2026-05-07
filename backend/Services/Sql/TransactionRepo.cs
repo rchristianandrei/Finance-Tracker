@@ -1,12 +1,12 @@
 using backend.Data;
 using backend.Dtos;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories.Sql;
 
-public class TransactionRepo(ApplicationDbContext _context) : ITransactionService
+public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 {
     public async Task Create(Transaction transaction)
     {

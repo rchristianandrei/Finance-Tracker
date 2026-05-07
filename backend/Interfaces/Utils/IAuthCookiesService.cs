@@ -1,4 +1,4 @@
-namespace backend.Interfaces;
+namespace backend.Interfaces.Utils;
 
 public interface IAuthCookiesService
 {

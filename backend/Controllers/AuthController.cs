@@ -1,7 +1,7 @@
 using backend.Attributes;
 using backend.Dtos.Auth;
-using backend.Interfaces;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
+using backend.Interfaces.Utils;
 using backend.Mappers;
 using backend.Models;
 using Google.Apis.Auth;

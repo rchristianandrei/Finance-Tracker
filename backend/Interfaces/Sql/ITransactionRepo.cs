@@ -1,9 +1,9 @@
 using backend.Dtos;
 using backend.Models;
 
-namespace backend.Interfaces.MySql;
+namespace backend.Interfaces.Sql;
 
-public interface ITransactionService
+public interface ITransactionRepo
 {
     Task Create(Transaction entity);
 

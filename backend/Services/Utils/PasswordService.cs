@@ -1,8 +1,8 @@
-using backend.Interfaces;
+using backend.Interfaces.Utils;
 using backend.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace backend.Services;
+namespace backend.Services.Utils;
 
 public class PasswordService(IPasswordHasher<LocalCredential> _passwordHasher) : IPasswordService
 {

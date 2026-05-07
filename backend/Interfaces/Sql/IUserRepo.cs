@@ -1,7 +1,7 @@
 using backend.Dtos;
 using backend.Models;
 
-namespace backend.Interfaces.MySql;
+namespace backend.Interfaces.Sql;
 
 public interface IUserRepo
 {

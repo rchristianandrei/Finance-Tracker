@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using backend.Interfaces.Utils;
 
-namespace backend.Services;
+namespace backend.Services.Utils;
 
 public class TokenService : ITokenService
 {

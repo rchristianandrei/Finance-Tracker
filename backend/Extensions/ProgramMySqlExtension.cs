@@ -1,5 +1,5 @@
 using backend.Data;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
 using backend.Repositories.Sql;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +18,7 @@ public static class ProgramMySqlExtension
         services.AddScoped<IAccountRepo, AccountRepo>();
         services.AddScoped<IDefaultAccountRepo, DefaultAccountRepo>();
         services.AddScoped<ICategoryRepo, CategoryRepo>();
-        services.AddScoped<ITransactionService, TransactionRepo>();
+        services.AddScoped<ITransactionRepo, TransactionRepo>();
 
         return services;
     }

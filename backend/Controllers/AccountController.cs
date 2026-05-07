@@ -2,8 +2,8 @@ using backend.Attributes;
 using backend.Dtos;
 using backend.Dtos.Account;
 using backend.Enums;
-using backend.Interfaces;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
+using backend.Interfaces.Utils;
 using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +21,7 @@ public class AccountController(
     IAccountRepo _accountRepo,
     IDefaultAccountRepo _defaultAccountRepo,
     ICategoryRepo _categoryRepo,
-    ITransactionService _transactionService
+    ITransactionRepo _transactionService
 ) : ControllerBase
 {
     [Transaction]

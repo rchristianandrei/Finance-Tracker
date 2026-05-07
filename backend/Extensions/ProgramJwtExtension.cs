@@ -1,7 +1,7 @@
 using System.Text;
 using backend.Enums;
-using backend.Interfaces;
-using backend.Services;
+using backend.Interfaces.Utils;
+using backend.Services.Utils;
 using backend.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

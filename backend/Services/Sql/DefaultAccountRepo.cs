@@ -1,5 +1,5 @@
 using backend.Data;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
 using backend.Models;
 
 namespace backend.Repositories.Sql;

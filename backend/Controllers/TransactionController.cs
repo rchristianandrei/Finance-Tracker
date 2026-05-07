@@ -1,7 +1,7 @@
 using backend.Dtos.Transaction;
 using backend.Enums;
-using backend.Interfaces;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
+using backend.Interfaces.Utils;
 using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +16,7 @@ namespace backend.Controllers;
 [EnableRateLimiting("per-user")]
 [Route("api/[controller]")]
 public class TransactionController(
-    ITransactionService _transactionService,
+    ITransactionRepo _transactionService,
     ICurrentUserService _currentUserService,
     IAccountRepo _accountRepo
 ) : ControllerBase

@@ -1,6 +1,6 @@
 using backend.Data;
 using backend.Dtos;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 

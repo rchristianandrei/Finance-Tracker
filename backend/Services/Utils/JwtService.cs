@@ -2,13 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using backend.Enums;
-using backend.Interfaces;
+using backend.Interfaces.Utils;
 using backend.Models;
 using backend.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace backend.Services;
+namespace backend.Services.Utils;
 
 public class JwtService(IOptions<JwtSettings> jwtSettingsAccessor) : IJwtService
 {

@@ -1,6 +1,6 @@
 using backend.Dtos.Category;
-using backend.Interfaces;
-using backend.Interfaces.MySql;
+using backend.Interfaces.Sql;
+using backend.Interfaces.Utils;
 using backend.Mappers;
 using backend.Models;
 using Microsoft.AspNetCore.Authorization;

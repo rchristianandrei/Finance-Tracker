@@ -1,7 +1,7 @@
-using backend.Interfaces;
+using backend.Interfaces.Utils;
 using System.Security.Claims;
 
-namespace backend.Services;
+namespace backend.Services.Utils;
 
 public class CurrentUserService(IHttpContextAccessor _httpContextAccessor) : ICurrentUserService
 {

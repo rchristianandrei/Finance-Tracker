@@ -1,8 +1,8 @@
-using backend.Interfaces;
+using backend.Interfaces.Utils;
 using backend.Settings;
 using Microsoft.Extensions.Options;
 
-namespace backend.Services;
+namespace backend.Services.Utils;
 
 public class AuthCookiesService(
     IHttpContextAccessor _httpContextAccessor,
