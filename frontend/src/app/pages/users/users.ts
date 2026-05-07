@@ -13,6 +13,7 @@ import { UserService } from '@app/services/user-service';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteUser } from './components/delete-user/delete-user';
+import { SaveUser } from './components/save-user/save-user';
 
 @Component({
   selector: 'app-users',
@@ -39,7 +40,7 @@ export class Users {
   private userService = inject(UserService);
   private dialog = inject(MatDialog);
 
-  private isDeleteOpen = signal(false);
+  private isDialogOpen = signal(false);
   totalItems = signal(0);
   paginationDetails = signal({
     page: 0,
@@ -105,9 +106,32 @@ export class Users {
     });
   }
 
+  update(user: User) {
+    if (this.isDialogOpen()) return;
+    this.isDialogOpen.set(true);
+
+    const dialogRef = this.dialog.open(SaveUser, {
+      data: {
+        user,
+      },
+    });
+
+    dialogRef.componentInstance.onSubmit.subscribe((value) => {
+      dialogRef.disableClose = true;
+      setTimeout(() => {
+        dialogRef.disableClose = false;
+        dialogRef.componentInstance.isLoading.set(false);
+      }, 10000);
+    });
+
+    dialogRef.afterClosed().subscribe((success) => {
+      this.isDialogOpen.set(false);
+    });
+  }
+
   delete(user: User) {
-    if (this.isDeleteOpen()) return;
-    this.isDeleteOpen.set(true);
+    if (this.isDialogOpen()) return;
+    this.isDialogOpen.set(true);
 
     const dialogRef = this.dialog.open(DeleteUser, {
       data: {
@@ -116,7 +140,7 @@ export class Users {
     });
 
     dialogRef.afterClosed().subscribe((success) => {
-      this.isDeleteOpen.set(false);
+      this.isDialogOpen.set(false);
       if (!success) return;
       this.dataSource.update((users) => users.filter((u) => u.id !== user.id));
     });
