@@ -1,5 +1,6 @@
 using backend.Attributes;
 using backend.Dtos.Auth;
+using backend.Interfaces;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
@@ -20,7 +21,8 @@ public class AuthController(
     IJwtService _jwtService,
     ICurrentUserService _currentUserService,
     IAuthCookiesService _authCookiesService,
-    IUserRepo _userRepo
+    IUserRepo _userRepo,
+    IEmailService _emailService
 ) : ControllerBase
 {
     [Transaction]
@@ -58,6 +60,7 @@ public class AuthController(
                     Subject = payload.Subject
                 };
                 await _googleCredRepo.Create(googleCreds);
+                await _emailService.SendRegisterNotification(user);
             }
             else
             {

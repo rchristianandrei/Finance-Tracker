@@ -1,5 +1,6 @@
 using backend.Dtos;
 using backend.Dtos.User;
+using backend.Interfaces;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
@@ -13,7 +14,11 @@ namespace backend.Controllers;
 [EnableRateLimiting("per-user")]
 [Authorize(Policy = "AdminOnly")]
 [Route("api/[controller]")]
-public class UserController(IUserRepo _userRepo, ICurrentUserService _currentUserService) : ControllerBase
+public class UserController(
+    IUserRepo _userRepo,
+    ICurrentUserService _currentUserService,
+    IEmailService _emailService
+) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] QueryParameters query)
@@ -38,6 +43,13 @@ public class UserController(IUserRepo _userRepo, ICurrentUserService _currentUse
         {
             user.Status = dto.Status;
             user.IsAdmin = dto.IsAdmin;
+
+            switch (user.Status)
+            {
+                case Enums.UserStatus.ACTIVE:
+                    await _emailService.SendApprovalNotification(user.GoogleCredential!.Email);
+                    break;
+            }
         }
 
         await _userRepo.Update(user);
@@ -56,6 +68,8 @@ public class UserController(IUserRepo _userRepo, ICurrentUserService _currentUse
         if (user.Id == currentUserId) return BadRequest("Unable to delete yourself");
 
         await _userRepo.Delete(user);
+        await _emailService.SendUserDeleteNotification(user.GoogleCredential!.Email);
+
         return NoContent();
     }
 }

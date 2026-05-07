@@ -13,8 +13,10 @@ public class UserRepo(
 {
     public async Task<User?> GetById(int id)
     {
-        var user = await _context.Users.FindAsync(id);
-        return user;
+        return await _context.Users
+            .Include(u => u.GoogleCredential)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<(ICollection<User> users, long count)> GetAll(QueryParameters query)
