@@ -27,4 +27,9 @@ export const API_ROUTES = {
     delete: (transactionId: number) =>
       `${environment.apiUrl}/${CONTROLLERS.transaction}/${transactionId}`,
   },
+  user: {
+    getAll: () => `${environment.apiUrl}/${CONTROLLERS.user}`,
+    update: (userId: number) => `${environment.apiUrl}/${CONTROLLERS.user}/${userId}`,
+    delete: (userId: number) => `${environment.apiUrl}/${CONTROLLERS.user}/${userId}`,
+  },
 };

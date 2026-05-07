@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteUser } from './components/delete-user/delete-user';
 import { SaveUser } from './components/save-user/save-user';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-users',
@@ -118,10 +119,30 @@ export class Users {
 
     dialogRef.componentInstance.onSubmit.subscribe((value) => {
       dialogRef.disableClose = true;
-      setTimeout(() => {
-        dialogRef.disableClose = false;
-        dialogRef.componentInstance.isLoading.set(false);
-      }, 10000);
+
+      this.userService
+        .update({
+          id: user.id,
+          firstName: value.firstName,
+          lastName: value.lastName,
+          isAdmin: value.isAdmin,
+          status: value.status,
+        })
+        .pipe(
+          finalize(() => {
+            dialogRef.disableClose = false;
+            dialogRef.componentInstance.isLoading.set(false);
+          }),
+        )
+        .subscribe({
+          next: (response) => {
+            dialogRef.close();
+            this.dataSource.update((users) =>
+              users.map((u) => (u.id === response.id ? response : u)),
+            );
+          },
+          error: (err) => {},
+        });
     });
 
     dialogRef.afterClosed().subscribe((success) => {

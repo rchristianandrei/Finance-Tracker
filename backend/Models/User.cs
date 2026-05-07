@@ -20,6 +20,8 @@ public class User
 
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
+    public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;
+
     [JsonIgnore]
     public LocalCredential? LocalCredential { get; set; }
     [JsonIgnore]

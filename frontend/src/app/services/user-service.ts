@@ -1,13 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { User } from '@app/types/user';
-import { environment } from '@env/environment';
 import { map } from 'rxjs';
+import { API_ROUTES } from './_api-routes';
 
 @Injectable()
 export class UserService {
   private http = inject(HttpClient);
-  url = `${environment.apiUrl}/user`;
 
   getUsers(filter?: {
     search?: string;
@@ -38,18 +37,30 @@ export class UserService {
       params = params.set('Page', filter.page);
     }
 
-    return this.http.get<{ data: User[]; totalCount: number }>(`${this.url}`, { params }).pipe(
-      map((res) => ({
-        ...res,
-        data: res.data.map((t) => ({
-          ...t,
-          date: new Date(t.createdAt),
+    return this.http
+      .get<{ data: User[]; totalCount: number }>(API_ROUTES.user.getAll(), { params })
+      .pipe(
+        map((res) => ({
+          ...res,
+          data: res.data.map((t) => ({
+            ...t,
+            date: new Date(t.createdAt),
+          })),
         })),
-      })),
-    );
+      );
+  }
+
+  update(user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    isAdmin: boolean;
+    status: number;
+  }) {
+    return this.http.put<User>(API_ROUTES.user.update(user.id), user);
   }
 
   delete(userId: number) {
-    return this.http.delete(`${this.url}/${userId}`);
+    return this.http.delete(API_ROUTES.user.update(userId));
   }
 }

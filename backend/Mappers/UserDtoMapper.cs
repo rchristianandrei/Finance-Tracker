@@ -11,6 +11,7 @@ public static class UserDtoMapper
         {
             Id = user.Id,
             IsAdmin = user.IsAdmin,
+            Status = user.Status,
             FirstName = user.FirstName,
             LastName = user.LastName,
             CreatedAt = user.CreatedAt
