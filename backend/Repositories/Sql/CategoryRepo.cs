@@ -4,7 +4,7 @@ using backend.Interfaces.MySql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Repositories.MySql;
+namespace backend.Repositories.Sql;
 
 public class CategoryRepo(ApplicationDbContext _context) : ICategoryRepo
 {

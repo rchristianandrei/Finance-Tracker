@@ -3,7 +3,7 @@ using backend.Interfaces.MySql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Repositories.MySql;
+namespace backend.Repositories.Sql;
 
 public class AccountRepo(ApplicationDbContext _context) : IAccountRepo
 {

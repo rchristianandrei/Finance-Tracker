@@ -29,7 +29,7 @@ public class UserController(IUserRepo _userRepo, ICurrentUserService _currentUse
         var user = await _userRepo.GetById(id);
         if (user == null) return NotFound();
 
-        if (user.Id == currentUserId) return BadRequest();
+        if (user.Id == currentUserId) return BadRequest("Unable to delete yourself");
 
         await _userRepo.Delete(user);
         return NoContent();

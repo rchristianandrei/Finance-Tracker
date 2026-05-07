@@ -4,9 +4,9 @@ using backend.Interfaces.MySql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Repositories.MySql;
+namespace backend.Repositories.Sql;
 
-public class TransactionService(ApplicationDbContext _context) : ITransactionService
+public class TransactionRepo(ApplicationDbContext _context) : ITransactionService
 {
     public async Task Create(Transaction transaction)
     {
@@ -34,9 +34,9 @@ public class TransactionService(ApplicationDbContext _context) : ITransactionSer
             var search = $"%{query.Search}%";
 
             queryable = queryable.Where(t =>
-                t.Type.ToString().Contains(query.Search) ||
-                t.Category.Contains(query.Search) ||
-                t.Description.Contains(query.Search)
+                EF.Functions.ILike(t.Type.ToString(), search) ||
+                EF.Functions.ILike(t.Category, search) ||
+                EF.Functions.ILike(t.Description, search)
             );
         }
 

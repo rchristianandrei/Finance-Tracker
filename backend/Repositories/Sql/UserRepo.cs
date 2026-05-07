@@ -4,7 +4,7 @@ using backend.Interfaces.MySql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Repositories.MySql;
+namespace backend.Repositories.Sql;
 
 public class UserRepo(
     ApplicationDbContext _context,
@@ -26,9 +26,9 @@ public class UserRepo(
             var search = $"%{query.Search}%";
 
             queryable = queryable.Where(u =>
-                EF.Functions.Like(u.FirstName, search) ||
-                EF.Functions.Like(u.LastName, search) ||
-                EF.Functions.Like(u.Id.ToString(), search)
+                EF.Functions.ILike(u.FirstName, search) ||
+                EF.Functions.ILike(u.LastName, search) ||
+                EF.Functions.ILike(u.Id.ToString(), search)
             );
         }
 
