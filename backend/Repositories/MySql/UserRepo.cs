@@ -28,7 +28,7 @@ public class UserRepo(
             queryable = queryable.Where(u =>
                 EF.Functions.Like(u.FirstName, search) ||
                 EF.Functions.Like(u.LastName, search) ||
-                EF.Functions.Like(u.Id, search)
+                EF.Functions.Like(u.Id.ToString(), search)
             );
         }
 

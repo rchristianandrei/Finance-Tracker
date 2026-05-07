@@ -10,7 +10,7 @@ public static class ProgramMySqlExtension
     public static IServiceCollection AddMySql(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IUserRepo, UserRepo>();
         services.AddScoped<IGoogleCredentialRepo, GoogleCredentialRepo>();

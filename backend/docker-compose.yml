@@ -1,27 +1,26 @@
 services:
-  mysql:
-    image: mysql:8
-    container_name: FinanceTracker_mysql
+  postgres:
+    image: postgres:16
+    container_name: FinanceTracker_postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: FinanceTracker
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: MyPass123
+      POSTGRES_DB: FinanceTracker
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: MyPass123
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - finance_tracker_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "myuser", "-pMyPass123"]
+      test: ["CMD-SHELL", "pg_isready -U myuser -d FinanceTracker"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  mysql_data:
+  postgres_data:
 
 networks:
   finance_tracker_network:
