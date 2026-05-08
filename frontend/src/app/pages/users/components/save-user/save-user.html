@@ -36,8 +36,8 @@
 
     <mat-checkbox formControlName="isAdmin">Is Admin</mat-checkbox>
 
-    @if (data.errorMessage?.()) {
-      <mat-error class="text-center">{{ data.errorMessage?.() }}</mat-error>
+    @if (errorMessage()) {
+      <mat-error class="text-center">{{ errorMessage() }}</mat-error>
     }
   </mat-dialog-content>
 

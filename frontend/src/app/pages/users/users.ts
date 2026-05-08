@@ -1,20 +1,17 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { User } from '@app/types/user';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { UserService } from '@app/services/user-service';
 import { DatePipe } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import { DeleteUser } from './components/delete-user/delete-user';
-import { SaveUser } from './components/save-user/save-user';
-import { finalize } from 'rxjs';
+import { ManageUsersService } from './services/manage-users-service';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-users',
@@ -32,25 +29,25 @@ import { finalize } from 'rxjs';
   ],
   templateUrl: './users.html',
   styleUrl: './users.scss',
-  providers: [UserService],
+  providers: [UserService, ManageUsersService],
 })
-export class Users {
-  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'createdAt', 'actions'];
-
+export class Users implements OnInit {
   private fb = inject(FormBuilder);
-  private userService = inject(UserService);
-  private dialog = inject(MatDialog);
 
-  private isDialogOpen = signal(false);
-  totalItems = signal(0);
-  paginationDetails = signal({
-    page: 0,
-    pageSize: 10,
-  });
+  protected readonly displayedColumns: string[] = [
+    'id',
+    'firstName',
+    'lastName',
+    'createdAt',
+    'actions',
+  ];
+  protected readonly manageUsersService = inject(ManageUsersService);
+
+  protected readonly page = signal(0);
 
   private today = new Date();
   private last30Days = new Date();
-  filterForm = this.fb.group({
+  protected readonly filterForm = this.fb.group({
     searchTerm: [''],
     dateRange: this.fb.group({
       start: new FormControl(this.last30Days, Validators.required),
@@ -61,17 +58,21 @@ export class Users {
     return this.filterForm.controls;
   }
 
-  dataSource = signal<User[]>([]);
-
   constructor() {
     this.last30Days.setDate(this.today.getDate() - 30);
-    effect(() => {
-      this.loadUsers();
-    });
   }
 
-  applyFilters() {
+  ngOnInit(): void {
     this.loadUsers();
+
+    this.filterForm.controls.searchTerm.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(() => this.loadUsers());
+
+    this.filterForm.controls.dateRange.controls.end.valueChanges.subscribe((value) => {
+      if (!value) return;
+      this.loadUsers();
+    });
   }
 
   clearFilters() {
@@ -82,88 +83,18 @@ export class Users {
   }
 
   onPageChange(event: any) {
-    this.paginationDetails.update((p) => ({
-      ...p,
-      pageSize: event.pageSize,
-      page: event.pageIndex,
-    }));
+    this.page.set(event.pageIndex);
     this.loadUsers();
   }
 
   loadUsers() {
-    let filter = {
+    const filter = {
       search: this.f.searchTerm.value ?? undefined,
       startDate: this.f.dateRange.controls.start.value ?? undefined,
       endDate: this.f.dateRange.controls.end.value ?? undefined,
-      pageSize: this.paginationDetails().pageSize,
-      page: this.paginationDetails().page + 1,
+      page: this.page() + 1,
     };
 
-    this.userService.getUsers(filter).subscribe({
-      next: (value) => {
-        this.dataSource.set(value.data);
-        this.totalItems.set(value.totalCount);
-      },
-    });
-  }
-
-  update(user: User) {
-    if (this.isDialogOpen()) return;
-    this.isDialogOpen.set(true);
-
-    const dialogRef = this.dialog.open(SaveUser, {
-      data: {
-        user,
-      },
-    });
-
-    dialogRef.componentInstance.onSubmit.subscribe((value) => {
-      dialogRef.disableClose = true;
-
-      this.userService
-        .update({
-          id: user.id,
-          firstName: value.firstName,
-          lastName: value.lastName,
-          isAdmin: value.isAdmin,
-          status: value.status,
-        })
-        .pipe(
-          finalize(() => {
-            dialogRef.disableClose = false;
-            dialogRef.componentInstance.isLoading.set(false);
-          }),
-        )
-        .subscribe({
-          next: (response) => {
-            dialogRef.close();
-            this.dataSource.update((users) =>
-              users.map((u) => (u.id === response.id ? response : u)),
-            );
-          },
-          error: (err) => {},
-        });
-    });
-
-    dialogRef.afterClosed().subscribe((success) => {
-      this.isDialogOpen.set(false);
-    });
-  }
-
-  delete(user: User) {
-    if (this.isDialogOpen()) return;
-    this.isDialogOpen.set(true);
-
-    const dialogRef = this.dialog.open(DeleteUser, {
-      data: {
-        user,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((success) => {
-      this.isDialogOpen.set(false);
-      if (!success) return;
-      this.dataSource.update((users) => users.filter((u) => u.id !== user.id));
-    });
+    this.manageUsersService.loadUsers(filter);
   }
 }

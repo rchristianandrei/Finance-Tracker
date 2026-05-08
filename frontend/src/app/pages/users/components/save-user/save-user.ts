@@ -13,7 +13,6 @@ import { AuthService } from '@app/services/auth-service';
 export type UserFormData = {
   heading: string;
   user?: User;
-  errorMessage?: Signal<string>;
   confirmButtonText?: string;
 };
 
@@ -54,6 +53,7 @@ export class SaveUser {
   }>();
 
   readonly isLoading = signal(false);
+  public readonly errorMessage = signal('');
 
   constructor() {
     effect(() => {
