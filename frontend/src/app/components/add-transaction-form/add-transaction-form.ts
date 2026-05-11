@@ -10,15 +10,18 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { CategoryService } from '@app/services/category-service';
 import { Transaction } from '@app/types/transaction';
 import { TransactionTypeField } from '../input/transaction-type-field/transaction-type-field';
 import { Category, TransactionType } from '@app/types/category';
+import { map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-add-transaction-form',
   imports: [
+    MatAutocompleteModule,
     MatDatepickerModule,
     MatProgressSpinnerModule,
     MatRadioModule,
@@ -52,6 +55,7 @@ export class AddTransactionForm {
   }>();
 
   category = signal<Category[]>([]);
+  filteredCategory = signal<Category[]>([]);
 
   form = this.fb.group({
     type: new FormControl<TransactionType>(this.transaction()?.type ?? 1, Validators.required),
@@ -68,6 +72,9 @@ export class AddTransactionForm {
   constructor() {
     effect(() => {
       this.category.set(this.categoryService.groupedCategories()[this.transaction()?.type ?? 1]);
+    });
+    effect(() => {
+      this.filteredCategory.set(this.category());
     });
 
     effect(() => {
@@ -93,15 +100,16 @@ export class AddTransactionForm {
       this.f.category.setValue('');
     });
 
-    this.f.category.valueChanges.subscribe((value) => {
-      const list = this.category(); // safe read
-
-      const exists = list.some((c) => c.name === value);
-
-      if (!exists && value !== null) {
-        this.f.category.setValue(null, { emitEvent: false });
-      }
-    });
+    this.f.category.valueChanges
+      .pipe(
+        startWith(''),
+        map((value) =>
+          this.category().filter((o) => o.name.toLowerCase().includes(value?.toLowerCase() ?? '')),
+        ),
+      )
+      .subscribe((value) => {
+        this.filteredCategory.set(value);
+      });
   }
 
   getNow(): string {

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RootLayout } from '@app/components/root-layout/root-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,7 +29,7 @@ import { MatChipsModule } from '@angular/material/chips';
   ],
   templateUrl: './accounts.html',
 })
-export class Accounts {
+export class Accounts implements OnInit {
   private accountsService = inject(AccountService);
   private dialog = inject(MatDialog);
   private toastService = inject(ToastService);
@@ -40,6 +40,10 @@ export class Accounts {
   isCreateOpen = signal(false);
   isDeleteOpen = signal(false);
   updateEvent = signal<Account | null>(null);
+
+  ngOnInit(): void {
+    this.accountsService.getAccounts();
+  }
 
   onCreate() {
     if (this.isCreateOpen()) return;

@@ -35,41 +35,40 @@ export class AccountService {
 
       this._isLoading.set(true);
 
-      this.getAccounts()
-        .pipe(finalize(() => this._isLoading.set(false)))
-        .subscribe({
-          next: (accounts) => {
-            let rawAccount: Account | null = null;
-            const stored = sessionStorage.getItem(this.storageKey);
-            if (stored) {
-              try {
-                rawAccount = JSON.parse(stored) as Account;
-              } catch {
-                rawAccount = null; // or handle cleanup
-              }
-            }
-            const account = accounts.accounts.find((a) => a.id === Number(rawAccount?.id)) || null;
-
-            if (account) {
-              this._selected.set(account);
-            } else {
-              this._selected.set(accounts.defaultAccount);
-              this.setSelectedAccount(accounts.defaultAccount?.id ?? 0);
-            }
-            this._default.set(accounts.defaultAccount);
-            this._accounts.set(accounts.accounts);
-          },
-          error: (err) => {
-            this.toastService.error(resolveHttpError(err) || 'Failed to load accounts');
-          },
-        });
+      this.getAccounts();
     });
   }
 
-  private getAccounts() {
-    return this.httpClient.get<{ accounts: Account[]; defaultAccount: Account | null }>(
-      `${this.baseUrl}`,
-    );
+  public getAccounts() {
+    return this.httpClient
+      .get<{ accounts: Account[]; defaultAccount: Account | null }>(`${this.baseUrl}`)
+      .pipe(finalize(() => this._isLoading.set(false)))
+      .subscribe({
+        next: (accounts) => {
+          let rawAccount: Account | null = null;
+          const stored = sessionStorage.getItem(this.storageKey);
+          if (stored) {
+            try {
+              rawAccount = JSON.parse(stored) as Account;
+            } catch {
+              rawAccount = null; // or handle cleanup
+            }
+          }
+          const account = accounts.accounts.find((a) => a.id === Number(rawAccount?.id)) || null;
+
+          if (account) {
+            this._selected.set(account);
+          } else {
+            this._selected.set(accounts.defaultAccount);
+            this.setSelectedAccount(accounts.defaultAccount?.id ?? 0);
+          }
+          this._default.set(accounts.defaultAccount);
+          this._accounts.set(accounts.accounts);
+        },
+        error: (err) => {
+          this.toastService.error(resolveHttpError(err) || 'Failed to load accounts');
+        },
+      });
   }
 
   private setSelectedAccount(accountId: number) {

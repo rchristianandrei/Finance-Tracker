@@ -12,7 +12,7 @@ public class Category
 
     public TransactionType Type { get; set; } = TransactionType.EXPENSE;
 
-    [MaxLength(20)]
+    [MaxLength(50)]
     public required string Name { get; set; } = string.Empty;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;

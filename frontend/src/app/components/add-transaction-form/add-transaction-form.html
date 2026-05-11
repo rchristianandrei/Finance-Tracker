@@ -24,35 +24,32 @@
       <!-- Category -->
       <mat-form-field appearance="outline">
         <mat-label>Category</mat-label>
+        <input
+          type="text"
+          matInput
+          [formControl]="f.category"
+          [matAutocomplete]="auto"
+          placeholder="Search..."
+          maxlength="50"
+        />
 
-        <div class="flex items-center">
-          <mat-select formControlName="category" class="flex-1">
-            @for (c of category(); track c.id) {
-              <mat-option [value]="c.name">
-                {{ c.name }}
-              </mat-option>
-            }
-          </mat-select>
-
-          @if (categoryService.isLoading()) {
-            <mat-spinner diameter="20" class="ml-2"></mat-spinner>
+        <mat-autocomplete #auto="matAutocomplete">
+          @for (option of filteredCategory(); track option.id) {
+            <mat-option [value]="option.name">{{ option.name }}</mat-option>
           }
-        </div>
-        @if (f['category'].touched && f['category'].invalid) {
-          <mat-error> Category is required </mat-error>
-        }
+        </mat-autocomplete>
       </mat-form-field>
 
       <!-- Description -->
       <mat-form-field appearance="outline">
         <mat-label>Description</mat-label>
-        <input matInput formControlName="description" />
+        <input matInput [formControl]="f.description" />
       </mat-form-field>
 
       <!-- Amount -->
       <mat-form-field appearance="outline">
         <mat-label>Amount</mat-label>
-        <input matInput type="number" formControlName="amount" />
+        <input matInput type="number" [formControl]="f.amount" />
         @if (f['amount'].touched && f['amount'].hasError('required')) {
           <mat-error> Amount is required </mat-error>
         }
@@ -65,7 +62,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Date</mat-label>
 
-        <input matInput [matDatepicker]="picker" formControlName="date" />
+        <input matInput [matDatepicker]="picker" [formControl]="f.date" />
 
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>

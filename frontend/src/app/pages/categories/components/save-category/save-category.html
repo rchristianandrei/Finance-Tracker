@@ -8,7 +8,7 @@
     ></app-transaction-type-field>
     <mat-form-field appearance="outline" class="w-full">
       <mat-label>Category Name</mat-label>
-      <input matInput formControlName="name" />
+      <input matInput formControlName="name" maxlength="50" />
       @if (form.get('name')?.invalid && form.get('name')?.touched) {
         <mat-error> Category name is required </mat-error>
       }

@@ -1,3 +1,4 @@
+using backend.Attributes;
 using backend.Dtos.Transaction;
 using backend.Enums;
 using backend.Interfaces.Sql;
@@ -7,6 +8,7 @@ using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.OpenApi.Reader;
 using Sprache;
 
 namespace backend.Controllers;
@@ -18,9 +20,11 @@ namespace backend.Controllers;
 public class TransactionController(
     ITransactionRepo _transactionService,
     ICurrentUserService _currentUserService,
-    IAccountRepo _accountRepo
+    IAccountRepo _accountRepo,
+    ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
+    [Transaction]
     [HttpPost()]
     public async Task<IActionResult> Create([FromBody] AddTransactionDto value)
     {
@@ -31,6 +35,18 @@ public class TransactionController(
 
         account.Balance += value.Type == TransactionType.INCOME ? value.Amount : -value.Amount;
         await _accountRepo.Update(account);
+
+        var ifExists = await _categoryRepo.ExistsByNameAndAccountId(value.Category, account.Id);
+        if (!ifExists)
+        {
+            var category = new Category
+            {
+                AccountId = account.Id,
+                Type = value.Type,
+                Name = value.Category,
+            };
+            await _categoryRepo.Create(category);
+        }
 
         var transaction = new Transaction
         {
@@ -48,6 +64,7 @@ public class TransactionController(
         return Ok();
     }
 
+    [Transaction]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateTransactionDto value)
     {
@@ -56,6 +73,19 @@ public class TransactionController(
         var transaction = await _transactionService.GetById(id);
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
+
+        var account = await _accountRepo.GetById(transaction.AccountId);
+        if (account == null) return NotFound("Account not found");
+        switch (value.Type)
+        {
+            case TransactionType.INCOME:
+                account.Balance += value.Amount - transaction.Amount;
+                break;
+            case TransactionType.EXPENSE:
+                account.Balance -= value.Amount - transaction.Amount;
+                break;
+        }
+        await _accountRepo.Update(account);
 
         transaction.Type = value.Type;
         transaction.Category = value.Category;
@@ -66,9 +96,11 @@ public class TransactionController(
 
         await _transactionService.Update(transaction);
 
+
         return Ok();
     }
 
+    [Transaction]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
     {
@@ -76,6 +108,19 @@ public class TransactionController(
 
         var transaction = await _transactionService.GetById(id);
         if (transaction == null) return NoContent();
+
+        var account = await _accountRepo.GetById(transaction.AccountId);
+        if (account == null) return NotFound("Account not found");
+        switch (transaction.Type)
+        {
+            case TransactionType.INCOME:
+                account.Balance -= transaction.Amount;
+                break;
+            case TransactionType.EXPENSE:
+                account.Balance += transaction.Amount;
+                break;
+        }
+        await _accountRepo.Update(account);
 
         if (transaction.UserId != userId) return Forbid();
         await _transactionService.Delete(transaction);
