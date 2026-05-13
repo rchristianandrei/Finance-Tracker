@@ -43,7 +43,7 @@
       <!-- Description -->
       <mat-form-field appearance="outline">
         <mat-label>Description</mat-label>
-        <input matInput [formControl]="f.description" />
+        <input matInput [formControl]="f.description" maxlength="30" />
       </mat-form-field>
 
       <!-- Amount -->
@@ -89,7 +89,7 @@
           @if (isLoading()) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {
-            Save Expense
+            Save
           }
         </button>
       </div>
