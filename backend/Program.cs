@@ -1,4 +1,5 @@
 using backend;
+using backend.Data;
 using backend.Extensions;
 using backend.Interfaces;
 using backend.Interfaces.Utils;
@@ -7,6 +8,7 @@ using backend.Services;
 using backend.Services.Utils;
 using backend.Settings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 DotNetEnv.Env.Load();
 
@@ -41,6 +43,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
