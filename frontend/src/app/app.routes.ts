@@ -2,6 +2,9 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
 import { guestGuard } from './guards/guest-guard';
 
+import { Login } from './pages/login/login';
+import { Dashboard } from './pages/dashboard/dashboard';
+
 export const routes: Routes = [
   {
     path: '',
@@ -13,7 +16,7 @@ export const routes: Routes = [
         path: '',
         title: 'Dashboard',
         canActivate: [authGuard],
-        loadComponent: () => import('./pages/dashboard/dashboard').then((c) => c.Dashboard),
+        component: Dashboard,
       },
       {
         path: 'transactions',
@@ -57,7 +60,7 @@ export const routes: Routes = [
         path: 'login',
         title: 'Login',
         canActivate: [guestGuard],
-        loadComponent: () => import('./pages/login/login').then((c) => c.Login),
+        component: Login,
       },
     ],
   },
