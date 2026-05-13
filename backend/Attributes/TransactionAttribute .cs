@@ -1,5 +1,6 @@
 using backend.Data;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Attributes;
 
@@ -11,24 +12,29 @@ public class TransactionAttribute : Attribute, IAsyncActionFilter
         var dbContext = context.HttpContext.RequestServices
             .GetRequiredService<ApplicationDbContext>();
 
-        await using var transaction = await dbContext.Database.BeginTransactionAsync();
-        try
-        {
-            var executedContext = await next();
+        var strategy = dbContext.Database.CreateExecutionStrategy();
 
-            if (executedContext.Exception == null)
+        await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
             {
-                await transaction.CommitAsync();
+                var executedContext = await next();
+
+                if (executedContext.Exception == null)
+                {
+                    await transaction.CommitAsync();
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                }
             }
-            else
+            catch
             {
                 await transaction.RollbackAsync();
+                throw;
             }
-        }
-        catch (Exception)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        });
     }
 }
