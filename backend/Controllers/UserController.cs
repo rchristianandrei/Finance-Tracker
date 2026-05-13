@@ -47,7 +47,7 @@ public class UserController(
             switch (user.Status)
             {
                 case Enums.UserStatus.ACTIVE:
-                    await _emailService.SendApprovalNotification(user.GoogleCredential!.Email);
+                    _ = _emailService.SendApprovalNotification(user.GoogleCredential!.Email);
                     break;
             }
         }

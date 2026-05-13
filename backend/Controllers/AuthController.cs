@@ -60,7 +60,7 @@ public class AuthController(
                     Subject = payload.Subject
                 };
                 await _googleCredRepo.Create(googleCreds);
-                await _emailService.SendRegisterNotification(user);
+                _ = _emailService.SendRegisterNotification(user);
             }
             else
             {
