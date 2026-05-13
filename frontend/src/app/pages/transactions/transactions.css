@@ -1,0 +1,7 @@
+:host ::ng-deep .mat-mdc-paginator .mat-mdc-paginator-outer-container .mat-mdc-paginator-container {
+  justify-content: center !important;
+}
+
+:host ::ng-deep .mat-mdc-paginator-page-size-label {
+  display: none !important;
+}

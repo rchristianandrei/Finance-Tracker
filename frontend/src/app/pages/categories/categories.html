@@ -1,0 +1,25 @@
+<app-root-layout heading="Categories">
+  <div class="flex flex-col gap-6 md:h-full">
+    <!-- Header -->
+    <div class="flex justify-end">
+      <button mat-raised-button color="primary" (click)="onCreate()">Create Category</button>
+    </div>
+
+    <!-- EXPENSE -->
+    <app-section
+      heading="Expense"
+      [categories]="groupedCategories()[1]"
+      [displayedColumns]="displayedColumns"
+      (onEdit)="onUpdate($event)"
+      (onDelete)="onDelete($event)"
+    ></app-section>
+    <!-- INCOME -->
+    <app-section
+      heading="Income"
+      [categories]="groupedCategories()[2]"
+      [displayedColumns]="displayedColumns"
+      (onEdit)="onUpdate($event)"
+      (onDelete)="onDelete($event)"
+    ></app-section>
+  </div>
+</app-root-layout>

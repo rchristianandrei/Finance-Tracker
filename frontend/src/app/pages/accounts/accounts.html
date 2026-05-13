@@ -1,0 +1,63 @@
+<app-root-layout heading="Accounts">
+  <div class="flex flex-col gap-6">
+    <!-- Create Button -->
+    <div class="flex justify-end">
+      <button mat-raised-button color="primary" (click)="onCreate()">Create Account</button>
+    </div>
+
+    <!-- Accounts Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (account of accounts(); track account.id) {
+        <mat-card class="p-4 shadow-md rounded-2xl flex flex-col justify-between">
+          <!-- Header -->
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-lg font-semibold">{{ account.name }}</div>
+              @if (isDefault(account)) {
+                <span class="text-xs border rounded-full px-2 font-medium">Default</span>
+              }
+            </div>
+
+            <!-- Kebab Menu -->
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="More options">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onEdit(account)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="onDelete(account)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </div>
+
+          <!-- Balance -->
+          <div class="mt-4">
+            <div class="text-sm text-gray-500">Balance</div>
+            <div
+              class="text-2xl font-bold"
+              [class]="account.balance < 0 ? 'text-red-600' : 'text-green-600'"
+            >
+              ₱ {{ account.balance | number: '1.2-2' }}
+            </div>
+          </div>
+        </mat-card>
+      }
+    </div>
+  </div>
+</app-root-layout>
+
+@if (isCreateOpen()) {
+  <app-create-account (onClose)="isCreateOpen.set(false)"></app-create-account>
+}
+
+@if (updateEvent()) {
+  <app-update-account
+    [account]="updateEvent()!"
+    (onClose)="updateEvent.set(null)"
+  ></app-update-account>
+}

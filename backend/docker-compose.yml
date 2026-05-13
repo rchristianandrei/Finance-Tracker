@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: FinanceTracker_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: FinanceTracker
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: MyPass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - finance_tracker_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d FinanceTracker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  finance_tracker_network:
+    driver: bridge

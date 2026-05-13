@@ -1,0 +1,8 @@
+<app-add-transaction-form
+  heading="Update Transaction"
+  [isLoading]="isLoading()"
+  [transaction]="transaction()"
+  [errorMessage]="errorMessage()"
+  (onSubmit)="onSubmit($event)"
+  (onClose)="close()"
+></app-add-transaction-form>

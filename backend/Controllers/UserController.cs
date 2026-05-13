@@ -1,0 +1,75 @@
+using backend.Dtos;
+using backend.Dtos.User;
+using backend.Interfaces;
+using backend.Interfaces.Sql;
+using backend.Interfaces.Utils;
+using backend.Mappers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+
+namespace backend.Controllers;
+
+[ApiController]
+[EnableRateLimiting("per-user")]
+[Authorize(Policy = "AdminOnly")]
+[Route("api/[controller]")]
+public class UserController(
+    IUserRepo _userRepo,
+    ICurrentUserService _currentUserService,
+    IEmailService _emailService
+) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] QueryParameters query)
+    {
+        var (users, count) = await _userRepo.GetAll(query);
+        return Ok(new { data = users.Select(u => u.ToDto()), totalCount = count });
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
+    {
+        var currentUserId = _currentUserService.Id();
+
+        var user = await _userRepo.GetById(id);
+        if (user == null) return NotFound();
+
+        user.FirstName = dto.FirstName;
+        user.LastName = dto.LastName;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        if (user.Id != currentUserId)
+        {
+            user.Status = dto.Status;
+            user.IsAdmin = dto.IsAdmin;
+
+            switch (user.Status)
+            {
+                case Enums.UserStatus.ACTIVE:
+                    await _emailService.SendApprovalNotification(user.GoogleCredential!.Email);
+                    break;
+            }
+        }
+
+        await _userRepo.Update(user);
+
+        return Ok(user.ToDto());
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var currentUserId = _currentUserService.Id();
+
+        var user = await _userRepo.GetById(id);
+        if (user == null) return NotFound();
+
+        if (user.Id == currentUserId) return BadRequest("Unable to delete yourself");
+
+        await _userRepo.Delete(user);
+        await _emailService.SendUserDeleteNotification(user.GoogleCredential!.Email);
+
+        return NoContent();
+    }
+}

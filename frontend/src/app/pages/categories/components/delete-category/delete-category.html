@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Delete Category</h2>
+
+<mat-dialog-content class="overflow-hidden! py-0! flex! flex-col gap-2!">
+  <p>
+    Are you sure you want to delete this
+    <span class="font-semibold">[{{ data.category.name }}]</span>?
+  </p>
+  @if (errorMessage()) {
+    <mat-error class="text-red-400 text-center block">{{ errorMessage() }}</mat-error>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()" [disabled]="isLoading()">Cancel</button>
+  <button
+    mat-raised-button
+    type="submit"
+    color="primary"
+    (click)="delete()"
+    [disabled]="isLoading()"
+  >
+    @if (isLoading()) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      Delete
+    }
+  </button>
+</mat-dialog-actions>
