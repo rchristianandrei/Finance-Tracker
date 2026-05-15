@@ -29,10 +29,6 @@ export class AuthService {
   user = this._user.asReadonly();
   isLoading = this._isLoading.asObservable();
 
-  constructor() {
-    this.getMe();
-  }
-
   login(body: { email: string; password: string }) {
     return this.httpClient
       .post<User>(`${environment.apiUrl}/auth/login`, body)

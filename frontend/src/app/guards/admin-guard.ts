@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
-import { filter, map, take } from 'rxjs';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '@app/services/auth-service';
+import { filter, map, take } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -15,6 +15,9 @@ export const authGuard: CanActivateFn = (route, state) => {
     map(() => {
       if (!authService.user()) {
         router.navigate(['/login']);
+        return false;
+      } else if (!authService.user()?.isAdmin) {
+        router.navigate(['/']);
         return false;
       }
       return true;

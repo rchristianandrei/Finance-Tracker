@@ -4,6 +4,7 @@ import { guestGuard } from './guards/guest-guard';
 
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { adminGuard } from './guards/admin-guard';
 
 export const routes: Routes = [
   {
@@ -15,33 +16,29 @@ export const routes: Routes = [
       {
         path: '',
         title: 'Dashboard',
-        canActivate: [authGuard],
         component: Dashboard,
       },
       {
         path: 'transactions',
         title: 'Transactions',
-        canActivate: [authGuard],
         loadComponent: () =>
           import('./pages/transactions/transactions').then((c) => c.Transactions),
       },
       {
         path: 'accounts',
         title: 'Accounts',
-        canActivate: [authGuard],
         loadComponent: () => import('./pages/accounts/accounts').then((c) => c.Accounts),
       },
       {
         path: 'categories',
         title: 'Categories',
-        canActivate: [authGuard],
         loadComponent: () => import('./pages/categories/categories').then((c) => c.Categories),
       },
     ],
   },
   {
     path: '',
-    canActivateChild: [authGuard],
+    canActivateChild: [adminGuard],
     children: [
       {
         path: 'users',
@@ -59,7 +56,6 @@ export const routes: Routes = [
       {
         path: 'login',
         title: 'Login',
-        canActivate: [guestGuard],
         component: Login,
       },
     ],
