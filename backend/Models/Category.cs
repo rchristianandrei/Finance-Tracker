@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using backend.Enums;
 
 namespace backend.Models;
@@ -18,4 +19,7 @@ public class Category
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [JsonIgnore]
+    public ICollection<Transaction> Transactions { get; set; } = [];
 }

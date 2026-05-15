@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using backend.Enums;
 
 namespace backend.Models;
@@ -18,9 +19,9 @@ public class Transaction
     [Required]
     public TransactionType Type { get; set; }
 
-    [Required]
-    [MaxLength(30)]
-    public string Category { get; set; } = string.Empty;
+    public int CategoryId { get; set; } = 0;
+    [JsonIgnore]
+    public Category Category { get; set; } = null!;
 
     [Required]
     [Range(0, double.MaxValue)]

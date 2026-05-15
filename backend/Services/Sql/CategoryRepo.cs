@@ -8,9 +8,12 @@ namespace backend.Repositories.Sql;
 
 public class CategoryRepo(ApplicationDbContext _context) : ICategoryRepo
 {
-    public async Task<bool> ExistsByNameAndAccountId(string categoryName, int accountId)
+    public async Task<Category?> ExistsByNameAndAccountId(string categoryName, int accountId)
     {
-        return await _context.Categories.AnyAsync(c => c.AccountId == accountId && c.Name == categoryName);
+        return await _context.Categories
+            .Where(c => c.AccountId == accountId && c.Name == categoryName)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
     }
 
     public async Task Create(Category category)
