@@ -12,7 +12,7 @@ public class AddTransactionDto
     public TransactionType Type { get; set; }
 
     [Required]
-    [MaxLength(30)]
+    [MaxLength(50)]
     public string Category { get; set; } = string.Empty;
 
     [Required]

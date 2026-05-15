@@ -9,6 +9,8 @@ public interface ITransactionRepo
 
     Task Update(Transaction entity);
 
+    Task<int> GetCountByAccountId(int accountId);
+
     Task<Transaction?> GetById(long id);
 
     Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, QueryParameters query);

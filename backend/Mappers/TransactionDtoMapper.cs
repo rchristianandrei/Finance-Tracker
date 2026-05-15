@@ -12,7 +12,7 @@ public static class TransactionDtoMapper
             Id = t.Id,
             Date = t.Date,
             Type = t.Type,
-            Category = t.Category,
+            Category = t.Category.Name,
             Description = t.Description,
             Amount = t.Amount
         };

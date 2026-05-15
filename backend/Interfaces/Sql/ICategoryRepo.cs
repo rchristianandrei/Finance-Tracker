@@ -5,7 +5,7 @@ namespace backend.Interfaces.Sql;
 
 public interface ICategoryRepo
 {
-    Task<bool> ExistsByNameAndAccountId(string categoryName, int accountId);
+    Task<Category?> ExistsByNameAndAccountId(string categoryName, int accountId);
     Task Create(Category category);
     Task<Category?> GetById(int id, bool includeAccount = false);
     Task<ICollection<Category>> GetByAccountId(int accountId);

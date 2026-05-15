@@ -104,10 +104,10 @@ public class AccountController(
             {
                 expenses += transaction.Amount;
 
-                if (!expensesBreakdown.ContainsKey(transaction.Category))
-                    expensesBreakdown.Add(transaction.Category, 0);
+                if (!expensesBreakdown.ContainsKey(transaction.Category.Name))
+                    expensesBreakdown.Add(transaction.Category.Name, 0);
 
-                expensesBreakdown[transaction.Category] += transaction.Amount;
+                expensesBreakdown[transaction.Category.Name] += transaction.Amount;
             }
         }
 

@@ -74,6 +74,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<DefaultAccount>().HasKey(d => d.UserId);
 
         modelBuilder.Entity<Category>().HasKey(d => d.Id);
+        modelBuilder.Entity<Category>()
+            .HasMany(c => c.Transactions)
+            .WithOne(t => t.Category)
+            .HasForeignKey(t => t.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Transaction>().HasKey(d => d.Id);
     }

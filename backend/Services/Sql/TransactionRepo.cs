@@ -20,14 +20,19 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         await _context.SaveChangesAsync();
     }
 
+    public async Task<int> GetCountByAccountId(int accountId)
+    {
+        return await _context.Transactions.CountAsync(t => t.AccountId == accountId);
+    }
+
     public async Task<Transaction?> GetById(long id)
     {
-        return await _context.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+        return await _context.Transactions.Include(t => t.Category).AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, QueryParameters query)
     {
-        var queryable = _context.Transactions.Where(t => t.AccountId == accountId);
+        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.AccountId == accountId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
@@ -35,7 +40,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
             queryable = queryable.Where(t =>
                 EF.Functions.ILike(t.Type.ToString(), search) ||
-                EF.Functions.ILike(t.Category, search) ||
+                EF.Functions.ILike(t.Category.Name, search) ||
                 EF.Functions.ILike(t.Description, search)
             );
         }
@@ -68,6 +73,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         var now = DateTime.UtcNow;
         var thirtyDaysAgo = DateTime.UtcNow.AddDays(-days);
         return await _context.Transactions
+            .Include(t => t.Category)
             .Where(t =>
                 t.AccountId == accountId &&
                 t.CreatedAt >= thirtyDaysAgo &&
