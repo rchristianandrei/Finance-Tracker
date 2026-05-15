@@ -1,17 +1,18 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth-guard';
 import { guestGuard } from './guards/guest-guard';
+import { adminGuard } from './guards/admin-guard';
 
+import { PrivateLayout } from './components/layouts/private-layout/private-layout';
+import { PublicLayout } from './components/layouts/public-layout/public-layout';
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { adminGuard } from './guards/admin-guard';
 
 export const routes: Routes = [
   {
     path: '',
     canActivateChild: [authGuard],
-    loadComponent: () =>
-      import('./components/layouts/private-layout/private-layout').then((c) => c.PrivateLayout),
+    component: PrivateLayout,
     children: [
       {
         path: '',
@@ -50,8 +51,7 @@ export const routes: Routes = [
   {
     path: '',
     canActivateChild: [guestGuard],
-    loadComponent: () =>
-      import('./components/layouts/public-layout/public-layout').then((c) => c.PublicLayout),
+    component: PublicLayout,
     children: [
       {
         path: 'login',
