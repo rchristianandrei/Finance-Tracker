@@ -38,7 +38,6 @@
           <mat-paginator
             [length]="totalTransactions()"
             [pageIndex]="paginationDetails().page"
-            [pageSizeOptions]="[5, 10, 20]"
             [hidePageSize]="true"
             (page)="onPageChange($event)"
             class="bg-transparent!"
