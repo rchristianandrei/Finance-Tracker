@@ -14,6 +14,8 @@ import { LoginFormValues, loginSchema } from "@/lib/validations/login"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LogIn } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
+import { GoogleLogin } from "@react-oauth/google"
+import GoogleSignIn from "@/components/GoogleSignIn"
 
 export default function LoginForm() {
   const form = useForm<LoginFormValues>({
@@ -91,10 +93,7 @@ export default function LoginForm() {
               </div>
             </div>
 
-            <Button type="button" variant="outline" className="w-full">
-              <LogIn className="mr-2 h-4 w-4" />
-              Login with Google
-            </Button>
+            <GoogleSignIn></GoogleSignIn>
           </form>
         </CardContent>
       </Card>
