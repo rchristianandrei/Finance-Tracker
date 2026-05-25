@@ -9,7 +9,6 @@ export default function GoogleSignIn() {
       onError={() => {
         console.log("Login Failed")
       }}
-      width="100%"
       theme="outline"
       size="large"
       shape="pill"

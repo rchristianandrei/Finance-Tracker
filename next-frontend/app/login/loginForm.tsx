@@ -93,7 +93,9 @@ export default function LoginForm() {
               </div>
             </div>
 
-            <GoogleSignIn></GoogleSignIn>
+            <div className="flex w-full items-center justify-center">
+              <GoogleSignIn></GoogleSignIn>
+            </div>
           </form>
         </CardContent>
       </Card>
