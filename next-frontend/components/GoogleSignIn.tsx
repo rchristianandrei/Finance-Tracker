@@ -1,10 +1,14 @@
-import { GoogleLogin } from "@react-oauth/google"
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google"
 
-export default function GoogleSignIn() {
+export default function GoogleSignIn({
+  onSuccess,
+}: {
+  onSuccess: (credentialResponse: CredentialResponse) => void
+}) {
   return (
     <GoogleLogin
       onSuccess={(credentialResponse) => {
-        console.log(credentialResponse)
+        onSuccess(credentialResponse)
       }}
       onError={() => {
         console.log("Login Failed")

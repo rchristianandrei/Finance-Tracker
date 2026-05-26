@@ -12,12 +12,15 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { LoginFormValues, loginSchema } from "@/lib/validations/login"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { LogIn } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
-import { GoogleLogin } from "@react-oauth/google"
+import { CredentialResponse } from "@react-oauth/google"
 import GoogleSignIn from "@/components/GoogleSignIn"
+import { useAuth } from "@/providers/AuthProvider"
+import { useState } from "react"
 
 export default function LoginForm() {
+  const { googleLogin } = useAuth()
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -26,8 +29,25 @@ export default function LoginForm() {
     },
   })
 
+  const [errorMessage, setErrorMessage] = useState<string>("")
+
   function onSubmit(values: LoginFormValues) {
     console.log(values)
+  }
+
+  async function onGoogleLoginSuccess(credentialResponse: CredentialResponse) {
+    const data = await googleLogin(credentialResponse.credential!)
+
+    switch (data.status) {
+      case 1:
+        // Show error message
+        console.log(data.message)
+        break
+      case 2:
+        // User is logged in, you can redirect or show a success message
+        console.log("Login successful", data.user)
+        break
+    }
   }
 
   return (
@@ -77,6 +97,8 @@ export default function LoginForm() {
               )}
             />
 
+            {errorMessage && <FieldError>{errorMessage}</FieldError>}
+
             <Button type="submit" className="w-full">
               Login
             </Button>
@@ -94,7 +116,7 @@ export default function LoginForm() {
             </div>
 
             <div className="flex w-full items-center justify-center">
-              <GoogleSignIn></GoogleSignIn>
+              <GoogleSignIn onSuccess={onGoogleLoginSuccess} />
             </div>
           </form>
         </CardContent>
