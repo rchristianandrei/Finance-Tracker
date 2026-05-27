@@ -17,11 +17,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     ;(async () => {
-      const response = await authApi.getMe()
-      const data = response.data
+      try {
+        const response = await authApi.getMe()
+        const data = response.data
 
-      setUser(data)
-      setLoading(false)
+        setUser(data)
+      } finally {
+        setLoading(false)
+      }
     })()
   }, [])
 
