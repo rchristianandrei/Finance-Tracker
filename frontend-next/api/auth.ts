@@ -1,6 +1,6 @@
 import api from "@/lib/axios"
-import { LoginApiResponse } from "@/types/LoginApiResponse"
-import { User } from "@/types/User"
+import { LoginApiResponse } from "@/types/login-api-response"
+import { User } from "@/types/user"
 
 export const authApi = {
   googleLogin: (body: { idToken?: string }) => {

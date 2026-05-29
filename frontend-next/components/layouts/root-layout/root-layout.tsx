@@ -1,12 +1,4 @@
 import { AppSidebar } from "@/components/layouts/root-layout/app-sidebar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
@@ -17,7 +9,7 @@ import { DynamicBreadcrumb } from "./DynamicBreadcrumb"
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={false} className="h-screen">
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -30,7 +22,9 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
             <DynamicBreadcrumb />
           </div>
         </header>
-        {children}
+        <div className="flex-1 overflow-auto p-4">
+          <div className="min-h-full md:h-full">{children}</div>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

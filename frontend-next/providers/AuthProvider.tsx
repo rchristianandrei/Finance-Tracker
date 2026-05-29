@@ -1,6 +1,6 @@
 import { authApi } from "@/api/auth"
-import { LoginApiResponse } from "@/types/LoginApiResponse"
-import { User } from "@/types/User"
+import { LoginApiResponse } from "@/types/login-api-response"
+import { User } from "@/types/user"
 import { createContext, useContext, useEffect, useState } from "react"
 
 interface UserContextType {

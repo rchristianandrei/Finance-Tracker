@@ -40,12 +40,9 @@ export default function LoginForm() {
 
     switch (data.status) {
       case 1:
-        // Show error message
-        console.log(data.message)
+        setErrorMessage(data.message)
         break
       case 2:
-        // User is logged in, you can redirect or show a success message
-        console.log("Login successful", data.user)
         break
     }
   }

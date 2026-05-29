@@ -71,7 +71,7 @@ export function AccountSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
+              Accounts
             </DropdownMenuLabel>
             {accounts.map((account, index) => (
               <DropdownMenuItem
@@ -86,7 +86,6 @@ export function AccountSwitcher() {
                 </Avatar>
 
                 {account.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -94,7 +93,9 @@ export function AccountSwitcher() {
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <PlusIcon className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
+              <div className="font-medium text-muted-foreground">
+                Add Account
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
