@@ -1,5 +1,6 @@
 "use client"
 
+import { transactionApi } from "@/api/transactions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import {
@@ -10,6 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useAccount } from "@/providers/AccountProvider"
+import { DashboardType } from "@/types/dashboard"
 import {
   BanknoteArrowDown,
   BanknoteArrowUp,
@@ -18,99 +21,44 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts"
 
 const COLORS = ["#22c55e", "#ef4444", "#3b82f6", "#f59e0b", "#8b5cf6"]
 
-const transactions = [
-  {
-    id: 1,
-    description: "Salary",
-    category: "Job",
-    type: "income",
-    amount: 50000,
-    date: "2026-05-01",
-  },
-  {
-    id: 2,
-    description: "Groceries",
-    category: "Food",
-    type: "expense",
-    amount: 3500,
-    date: "2026-05-02",
-  },
-  {
-    id: 3,
-    description: "Freelance",
-    category: "Side Hustle",
-    type: "income",
-    amount: 12000,
-    date: "2026-05-05",
-  },
-  {
-    id: 4,
-    description: "Electric Bill",
-    category: "Utilities",
-    type: "expense",
-    amount: 2800,
-    date: "2026-05-08",
-  },
-  {
-    id: 5,
-    description: "Transportation",
-    category: "Transport",
-    type: "expense",
-    amount: 1500,
-    date: "2026-05-10",
-  },
-  {
-    id: 6,
-    description: "Transportation",
-    category: "Transport",
-    type: "expense",
-    amount: 1500,
-    date: "2026-05-10",
-  },
-  {
-    id: 7,
-    description: "Transportation",
-    category: "Transport",
-    type: "expense",
-    amount: 1500,
-    date: "2026-05-10",
-  },
-  {
-    id: 8,
-    description: "Transportation",
-    category: "Transport",
-    type: "expense",
-    amount: 1500,
-    date: "2026-05-10",
-  },
+const INCOME_COLORS = [
+  "#166534", // green-800
+  "#15803d", // green-700
+  "#16a34a", // green-600
+  "#22c55e", // green-500
+  "#4ade80", // green-400
+  "#86efac", // green-300
 ]
 
-const expenseCategories = [
-  { name: "Food", value: 3500 },
-  { name: "Utilities", value: 2800 },
-  { name: "Transport", value: 1500 },
-]
-
-const incomeCategories = [
-  { name: "Job", value: 50000 },
-  { name: "Side Hustle", value: 12000 },
+const EXPENSE_COLORS = [
+  "#991b1b", // red-800
+  "#b91c1c", // red-700
+  "#dc2626", // red-600
+  "#ef4444", // red-500
+  "#f87171", // red-400
+  "#fca5a5", // red-300
 ]
 
 export default function DashboardPage() {
-  const income = transactions
-    .filter((t) => t.type === "income")
-    .reduce((acc, curr) => acc + curr.amount, 0)
+  const { selectedAccount } = useAccount()
+  const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
 
-  const expenses = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((acc, curr) => acc + curr.amount, 0)
+  useEffect(() => {
+    if (!selectedAccount) return
+    ;(async () => {
+      const response = await transactionApi.getDashboard(selectedAccount.id)
 
-  const balance = income - expenses
+      const data = response.data
+
+      setDashboardData(data)
+    })()
+  }, [selectedAccount])
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -124,7 +72,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-blue-600">
-              {balance.toLocaleString()}
+              {dashboardData ? dashboardData.balance.toLocaleString() : ""}
             </p>
           </CardContent>
         </Card>
@@ -137,7 +85,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-green-600">
-              {income.toLocaleString()}
+              {dashboardData ? dashboardData.income.toLocaleString() : ""}
             </p>
           </CardContent>
         </Card>
@@ -150,7 +98,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-red-600">
-              {expenses.toLocaleString()}
+              {dashboardData ? dashboardData.expenses.toLocaleString() : ""}
             </p>
           </CardContent>
         </Card>
@@ -169,14 +117,17 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Pie
-                  data={incomeCategories}
+                  data={dashboardData?.incomeBreakdown || []}
                   dataKey="value"
-                  nameKey="name"
+                  nameKey="key"
                   outerRadius={110}
                   label
                 >
-                  {incomeCategories.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  {dashboardData?.incomeBreakdown.map((_, index) => (
+                    <Cell
+                      key={index}
+                      fill={INCOME_COLORS[index % INCOME_COLORS.length]}
+                    />
                   ))}
                 </Pie>
 
@@ -197,14 +148,17 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Pie
-                  data={expenseCategories}
+                  data={dashboardData?.expensesBreakdown || []}
                   dataKey="value"
-                  nameKey="name"
+                  nameKey="key"
                   outerRadius={110}
                   label
                 >
-                  {expenseCategories.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  {dashboardData?.expensesBreakdown.map((_, index) => (
+                    <Cell
+                      key={index}
+                      fill={EXPENSE_COLORS[index % EXPENSE_COLORS.length]}
+                    />
                   ))}
                 </Pie>
 
@@ -216,7 +170,7 @@ export default function DashboardPage() {
       </div>
 
       {/* TRANSACTIONS */}
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex items-center gap-2">
           <Receipt></Receipt>
           <CardTitle>This Month Transactions</CardTitle>
@@ -226,36 +180,36 @@ export default function DashboardPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Type</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
+              {dashboardData?.transactions.map((transaction, index) => (
+                <TableRow key={index}>
+                  <TableCell>{transaction.date.toDateString()}</TableCell>
+
+                  <TableCell>{transaction.category}</TableCell>
+
                   <TableCell className="font-medium">
                     {transaction.description}
                   </TableCell>
 
-                  <TableCell>{transaction.category}</TableCell>
-
                   <TableCell>
                     <span
                       className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        transaction.type === "income"
+                        transaction.type === 2
                           ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                           : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
                       }`}
                     >
-                      {transaction.type}
+                      {transaction.type === 2 ? "Income" : "Expense"}
                     </span>
                   </TableCell>
-
-                  <TableCell>{transaction.date}</TableCell>
 
                   <TableCell className="text-right font-semibold">
                     {transaction.amount.toLocaleString()}

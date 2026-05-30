@@ -89,6 +89,7 @@ public class AccountController(
     public async Task<IActionResult> Dashboard(int accountId)
     {
         var expensesBreakdown = new Dictionary<string, double>();
+        var incomeBreakdown = new Dictionary<string, double>();
         var expenses = 0.00;
         var income = 0.00;
 
@@ -99,6 +100,11 @@ public class AccountController(
             if (transaction.Type == TransactionType.INCOME)
             {
                 income += transaction.Amount;
+
+                if (!incomeBreakdown.ContainsKey(transaction.Category.Name))
+                    incomeBreakdown.Add(transaction.Category.Name, 0);
+
+                incomeBreakdown[transaction.Category.Name] += transaction.Amount;
             }
             else if (transaction.Type == TransactionType.EXPENSE)
             {
@@ -119,6 +125,7 @@ public class AccountController(
             Income = income,
             Expenses = expenses,
             ExpensesBreakdown = expensesBreakdown.ToArray(),
+            IncomeBreakdown = incomeBreakdown.ToArray(),
             Transactions = transactionDtos
         });
     }
