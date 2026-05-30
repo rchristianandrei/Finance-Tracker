@@ -11,6 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 import { useAccount } from "@/providers/AccountProvider"
 import { DashboardType } from "@/types/dashboard"
 import {
@@ -23,9 +30,13 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from "recharts"
-
-const COLORS = ["#22c55e", "#ef4444", "#3b82f6", "#f59e0b", "#8b5cf6"]
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as RechartsTooltip,
+} from "recharts"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -105,16 +116,16 @@ export default function DashboardPage() {
       </div>
 
       {/* CHARTS */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:flex-1 md:grid-cols-2">
         {/* INCOME PIE */}
-        <Card className="">
+        <Card>
           <CardHeader className="flex items-center gap-2">
             <BanknoteArrowUp></BanknoteArrowUp>
             <CardTitle>Income Categories</CardTitle>
           </CardHeader>
 
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
+          <CardContent className="h-60 md:h-full">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={dashboardData?.incomeBreakdown || []}
@@ -131,21 +142,21 @@ export default function DashboardPage() {
                   ))}
                 </Pie>
 
-                <Tooltip />
+                <RechartsTooltip />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* EXPENSE PIE */}
-        <Card className="">
+        <Card>
           <CardHeader className="flex items-center gap-2">
             <BanknoteArrowDown></BanknoteArrowDown>
             <CardTitle>Expense Categories</CardTitle>
           </CardHeader>
 
-          <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
+          <CardContent className="h-60 md:h-full">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={dashboardData?.expensesBreakdown || []}
@@ -162,7 +173,7 @@ export default function DashboardPage() {
                   ))}
                 </Pie>
 
-                <Tooltip />
+                <RechartsTooltip />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -170,13 +181,13 @@ export default function DashboardPage() {
       </div>
 
       {/* TRANSACTIONS */}
-      <Card className="h-full">
+      <Card className="flex flex-1 flex-col overflow-auto">
         <CardHeader className="flex items-center gap-2">
           <Receipt></Receipt>
           <CardTitle>This Month Transactions</CardTitle>
         </CardHeader>
 
-        <CardContent className="md:flex-1 md:overflow-auto">
+        <CardContent className="flex flex-1 flex-col overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -189,33 +200,58 @@ export default function DashboardPage() {
             </TableHeader>
 
             <TableBody>
-              {dashboardData?.transactions.map((transaction, index) => (
-                <TableRow key={index}>
-                  <TableCell>{transaction.date.toDateString()}</TableCell>
+              <TooltipProvider>
+                {dashboardData?.transactions.map((transaction, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{transaction.date.toDateString()}</TableCell>
 
-                  <TableCell>{transaction.category}</TableCell>
+                    <TableCell className="max-w-50 truncate">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="block cursor-help truncate">
+                            {transaction.category}
+                          </span>
+                        </TooltipTrigger>
 
-                  <TableCell className="font-medium">
-                    {transaction.description}
-                  </TableCell>
+                        <TooltipContent>
+                          <p>{transaction.category}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
 
-                  <TableCell>
-                    <span
-                      className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        transaction.type === 2
-                          ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                          : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                      }`}
-                    >
-                      {transaction.type === 2 ? "Income" : "Expense"}
-                    </span>
-                  </TableCell>
+                    <TableCell className="max-w-50 truncate font-medium">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="block cursor-help truncate">
+                            {transaction.description}
+                          </span>
+                        </TooltipTrigger>
 
-                  <TableCell className="text-right font-semibold">
-                    {transaction.amount.toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
+                        <TooltipContent>
+                          <p>{transaction.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+
+                    <TableCell>
+                      <span
+                        className={cn(
+                          `rounded-full px-2 py-1 text-xs font-medium`,
+                          transaction.type === 2
+                            ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                            : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                        )}
+                      >
+                        {transaction.type === 2 ? "Income" : "Expense"}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="text-right font-semibold">
+                      {transaction.amount.toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TooltipProvider>
             </TableBody>
           </Table>
         </CardContent>
