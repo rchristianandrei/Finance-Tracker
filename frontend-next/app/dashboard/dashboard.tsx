@@ -124,8 +124,8 @@ export default function DashboardPage() {
             <CardTitle>Income Categories</CardTitle>
           </CardHeader>
 
-          <CardContent className="h-60 md:h-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={dashboardData?.incomeBreakdown || []}
@@ -155,8 +155,8 @@ export default function DashboardPage() {
             <CardTitle>Expense Categories</CardTitle>
           </CardHeader>
 
-          <CardContent className="h-60 md:h-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={dashboardData?.expensesBreakdown || []}
