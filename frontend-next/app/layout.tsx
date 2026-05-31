@@ -12,6 +12,13 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+export const metadata = {
+  title: {
+    default: "Finance Tracker",
+    template: "%s - Finance Tracker",
+  },
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
