@@ -9,4 +9,7 @@ export const authApi = {
   getMe: () => {
     return api.get<User>("/auth/me")
   },
+  logout: () => {
+    return api.post("/auth/logout")
+  },
 }

@@ -15,19 +15,33 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Spinner } from "@/components/ui/spinner"
 import { useAuth } from "@/providers/AuthProvider"
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
+  const { user, logout } = useAuth()
 
-  const { user } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const fallbackName = useMemo(() => {
     if (!user) return null
     return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
   }, [user])
+
+  const onClickLogout = async () => {
+    if (isLoggingOut) return
+    setIsLoggingOut(true)
+    try {
+      await logout()
+    } catch (error) {
+      console.error("Logout failed:", error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -76,9 +90,9 @@ export function NavUser() {
               )}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={onClickLogout}>
               <LogOutIcon />
-              Log out
+              Log out {isLoggingOut && <Spinner />}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

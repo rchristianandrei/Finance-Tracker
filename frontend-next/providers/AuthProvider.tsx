@@ -7,6 +7,7 @@ interface UserContextType {
   user: User | null
   loading: boolean
   googleLogin: (idToken: string) => Promise<LoginApiResponse>
+  logout: () => Promise<void>
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -40,8 +41,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data
   }
 
+  const logout = async () => {
+    await authApi.logout()
+    setUser(null)
+  }
+
   return (
-    <UserContext.Provider value={{ user, loading, googleLogin }}>
+    <UserContext.Provider value={{ user, loading, googleLogin, logout }}>
       {children}
     </UserContext.Provider>
   )
