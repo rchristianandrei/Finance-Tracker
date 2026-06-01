@@ -17,9 +17,13 @@ import { CredentialResponse } from "@react-oauth/google"
 import GoogleSignIn from "@/components/GoogleSignIn"
 import { useAuth } from "@/providers/AuthProvider"
 import { useState } from "react"
+import { toast } from "sonner"
+import { Spinner } from "@/components/ui/spinner"
 
 export default function LoginForm() {
   const { googleLogin } = useAuth()
+
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -32,18 +36,29 @@ export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState<string>("")
 
   function onSubmit(values: LoginFormValues) {
-    console.log(values)
+    if (isLoggingIn) return
   }
 
   async function onGoogleLoginSuccess(credentialResponse: CredentialResponse) {
-    const data = await googleLogin(credentialResponse.credential!)
+    if (isLoggingIn) return
+    setIsLoggingIn(true)
 
-    switch (data.status) {
-      case 1:
-        setErrorMessage(data.message)
-        break
-      case 2:
-        break
+    try {
+      const data = await googleLogin(credentialResponse.credential!)
+
+      switch (data.status) {
+        case 1:
+          setErrorMessage(data.message)
+          break
+        case 2:
+          break
+      }
+
+      toast.success("Logged in successfully!")
+    } catch (error) {
+      setErrorMessage("An unexpected error occurred. Please try again.")
+    } finally {
+      setIsLoggingIn(false)
     }
   }
 
@@ -57,64 +72,72 @@ export default function LoginForm() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Controller
-              name="username"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset disabled={isLoggingIn} className="space-y-4">
+              <Controller
+                name="username"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Username</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              {errorMessage && (
+                <FieldError className="text-center">{errorMessage}</FieldError>
               )}
-            />
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="password"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+
+              <Button type="submit" className="w-full">
+                {isLoggingIn ? <Spinner /> : "Login"}
+              </Button>
+
+              {!isLoggingIn && (
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
               )}
-            />
 
-            {errorMessage && <FieldError>{errorMessage}</FieldError>}
-
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className="flex w-full items-center justify-center">
-              <GoogleSignIn onSuccess={onGoogleLoginSuccess} />
-            </div>
+              {!isLoggingIn && (
+                <div className="flex w-full items-center justify-center">
+                  <GoogleSignIn onSuccess={onGoogleLoginSuccess} />
+                </div>
+              )}
+            </fieldset>
           </form>
         </CardContent>
       </Card>
