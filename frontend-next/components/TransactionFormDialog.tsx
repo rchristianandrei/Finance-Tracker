@@ -39,24 +39,32 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { transactionSchema } from "@/lib/validations/transaction"
 import { TransactionFormValues } from "@/lib/validations/transaction"
 import { Field, FieldError, FieldLabel } from "./ui/field"
-import { useState } from "react"
-
-const categories = [
-  "Food",
-  "Transport",
-  "Shopping",
-  "Entertainment",
-  "Utilities",
-]
+import { useEffect, useState } from "react"
+import { Category, TransactionType } from "@/types/category"
+import { categoryApi } from "@/api/category"
+import { transactionApi } from "@/api/transactions"
+import { useAccount } from "@/providers/AccountProvider"
+import { toast } from "sonner"
+import { Spinner } from "./ui/spinner"
 
 export function TransactionFormDialog() {
+  const { selectedAccount } = useAccount()
+
+  useEffect(() => {
+    categoryApi.getCategories("1").then((res) => {
+      setCategories(res.data)
+    })
+  }, [])
+
+  const [categories, setCategories] = useState<Category[]>([])
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [dateOpen, setDateOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      type: "expense",
+      type: "1",
       category: "",
       description: "",
       amount: undefined,
@@ -64,9 +72,33 @@ export function TransactionFormDialog() {
     },
   })
 
-  function onSubmit(values: TransactionFormValues) {
-    console.log(values)
-    form.reset()
+  const selectedType = form.watch("type")
+
+  useEffect(() => {
+    form.resetField("category")
+  }, [selectedType])
+
+  async function onSubmit(values: TransactionFormValues) {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+    if (!selectedAccount) return
+    try {
+      await transactionApi.createTransaction(selectedAccount.id, {
+        type: Number(values.type) as TransactionType,
+        category: values.category,
+        description: values.description,
+        amount: values.amount!,
+        date: new Date(values.date),
+      })
+
+      toast.success("Transaction created successfully")
+      form.reset()
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to create transaction")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -86,194 +118,205 @@ export function TransactionFormDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <Controller
-            name="type"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Type</FieldLabel>
-
-                <RadioGroup
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="expense" id="expense" />
-                    <label htmlFor="expense">Expense</label>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="income" id="income" />
-                    <label htmlFor="income">Income</label>
-                  </div>
-                </RadioGroup>
-
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="category"
-            control={form.control}
-            render={({ field, fieldState }) => {
-              const value = field.value ?? ""
-
-              const filtered = categories.filter((c) =>
-                c.toLowerCase().includes(value.toLowerCase())
-              )
-
-              return (
+        <fieldset disabled={isSubmitting}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Controller
+              name="type"
+              control={form.control}
+              render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Category</FieldLabel>
+                  <FieldLabel>Type</FieldLabel>
 
-                  <div className="relative">
-                    <Input
-                      {...field}
-                      value={value}
-                      onChange={(e) => {
-                        field.onChange(e.target.value)
-                        setCategoryOpen(true)
-                      }}
-                      onFocus={() => setCategoryOpen(true)}
-                      onBlur={() => {
-                        // small delay so clicks still work
-                        setTimeout(() => setCategoryOpen(false), 100)
-                      }}
-                      placeholder="Type or select a category"
-                    />
+                  <RadioGroup
+                    value={field.value.toString()}
+                    onValueChange={field.onChange}
+                    className="flex gap-6"
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="1" id="expense" />
+                      <label htmlFor="expense">Expense</label>
+                    </div>
 
-                    {categoryOpen && (
-                      <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
-                        <Command shouldFilter={false}>
-                          <CommandList>
-                            <CommandEmpty>No results</CommandEmpty>
-
-                            <CommandGroup>
-                              {filtered.map((category) => (
-                                <CommandItem
-                                  key={category}
-                                  value={category}
-                                  onMouseDown={(e) => {
-                                    // prevents blur before click
-                                    e.preventDefault()
-                                  }}
-                                  onSelect={() => {
-                                    field.onChange(category)
-                                    setCategoryOpen(false)
-                                  }}
-                                >
-                                  {category}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </div>
-                    )}
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="2" id="income" />
+                      <label htmlFor="income">Income</label>
+                    </div>
+                  </RadioGroup>
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
-              )
-            }}
-          />
+              )}
+            />
 
-          <Controller
-            name="description"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+            <Controller
+              name="category"
+              control={form.control}
+              render={({ field, fieldState }) => {
+                const value = field.value ?? ""
 
-                <Input
-                  {...field}
-                  id={field.name}
-                  aria-invalid={fieldState.invalid}
-                />
+                const filtered = categories
+                  .filter(
+                    (c) =>
+                      c.type.toString() === selectedType &&
+                      c.name.toLowerCase().includes(value.toLowerCase())
+                  )
+                  .map((c) => c.name)
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Category</FieldLabel>
 
-          <Controller
-            name="amount"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Amount</FieldLabel>
+                    <div className="relative">
+                      <Input
+                        {...field}
+                        value={value}
+                        autoComplete="off"
+                        onChange={(e) => {
+                          field.onChange(e.target.value)
+                          setCategoryOpen(true)
+                        }}
+                        onFocus={() => setCategoryOpen(true)}
+                        onBlur={() => {
+                          // small delay so clicks still work
+                          setTimeout(() => setCategoryOpen(false), 100)
+                        }}
+                        placeholder="Type or select a category"
+                      />
 
-                <Input
-                  id={field.name}
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={field.value ?? ""}
-                  onChange={(e) =>
-                    field.onChange(
-                      e.target.value === "" ? undefined : Number(e.target.value)
-                    )
-                  }
-                  aria-invalid={fieldState.invalid}
-                />
+                      {categoryOpen && (
+                        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
+                          <Command shouldFilter={false}>
+                            <CommandList>
+                              <CommandEmpty>No results</CommandEmpty>
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+                              <CommandGroup>
+                                {filtered.map((category) => (
+                                  <CommandItem
+                                    key={category}
+                                    value={category}
+                                    onMouseDown={(e) => {
+                                      // prevents blur before click
+                                      e.preventDefault()
+                                    }}
+                                    onSelect={() => {
+                                      field.onChange(category)
+                                      setCategoryOpen(false)
+                                    }}
+                                  >
+                                    {category}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </div>
+                      )}
+                    </div>
 
-          <Controller
-            name="date"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Date</FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )
+              }}
+            />
 
-                <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      {field.value ? format(field.value, "PPP") : "Select date"}
-                    </Button>
-                  </PopoverTrigger>
+            <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Description</FieldLabel>
 
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={(date) => {
-                        field.onChange(date)
-                        setDateOpen(false) // 👈 close on select
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                  />
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-          <Button type="submit" className="w-full">
-            Save
-          </Button>
-        </form>
+            <Controller
+              name="amount"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Amount</FieldLabel>
+
+                  <Input
+                    id={field.name}
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === ""
+                          ? undefined
+                          : Number(e.target.value)
+                      )
+                    }
+                    aria-invalid={fieldState.invalid}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="date"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Date</FieldLabel>
+
+                  <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        {field.value
+                          ? format(field.value, "PPP")
+                          : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          field.onChange(date)
+                          setDateOpen(false) // 👈 close on select
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Button type="submit" className="w-full">
+              {isSubmitting ? <Spinner className="ml-2" /> : "Save"}
+            </Button>
+          </form>
+        </fieldset>
       </DialogContent>
     </Dialog>
   )
