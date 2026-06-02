@@ -1,5 +1,5 @@
 using backend.Data;
-using backend.Dtos;
+using backend.Dtos.Transaction;
 using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +30,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return await _context.Transactions.Include(t => t.Category).AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, QueryParameters query)
+    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query)
     {
         var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.AccountId == accountId);
 
@@ -43,6 +43,11 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
                 EF.Functions.ILike(t.Category.Name, search) ||
                 EF.Functions.ILike(t.Description, search)
             );
+        }
+
+        if (query.TransactionType != null)
+        {
+            queryable = queryable.Where(t => t.Type == query.TransactionType);
         }
 
         if (query.StartDate != null)

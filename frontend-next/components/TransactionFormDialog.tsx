@@ -40,23 +40,17 @@ import { transactionSchema } from "@/lib/validations/transaction"
 import { TransactionFormValues } from "@/lib/validations/transaction"
 import { Field, FieldError, FieldLabel } from "./ui/field"
 import { useEffect, useState } from "react"
-import { Category, TransactionType } from "@/types/category"
-import { categoryApi } from "@/api/category"
+import { TransactionType } from "@/types/category"
 import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/AccountProvider"
 import { toast } from "sonner"
 import { Spinner } from "./ui/spinner"
+import { useCategory } from "@/providers/CategoryProvider"
 
 export function TransactionFormDialog() {
   const { selectedAccount } = useAccount()
+  const { categories } = useCategory()
 
-  useEffect(() => {
-    categoryApi.getCategories("1").then((res) => {
-      setCategories(res.data)
-    })
-  }, [])
-
-  const [categories, setCategories] = useState<Category[]>([])
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [dateOpen, setDateOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)

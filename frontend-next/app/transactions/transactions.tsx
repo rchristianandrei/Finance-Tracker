@@ -33,7 +33,7 @@ export function Transactions() {
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <TransactionFilter categories={[{ id: "1", name: "Food" }]} />
+      <TransactionFilter />
       <Card className="flex flex-1 flex-col overflow-auto">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">

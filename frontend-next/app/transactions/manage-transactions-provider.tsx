@@ -1,7 +1,9 @@
 "use client"
 
+import { categoryApi } from "@/api/category"
 import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/AccountProvider"
+import { Category } from "@/types/category"
 import { Transaction } from "@/types/transaction"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import {
@@ -53,19 +55,23 @@ export function ManageTransactionsProvider({
       if (!selectedAccount) return
 
       const search = searchParams.get("search")
+      const type = searchParams.get("type")
+
       let filter = {
         search: search ?? undefined,
         startDate: dateRange?.from ?? undefined,
         endDate: dateRange?.to ?? undefined,
         page: currentPage,
+        type: type ? (type === "expense" ? 1 : 2) : undefined,
       }
       try {
-        const data = await transactionApi.readTransactions(
+        const transactionsData = await transactionApi.readTransactions(
           selectedAccount.id,
           filter
         )
-        setTransactions(data.data)
-        setTotalTransactions(data.totalCount)
+
+        setTransactions(transactionsData.data)
+        setTotalTransactions(transactionsData.totalCount)
       } finally {
         setLoading(false)
       }

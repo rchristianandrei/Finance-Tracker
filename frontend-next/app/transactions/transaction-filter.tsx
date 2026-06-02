@@ -27,17 +27,10 @@ import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { useManageTransactions } from "./manage-transactions-provider"
+import { useCategory } from "@/providers/CategoryProvider"
 
-type Category = {
-  id: string
-  name: string
-}
-
-type Props = {
-  categories: Category[]
-}
-
-export function TransactionFilter({ categories }: Props) {
+export function TransactionFilter() {
+  const { categories } = useCategory()
   const { searchParams, search, dateRange, setSearch, navigate, clearFilters } =
     useManageTransactions()
 
@@ -78,6 +71,7 @@ export function TransactionFilter({ categories }: Props) {
           onValueChange={(value) =>
             navigate({
               type: value === "all" ? undefined : value,
+              page: undefined,
             })
           }
         >
@@ -112,7 +106,7 @@ export function TransactionFilter({ categories }: Props) {
             <SelectItem value="all">All Categories</SelectItem>
 
             {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
+              <SelectItem key={category.id} value={category.name}>
                 {category.name}
               </SelectItem>
             ))}

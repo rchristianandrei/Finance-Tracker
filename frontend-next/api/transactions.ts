@@ -41,12 +41,17 @@ export const transactionApi = {
       startDate?: Date
       endDate?: Date
       page?: number
+      type?: number
     }
   ) => {
     let params = new URLSearchParams()
 
     if (filter?.search) {
       params.set("Search", filter.search)
+    }
+
+    if (filter?.type) {
+      params.set("TransactionType", filter.type.toString())
     }
 
     if (filter?.startDate) {

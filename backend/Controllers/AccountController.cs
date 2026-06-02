@@ -1,6 +1,6 @@
 using backend.Attributes;
-using backend.Dtos;
 using backend.Dtos.Account;
+using backend.Dtos.Transaction;
 using backend.Enums;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
@@ -74,7 +74,7 @@ public class AccountController(
     }
 
     [HttpGet("{accountId}/transactions")]
-    public async Task<IActionResult> Get(int accountId, [FromQuery] QueryParameters query)
+    public async Task<IActionResult> Get(int accountId, [FromQuery] TransactionQueryParameters query)
     {
         var (transactions, count) = await _transactionService.GetAll(accountId, query);
         var dto = transactions.Select(t => t.ToDto());
