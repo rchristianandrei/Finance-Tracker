@@ -45,21 +45,21 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             );
         }
 
-        if (query.StartDate.HasValue)
+        if (query.StartDate != null)
         {
-            queryable = queryable.Where(t => t.CreatedAt >= query.StartDate.Value);
+            queryable = queryable.Where(t => t.Date >= query.StartDate.Value);
         }
 
-        if (query.EndDate.HasValue)
+        if (query.EndDate != null)
         {
             var end = query.EndDate.Value.AddDays(1).AddTicks(-1);
-            queryable = queryable.Where(t => t.CreatedAt <= end);
+            queryable = queryable.Where(t => t.Date <= end);
         }
 
         var count = await queryable.LongCountAsync();
 
         var transactions = await queryable
-            .OrderByDescending(t => t.CreatedAt)
+            .OrderByDescending(t => t.Date)
             .Skip((query.PageOrDefault - 1) * query.PageSizeOrDefault)
             .Take(query.PageSizeOrDefault)
             .AsNoTracking()

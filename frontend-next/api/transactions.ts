@@ -1,6 +1,7 @@
 import api from "@/lib/axios"
 import { TransactionType } from "@/types/category"
 import { DashboardType } from "@/types/dashboard"
+import { Transaction } from "@/types/transaction"
 
 export const transactionApi = {
   getDashboard: async (accountId: number) => {
@@ -32,5 +33,44 @@ export const transactionApi = {
       accountId: accountId,
     }
     return await api.post(`/transaction`, body)
+  },
+  readTransactions: async (
+    accountId: number,
+    filter?: {
+      search?: string
+      startDate?: Date
+      endDate?: Date
+      page?: number
+    }
+  ) => {
+    let params = new URLSearchParams()
+
+    if (filter?.search) {
+      params.set("Search", filter.search)
+    }
+
+    if (filter?.startDate) {
+      params.set("StartDate", filter.startDate.toISOString())
+    }
+
+    if (filter?.endDate) {
+      params.set("EndDate", filter.endDate.toISOString())
+    }
+
+    if (filter?.page) {
+      params.set("Page", filter.page.toString())
+    }
+
+    const response = await api.get<{
+      totalCount: number
+      data: Transaction[]
+    }>(`/account/${accountId}/transactions`, { params })
+
+    response.data.data = response.data.data.map((t) => ({
+      ...t,
+      date: new Date(t.date),
+    }))
+
+    return response.data
   },
 }

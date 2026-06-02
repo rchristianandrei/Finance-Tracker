@@ -3,7 +3,6 @@
 import { format } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { useDebouncedCallback } from "use-debounce"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,7 +26,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useManageTransactions } from "./manage-transactions-provider"
 
 type Category = {
   id: string
@@ -39,38 +38,8 @@ type Props = {
 }
 
 export function TransactionFilter({ categories }: Props) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  const [search, setSearch] = useState(searchParams.get("search") ?? "")
-
-  useEffect(() => {
-    setSearch(searchParams.get("search") ?? "")
-  }, [searchParams])
-
-  const createQueryString = useCallback(
-    (updates: Record<string, string | undefined>) => {
-      const params = new URLSearchParams(searchParams.toString())
-
-      Object.entries(updates).forEach(([key, value]) => {
-        if (!value) {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-
-      params.delete("page")
-
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const navigate = (updates: Record<string, string | undefined>) => {
-    router.replace(`${pathname}?${createQueryString(updates)}`)
-  }
+  const { searchParams, search, dateRange, setSearch, navigate, clearFilters } =
+    useManageTransactions()
 
   const handleSearch = useDebouncedCallback((value: string) => {
     navigate({
@@ -78,28 +47,14 @@ export function TransactionFilter({ categories }: Props) {
     })
   }, 500)
 
-  const dateRange: DateRange | undefined = useMemo(() => {
-    const from = searchParams.get("from")
-    const to = searchParams.get("to")
-
-    if (!from && !to) return undefined
-
-    return {
-      from: from ? new Date(from) : undefined,
-      to: to ? new Date(to) : undefined,
-    }
-  }, [searchParams])
-
   const onDateChange = (range: DateRange | undefined) => {
     navigate({
-      from: range?.from ? format(range.from, "yyyy-MM-dd") : undefined,
+      from: range?.from
+        ? format(range.from, "yyyy-MM-dd'T'00:00:00.000")
+        : undefined,
 
-      to: range?.to ? format(range.to, "yyyy-MM-dd") : undefined,
+      to: range?.to ? format(range.to, "yyyy-MM-dd'T'00:00:00.000") : undefined,
     })
-  }
-
-  const clearFilters = () => {
-    router.replace(pathname)
   }
 
   return (

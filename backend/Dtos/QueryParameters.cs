@@ -9,28 +9,10 @@ public class QueryParameters
    public string? Search { get; set; } = string.Empty;
 
    [JsonIgnore]
-   private DateTime? _startDate { get; set; } = DateTime.Now;
-   public DateTime? StartDate
-   {
-      get => _startDate;
-      set => _startDate = value == null
-          ? DateTime.UtcNow
-          : value.Value.Kind == DateTimeKind.Utc
-              ? value.Value
-              : value.Value.ToUniversalTime();
-   }
+   public DateTimeOffset? StartDate { get; set; }
 
    [JsonIgnore]
-   private DateTime? _endDate { get; set; } = DateTime.Now;
-   public DateTime? EndDate
-   {
-      get => _endDate;
-      set => _endDate = value == null
-          ? DateTime.UtcNow
-          : value.Value.Kind == DateTimeKind.Utc
-              ? value.Value
-              : value.Value.ToUniversalTime();
-   }
+   public DateTimeOffset? EndDate { get; set; }
 
    private int? _page;
    [Range(1, int.MaxValue)]

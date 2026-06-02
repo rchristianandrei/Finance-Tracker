@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TransactionFilter } from "./transaction-filter"
-import { Delete, Edit, Ellipsis, Receipt, Trash } from "lucide-react"
+import { Edit, Ellipsis, Receipt, Trash } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -17,44 +17,25 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useEffect, useState } from "react"
-import { Transaction } from "@/types/transaction"
 import { cn } from "@/lib/utils"
-import { useSearchParams } from "next/navigation"
 import { Pagination } from "./pagination"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useManageTransactions } from "./manage-transactions-provider"
 
 export function Transactions() {
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      id: 1,
-      date: new Date(),
-      category: "Food",
-      description: "Grocery shopping",
-      type: 1,
-      amount: 100,
-    },
-  ])
-
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    // runs whenever URL query changes
-    console.log("URL changed:", searchParams.toString())
-  }, [searchParams])
+  const { transactions } = useManageTransactions()
 
   return (
     <div className="flex h-full flex-col gap-4">
       <TransactionFilter categories={[{ id: "1", name: "Food" }]} />
       <Card className="flex flex-1 flex-col overflow-auto">
-        <CardHeader className="flex flex-wrap justify-between gap-2">
+        <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Receipt></Receipt>
             <CardTitle>Transactions</CardTitle>
@@ -123,7 +104,10 @@ export function Transactions() {
                     </TableCell>
 
                     <TableCell className="text-right font-semibold">
-                      {transaction.amount.toLocaleString()}
+                      {transaction.amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </TableCell>
 
                     <TableCell className="flex justify-end">
