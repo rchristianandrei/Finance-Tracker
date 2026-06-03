@@ -1,6 +1,7 @@
 import { authApi } from "@/api/auth"
 import { LoginApiResponse } from "@/types/login-api-response"
 import { User } from "@/types/user"
+import axios from "axios"
 import { createContext, useContext, useEffect, useState } from "react"
 
 interface UserContextType {
@@ -23,6 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = response.data
 
         setUser(data)
+      } catch (err) {
+        if (axios.isCancel(err)) return
       } finally {
         setLoading(false)
       }

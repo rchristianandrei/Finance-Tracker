@@ -3,6 +3,7 @@
 import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/AccountProvider"
 import { Transaction } from "@/types/transaction"
+import axios from "axios"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import {
   createContext,
@@ -88,6 +89,8 @@ export function ManageTransactionsProvider({
 
         setTransactions(transactionsData.data)
         setTotalTransactions(transactionsData.totalCount)
+      } catch (err) {
+        if (axios.isCancel(err)) return
       } finally {
         setLoading(false)
       }

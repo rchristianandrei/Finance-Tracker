@@ -2,6 +2,7 @@ import { accountApi } from "@/api/account"
 import { Account } from "@/types/account"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { useAuth } from "./AuthProvider"
+import axios from "axios"
 
 interface AccountContextType {
   accounts: Account[]
@@ -34,6 +35,8 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
         setAccounts(data.accounts)
         setSelectedAccountId(data.defaultAccount?.id || null)
+      } catch (err) {
+        if (axios.isCancel(err)) return
       } finally {
         setLoading(false)
       }

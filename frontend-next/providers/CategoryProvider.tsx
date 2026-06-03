@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { Category } from "@/types/category"
 import { useAccount } from "./AccountProvider"
 import { categoryApi } from "@/api/category"
+import axios from "axios"
 
 interface CategoryContextType {
   categories: Category[]
@@ -27,6 +28,8 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
         const data = response.data
 
         setCategories(data)
+      } catch (err) {
+        if (axios.isCancel(err)) return
       } finally {
         setLoading(false)
       }
