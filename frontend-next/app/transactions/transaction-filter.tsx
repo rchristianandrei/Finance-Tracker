@@ -28,17 +28,61 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { useManageTransactions } from "./manage-transactions-provider"
 import { useCategory } from "@/providers/CategoryProvider"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { useMemo } from "react"
 
 export function TransactionFilter() {
   const { categories } = useCategory()
-  const { searchParams, search, dateRange, setSearch, navigate, clearFilters } =
-    useManageTransactions()
+  const {
+    searchParams,
+    search,
+    dateRange,
+    type,
+    selectedCategories,
+    setSearch,
+    navigate,
+    clearFilters,
+  } = useManageTransactions()
+
+  const filteredCategories = useMemo(() => {
+    if (!type) return categories
+    return categories.filter((c) =>
+      c.type === 2 ? "income" : "expense" === type
+    )
+  }, [categories, type])
+
+  const allSelected = selectedCategories.length === 0
 
   const handleSearch = useDebouncedCallback((value: string) => {
     navigate({
       search: value || undefined,
     })
   }, 500)
+
+  const categoryChange = (categoryName: string, checked: boolean) => {
+    let next: string[]
+
+    if (categoryName === "all") {
+      next = []
+    } else {
+      next = checked
+        ? [...selectedCategories, categoryName]
+        : selectedCategories.filter((c) => c !== categoryName)
+    }
+
+    if (next.length === filteredCategories.length) {
+      next = []
+    }
+
+    navigate({
+      category: next.length > 0 ? next.join(",") : undefined,
+    })
+  }
 
   const onDateChange = (range: DateRange | undefined) => {
     navigate({
@@ -71,6 +115,7 @@ export function TransactionFilter() {
           onValueChange={(value) =>
             navigate({
               type: value === "all" ? undefined : value,
+              category: undefined,
               page: undefined,
             })
           }
@@ -90,28 +135,69 @@ export function TransactionFilter() {
 
         {/* Category */}
 
-        <Select
-          value={searchParams.get("category") ?? "all"}
-          onValueChange={(value) =>
-            navigate({
-              category: value === "all" ? undefined : value,
-            })
-          }
-        >
-          <SelectTrigger className="w-55">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
+        {/* Category — replace your existing <Select> block */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-55 justify-start truncate font-normal"
+            >
+              {allSelected
+                ? "All Categories"
+                : selectedCategories.length === 1
+                  ? filteredCategories.find(
+                      (c) => c.id === Number(selectedCategories[0])
+                    )?.name
+                  : `${selectedCategories.length} categories`}
+            </Button>
+          </PopoverTrigger>
 
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+          <PopoverContent className="w-55 p-2" align="start">
+            <div className="flex flex-col gap-1">
+              {/* All option */}
+              <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={() => categoryChange("all", true)}
+                  className="accent-primary"
+                />
+                All Categories
+              </label>
 
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.name}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              <div className="my-1 border-t" />
+
+              <TooltipProvider>
+                {/* Individual categories */}
+                {filteredCategories.map((category) => (
+                  <label
+                    key={category.id}
+                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(
+                        category.id.toString()
+                      )}
+                      onChange={(e) =>
+                        categoryChange(category.id.toString(), e.target.checked)
+                      }
+                      className="accent-primary"
+                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="truncate">{category.name}</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="truncate">
+                        {category.name}
+                      </TooltipContent>
+                    </Tooltip>
+                  </label>
+                ))}
+              </TooltipProvider>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Date Range */}
 

@@ -1,9 +1,7 @@
 "use client"
 
-import { categoryApi } from "@/api/category"
 import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/AccountProvider"
-import { Category } from "@/types/category"
 import { Transaction } from "@/types/transaction"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import {
@@ -23,6 +21,8 @@ interface ManageTransactionsContextType {
   searchParams: URLSearchParams
   search: string
   dateRange: DateRange | undefined
+  type: string | null
+  selectedCategories: string[]
   currentPage: number
   setSearch: (value: string) => void
   navigate: (updates: Record<string, string | undefined>) => void
@@ -50,12 +50,26 @@ export function ManageTransactionsProvider({
   const [totalTransactions, setTotalTransactions] = useState(0)
   const [loading, setLoading] = useState(true)
 
+  const type = useMemo(() => {
+    return searchParams.get("type")
+  }, [searchParams])
+
+  const selectedCategories = useMemo(() => {
+    return searchParams.get("category")?.split(",").filter(Boolean) ?? []
+  }, [searchParams])
+
+  const currentPage = useMemo(() => {
+    const page = searchParams.get("page")
+    return page ? Number(page) : 1
+  }, [searchParams])
+
   useEffect(() => {
+    const controller = new AbortController()
+
     ;(async () => {
       if (!selectedAccount) return
 
       const search = searchParams.get("search")
-      const type = searchParams.get("type")
 
       let filter = {
         search: search ?? undefined,
@@ -63,11 +77,16 @@ export function ManageTransactionsProvider({
         endDate: dateRange?.to ?? undefined,
         page: currentPage,
         type: type ? (type === "expense" ? 1 : 2) : undefined,
+        categories:
+          selectedCategories.length > 0
+            ? selectedCategories.join(",")
+            : undefined,
       }
       try {
         const transactionsData = await transactionApi.readTransactions(
           selectedAccount.id,
-          filter
+          filter,
+          controller.signal
         )
 
         setTransactions(transactionsData.data)
@@ -76,6 +95,10 @@ export function ManageTransactionsProvider({
         setLoading(false)
       }
     })()
+
+    return () => {
+      controller.abort()
+    }
   }, [selectedAccount, searchParams])
 
   useEffect(() => {
@@ -119,11 +142,6 @@ export function ManageTransactionsProvider({
     }
   }, [searchParams])
 
-  const currentPage = useMemo(() => {
-    const page = searchParams.get("page")
-    return page ? Number(page) : 1
-  }, [searchParams])
-
   const goToPage = (newPage: number) => {
     navigate({
       page: String(newPage),
@@ -143,6 +161,8 @@ export function ManageTransactionsProvider({
         searchParams,
         search,
         dateRange,
+        type,
+        selectedCategories,
         currentPage,
         setSearch,
         navigate,

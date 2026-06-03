@@ -42,7 +42,8 @@ export const transactionApi = {
       endDate?: Date
       page?: number
       type?: number
-    }
+    },
+    signal?: AbortSignal
   ) => {
     let params = new URLSearchParams()
 
@@ -69,7 +70,7 @@ export const transactionApi = {
     const response = await api.get<{
       totalCount: number
       data: Transaction[]
-    }>(`/account/${accountId}/transactions`, { params })
+    }>(`/account/${accountId}/transactions`, { params, signal })
 
     response.data.data = response.data.data.map((t) => ({
       ...t,
