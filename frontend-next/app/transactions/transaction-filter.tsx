@@ -1,8 +1,6 @@
 "use client"
 
 import { format } from "date-fns"
-import { DateRange } from "react-day-picker"
-import { useDebouncedCallback } from "use-debounce"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,74 +24,35 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { useManageTransactions } from "./manage-transactions-provider"
-import { useCategory } from "@/providers/category-provider"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
+import { useTransactionFilter } from "./providers/transaction-filter-provider"
 
 export function TransactionFilter() {
-  const { categories } = useCategory()
   const {
-    searchParams,
-    search,
-    dateRange,
+    search: querySearch,
     type,
+    dateRange,
     selectedCategories,
-    setSearch,
-    navigate,
+    filteredCategories,
+    changeSearch,
+    changeType,
+    changeSelectedCategory,
+    changeDate,
     clearFilters,
-  } = useManageTransactions()
+  } = useTransactionFilter()
 
-  const filteredCategories = useMemo(() => {
-    if (!type) return categories
+  const [search, setSearch] = useState(querySearch ?? "")
 
-    return categories.filter(
-      (c) => (c.type === 2 ? "income" : "expense") === type
-    )
-  }, [categories, type])
-
-  const allSelected = selectedCategories.length === 0
-
-  const handleSearch = useDebouncedCallback((value: string) => {
-    navigate({
-      search: value || undefined,
-    })
-  }, 500)
-
-  const categoryChange = (categoryName: string, checked: boolean) => {
-    let next: string[]
-
-    if (categoryName === "all") {
-      next = []
-    } else {
-      next = checked
-        ? [...selectedCategories, categoryName]
-        : selectedCategories.filter((c) => c !== categoryName)
-    }
-
-    if (next.length === filteredCategories.length) {
-      next = []
-    }
-
-    navigate({
-      category: next.length > 0 ? next.join(",") : undefined,
-    })
-  }
-
-  const onDateChange = (range: DateRange | undefined) => {
-    navigate({
-      from: range?.from
-        ? format(range.from, "yyyy-MM-dd'T'00:00:00.000")
-        : undefined,
-
-      to: range?.to ? format(range.to, "yyyy-MM-dd'T'00:00:00.000") : undefined,
-    })
-  }
+  const allSelected = useMemo(
+    () => selectedCategories.length === 0,
+    [selectedCategories]
+  )
 
   return (
     <Card>
@@ -105,22 +64,13 @@ export function TransactionFilter() {
           className="w-full md:w-75"
           onChange={(e) => {
             setSearch(e.target.value)
-            handleSearch(e.target.value)
+            changeSearch(e.target.value)
           }}
         />
 
         {/* Type */}
 
-        <Select
-          value={searchParams.get("type") ?? "all"}
-          onValueChange={(value) =>
-            navigate({
-              type: value === "all" ? undefined : value,
-              category: undefined,
-              page: undefined,
-            })
-          }
-        >
+        <Select value={type ?? "all"} onValueChange={changeType}>
           <SelectTrigger className="w-45">
             <SelectValue placeholder="Type" />
           </SelectTrigger>
@@ -135,8 +85,6 @@ export function TransactionFilter() {
         </Select>
 
         {/* Category */}
-
-        {/* Category — replace your existing <Select> block */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -160,7 +108,7 @@ export function TransactionFilter() {
                 <input
                   type="checkbox"
                   checked={allSelected}
-                  onChange={() => categoryChange("all", true)}
+                  onChange={() => changeSelectedCategory("all", true)}
                   className="accent-primary"
                 />
                 All Categories
@@ -181,7 +129,10 @@ export function TransactionFilter() {
                         category.id.toString()
                       )}
                       onChange={(e) =>
-                        categoryChange(category.id.toString(), e.target.checked)
+                        changeSelectedCategory(
+                          category.id.toString(),
+                          e.target.checked
+                        )
                       }
                       className="accent-primary"
                     />
@@ -232,7 +183,7 @@ export function TransactionFilter() {
             <Calendar
               mode="range"
               selected={dateRange}
-              onSelect={onDateChange}
+              onSelect={changeDate}
               numberOfMonths={2}
             />
           </PopoverContent>

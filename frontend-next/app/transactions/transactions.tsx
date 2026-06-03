@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useManageTransactions } from "./manage-transactions-provider"
+import { useManageTransactions } from "./providers/manage-transactions-provider"
 
 export function Transactions() {
   const { transactions } = useManageTransactions()

@@ -1,7 +1,8 @@
 import { PrivateRoute } from "@/components/guards/PrivateRoute"
 import { RootLayout } from "@/components/layouts/root-layout/root-layout"
 import { Transactions } from "./transactions"
-import { ManageTransactionsProvider } from "./manage-transactions-provider"
+import { ManageTransactionsProvider } from "./providers/manage-transactions-provider"
+import { TransactionFilterProvider } from "./providers/transaction-filter-provider"
 
 export const metadata = {
   title: "Transactions",
@@ -11,9 +12,11 @@ export default function TransactionsPage() {
   return (
     <PrivateRoute>
       <RootLayout>
-        <ManageTransactionsProvider>
-          <Transactions />
-        </ManageTransactionsProvider>
+        <TransactionFilterProvider>
+          <ManageTransactionsProvider>
+            <Transactions />
+          </ManageTransactionsProvider>
+        </TransactionFilterProvider>
       </RootLayout>
     </PrivateRoute>
   )
