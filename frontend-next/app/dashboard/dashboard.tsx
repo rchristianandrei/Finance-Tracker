@@ -18,7 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { useAccount } from "@/providers/AccountProvider"
+import { useAccount } from "@/providers/account-provider"
 import { DashboardType } from "@/types/dashboard"
 import {
   BanknoteArrowDown,

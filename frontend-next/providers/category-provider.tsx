@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { Category } from "@/types/category"
-import { useAccount } from "./AccountProvider"
+import { useAccount } from "./account-provider"
 import { categoryApi } from "@/api/category"
 import axios from "axios"
 

@@ -27,7 +27,7 @@ import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { useManageTransactions } from "./manage-transactions-provider"
-import { useCategory } from "@/providers/CategoryProvider"
+import { useCategory } from "@/providers/category-provider"
 import {
   Tooltip,
   TooltipContent,

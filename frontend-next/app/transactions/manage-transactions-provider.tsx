@@ -1,7 +1,7 @@
 "use client"
 
 import { transactionApi } from "@/api/transactions"
-import { useAccount } from "@/providers/AccountProvider"
+import { useAccount } from "@/providers/account-provider"
 import { Transaction } from "@/types/transaction"
 import axios from "axios"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"

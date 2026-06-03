@@ -1,7 +1,7 @@
 import { accountApi } from "@/api/account"
 import { Account } from "@/types/account"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import { useAuth } from "./AuthProvider"
+import { useAuth } from "./auth-provider"
 import axios from "axios"
 
 interface AccountContextType {

@@ -42,10 +42,10 @@ import { Field, FieldError, FieldLabel } from "./ui/field"
 import { useEffect, useState } from "react"
 import { TransactionType } from "@/types/category"
 import { transactionApi } from "@/api/transactions"
-import { useAccount } from "@/providers/AccountProvider"
+import { useAccount } from "@/providers/account-provider"
 import { toast } from "sonner"
 import { Spinner } from "./ui/spinner"
-import { useCategory } from "@/providers/CategoryProvider"
+import { useCategory } from "@/providers/category-provider"
 
 export function TransactionFormDialog() {
   const { selectedAccount } = useAccount()

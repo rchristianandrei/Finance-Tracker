@@ -16,7 +16,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Spinner } from "@/components/ui/spinner"
-import { useAuth } from "@/providers/AuthProvider"
+import { useAuth } from "@/providers/auth-provider"
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 import { useMemo, useState } from "react"
 
