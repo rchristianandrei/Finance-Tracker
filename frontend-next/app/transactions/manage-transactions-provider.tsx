@@ -77,10 +77,7 @@ export function ManageTransactionsProvider({
         endDate: dateRange?.to ?? undefined,
         page: currentPage,
         type: type ? (type === "expense" ? 1 : 2) : undefined,
-        categories:
-          selectedCategories.length > 0
-            ? selectedCategories.join(",")
-            : undefined,
+        categories: selectedCategories ?? undefined,
       }
       try {
         const transactionsData = await transactionApi.readTransactions(

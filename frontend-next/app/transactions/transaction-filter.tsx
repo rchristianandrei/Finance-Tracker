@@ -51,8 +51,9 @@ export function TransactionFilter() {
 
   const filteredCategories = useMemo(() => {
     if (!type) return categories
-    return categories.filter((c) =>
-      c.type === 2 ? "income" : "expense" === type
+
+    return categories.filter(
+      (c) => (c.type === 2 ? "income" : "expense") === type
     )
   }, [categories, type])
 

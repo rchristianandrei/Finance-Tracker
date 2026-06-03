@@ -36,18 +36,17 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var search = $"%{query.Search}%";
-
-            queryable = queryable.Where(t =>
-                EF.Functions.ILike(t.Type.ToString(), search) ||
-                EF.Functions.ILike(t.Category.Name, search) ||
-                EF.Functions.ILike(t.Description, search)
-            );
+            queryable = queryable.Where(t => EF.Functions.ILike(t.Description, $"%{query.Search}%"));
         }
 
         if (query.TransactionType != null)
         {
             queryable = queryable.Where(t => t.Type == query.TransactionType);
+        }
+
+        if (query.Categories != null && query.Categories.Length > 0)
+        {
+            queryable = queryable.Where(t => query.Categories.Contains(t.CategoryId.ToString()));
         }
 
         if (query.StartDate != null)
