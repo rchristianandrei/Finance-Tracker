@@ -4,14 +4,27 @@ import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/account-provider"
 import { Transaction } from "@/types/transaction"
 import axios from "axios"
-import { createContext, useContext, useEffect, useState } from "react"
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
 import { useTransactionFilter } from "./transaction-filter-provider"
+import { useRouter } from "next/navigation"
 
 interface ManageTransactionsContextType {
   transactions: Transaction[]
   loading: boolean
   totalTransactions: number
   selectedCategories: string[]
+  deleteTransactionEvent: Transaction | null
+  setDeleteTransactionEvent: Dispatch<SetStateAction<Transaction | null>>
+  cancelDeleteTransactionEvent: () => void
+  confirmDeleteTransactionEvent: () => Promise<void>
 }
 
 const ManageTransactionsContext = createContext<
@@ -23,6 +36,7 @@ export function ManageTransactionsProvider({
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter()
   const { selectedAccount } = useAccount()
 
   const { dateRange, type, selectedCategories, currentPage, search } =
@@ -31,6 +45,9 @@ export function ManageTransactionsProvider({
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalTransactions, setTotalTransactions] = useState(0)
   const [loading, setLoading] = useState(true)
+
+  const [deleteTransactionEvent, setDeleteTransactionEvent] =
+    useState<Transaction | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -74,6 +91,17 @@ export function ManageTransactionsProvider({
     currentPage,
   ])
 
+  const confirmDeleteTransactionEvent = useCallback(async () => {
+    if (!deleteTransactionEvent) return
+    await transactionApi.delete(deleteTransactionEvent.id)
+    setDeleteTransactionEvent(null)
+    router.refresh()
+  }, [deleteTransactionEvent])
+
+  const cancelDeleteTransactionEvent = useCallback(() => {
+    setDeleteTransactionEvent(null)
+  }, [])
+
   return (
     <ManageTransactionsContext.Provider
       value={{
@@ -81,6 +109,10 @@ export function ManageTransactionsProvider({
         loading,
         totalTransactions,
         selectedCategories,
+        deleteTransactionEvent,
+        setDeleteTransactionEvent,
+        cancelDeleteTransactionEvent,
+        confirmDeleteTransactionEvent,
       }}
     >
       {children}

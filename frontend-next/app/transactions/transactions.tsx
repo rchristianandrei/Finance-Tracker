@@ -27,9 +27,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useManageTransactions } from "./providers/manage-transactions-provider"
+import { Transaction } from "@/types/transaction"
 
 export function Transactions() {
-  const { transactions } = useManageTransactions()
+  const { transactions, setDeleteTransactionEvent } = useManageTransactions()
+
+  const onDeleteClick = (transaction: Transaction) => {
+    setDeleteTransactionEvent(transaction)
+  }
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -126,7 +131,9 @@ export function Transactions() {
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onDeleteClick(transaction)}
+                          >
                             <Trash /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>

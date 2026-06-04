@@ -84,4 +84,7 @@ export const transactionApi = {
 
     return response.data
   },
+  delete: (id: number) => {
+    return api.delete(`/transaction/${id}`)
+  },
 }
