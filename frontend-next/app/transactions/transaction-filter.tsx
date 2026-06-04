@@ -152,7 +152,6 @@ export function TransactionFilter() {
         </Popover>
 
         {/* Date Range */}
-
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -180,6 +179,18 @@ export function TransactionFilter() {
           </PopoverTrigger>
 
           <PopoverContent align="start" className="w-auto p-0">
+            <div className="border-b p-2 text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => changeDate(undefined)}
+                disabled={!dateRange?.from}
+              >
+                <X />
+                Clear dates
+              </Button>
+            </div>
+
             <Calendar
               mode="range"
               selected={dateRange}
