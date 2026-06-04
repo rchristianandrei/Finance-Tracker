@@ -84,6 +84,13 @@ export const transactionApi = {
 
     return response.data
   },
+  update: (transaction: Transaction) => {
+    const body = {
+      ...transaction,
+      date: transaction.date.toISOString(),
+    }
+    return api.put(`/transaction/${transaction.id}`, body)
+  },
   delete: (id: number) => {
     return api.delete(`/transaction/${id}`)
   },

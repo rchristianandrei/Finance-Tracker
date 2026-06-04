@@ -36,7 +36,7 @@ public class TransactionController(
         account.Balance += value.Type == TransactionType.INCOME ? value.Amount : -value.Amount;
         await _accountRepo.Update(account);
 
-        var category = await _categoryRepo.ExistsByNameAndAccountId(value.Category, account.Id);
+        var category = await _categoryRepo.IfExists(value.Type, value.Category, account.Id);
         if (category == null)
         {
             category = new Category
@@ -87,7 +87,7 @@ public class TransactionController(
         }
         await _accountRepo.Update(account);
 
-        var category = await _categoryRepo.ExistsByNameAndAccountId(value.Category, account.Id);
+        var category = await _categoryRepo.IfExists(value.Type, value.Category, account.Id);
         if (category == null)
         {
             category = new Category
@@ -100,14 +100,13 @@ public class TransactionController(
         }
 
         transaction.Type = value.Type;
-        transaction.CategoryId = category.Id;
+        transaction.Category = category;
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
         transaction.Date = value.Date;
         transaction.LastUpdated = DateTime.UtcNow;
 
         await _transactionService.Update(transaction);
-
 
         return Ok();
     }

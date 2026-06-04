@@ -31,7 +31,7 @@ public class CategoryController(
         var count = await _categoryRepo.GetCountByAccountIdAndType(dto.AccountId, dto.Type);
         if (count >= 10) return BadRequest("You're exceeding the max limit of 10");
 
-        var category = await _categoryRepo.ExistsByNameAndAccountId(dto.Name, dto.AccountId);
+        var category = await _categoryRepo.IfExists(dto.Type, dto.Name, dto.AccountId);
         if (category != null) return BadRequest("Existsing Category");
 
         var newCategory = new Category

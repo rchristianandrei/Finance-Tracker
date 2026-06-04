@@ -30,7 +30,12 @@ import { useManageTransactions } from "./providers/manage-transactions-provider"
 import { Transaction } from "@/types/transaction"
 
 export function Transactions() {
-  const { transactions, setDeleteTransactionEvent } = useManageTransactions()
+  const { transactions, setUpdateTransactionEvent, setDeleteTransactionEvent } =
+    useManageTransactions()
+
+  const onUpdateClick = (transaction: Transaction) => {
+    setUpdateTransactionEvent(transaction)
+  }
 
   const onDeleteClick = (transaction: Transaction) => {
     setDeleteTransactionEvent(transaction)
@@ -126,7 +131,9 @@ export function Transactions() {
                           align="end"
                           sideOffset={4}
                         >
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onUpdateClick(transaction)}
+                          >
                             <Edit />
                             Edit
                           </DropdownMenuItem>

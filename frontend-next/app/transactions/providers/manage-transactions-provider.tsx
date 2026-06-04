@@ -21,7 +21,11 @@ interface ManageTransactionsContextType {
   loading: boolean
   totalTransactions: number
   selectedCategories: string[]
+  updateTransactionEvent: Transaction | null
   deleteTransactionEvent: Transaction | null
+  setUpdateTransactionEvent: Dispatch<SetStateAction<Transaction | null>>
+  cancelUpdateTransactionEvent: () => void
+  confirmUpdateTransactionEvent: (transaction: Transaction) => Promise<void>
   setDeleteTransactionEvent: Dispatch<SetStateAction<Transaction | null>>
   cancelDeleteTransactionEvent: () => void
   confirmDeleteTransactionEvent: () => Promise<void>
@@ -47,6 +51,9 @@ export function ManageTransactionsProvider({
   const [loading, setLoading] = useState(true)
 
   const [deleteTransactionEvent, setDeleteTransactionEvent] =
+    useState<Transaction | null>(null)
+
+  const [updateTransactionEvent, setUpdateTransactionEvent] =
     useState<Transaction | null>(null)
 
   useEffect(() => {
@@ -91,6 +98,20 @@ export function ManageTransactionsProvider({
     currentPage,
   ])
 
+  const confirmUpdateTransactionEvent = useCallback(
+    async (transaction: Transaction) => {
+      if (!updateTransactionEvent) return
+      await transactionApi.update(transaction)
+      setUpdateTransactionEvent(null)
+      router.refresh()
+    },
+    [updateTransactionEvent]
+  )
+
+  const cancelUpdateTransactionEvent = useCallback(() => {
+    setUpdateTransactionEvent(null)
+  }, [])
+
   const confirmDeleteTransactionEvent = useCallback(async () => {
     if (!deleteTransactionEvent) return
     await transactionApi.delete(deleteTransactionEvent.id)
@@ -109,8 +130,12 @@ export function ManageTransactionsProvider({
         loading,
         totalTransactions,
         selectedCategories,
+        updateTransactionEvent,
         deleteTransactionEvent,
+        setUpdateTransactionEvent,
         setDeleteTransactionEvent,
+        cancelUpdateTransactionEvent,
+        confirmUpdateTransactionEvent,
         cancelDeleteTransactionEvent,
         confirmDeleteTransactionEvent,
       }}
