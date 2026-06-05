@@ -1,5 +1,5 @@
 using backend.Data;
-using backend.Dtos;
+using backend.Dtos.Transaction;
 using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,9 +20,9 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         await _context.SaveChangesAsync();
     }
 
-    public async Task<int> GetCountByAccountId(int accountId)
+    public async Task<int> GetCountByCategoryId(int categoryId)
     {
-        return await _context.Transactions.CountAsync(t => t.AccountId == accountId);
+        return await _context.Transactions.CountAsync(t => t.CategoryId == categoryId);
     }
 
     public async Task<Transaction?> GetById(long id)
@@ -30,36 +30,40 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return await _context.Transactions.Include(t => t.Category).AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, QueryParameters query)
+    public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query)
     {
         var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.AccountId == accountId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
-            var search = $"%{query.Search}%";
-
-            queryable = queryable.Where(t =>
-                EF.Functions.ILike(t.Type.ToString(), search) ||
-                EF.Functions.ILike(t.Category.Name, search) ||
-                EF.Functions.ILike(t.Description, search)
-            );
+            queryable = queryable.Where(t => EF.Functions.ILike(t.Description, $"%{query.Search}%"));
         }
 
-        if (query.StartDate.HasValue)
+        if (query.TransactionType != null)
         {
-            queryable = queryable.Where(t => t.CreatedAt >= query.StartDate.Value);
+            queryable = queryable.Where(t => t.Type == query.TransactionType);
         }
 
-        if (query.EndDate.HasValue)
+        if (query.Categories != null && query.Categories.Length > 0)
+        {
+            queryable = queryable.Where(t => query.Categories.Contains(t.CategoryId.ToString()));
+        }
+
+        if (query.StartDate != null)
+        {
+            queryable = queryable.Where(t => t.Date >= query.StartDate.Value);
+        }
+
+        if (query.EndDate != null)
         {
             var end = query.EndDate.Value.AddDays(1).AddTicks(-1);
-            queryable = queryable.Where(t => t.CreatedAt <= end);
+            queryable = queryable.Where(t => t.Date <= end);
         }
 
         var count = await queryable.LongCountAsync();
 
         var transactions = await queryable
-            .OrderByDescending(t => t.CreatedAt)
+            .OrderByDescending(t => t.Date)
             .Skip((query.PageOrDefault - 1) * query.PageSizeOrDefault)
             .Take(query.PageSizeOrDefault)
             .AsNoTracking()

@@ -31,8 +31,8 @@ public class CategoryController(
         var count = await _categoryRepo.GetCountByAccountIdAndType(dto.AccountId, dto.Type);
         if (count >= 10) return BadRequest("You're exceeding the max limit of 10");
 
-        var category = await _categoryRepo.ExistsByNameAndAccountId(dto.Name, dto.AccountId);
-        if (category != null) return BadRequest("Existsing Category");
+        var category = await _categoryRepo.IfExists(dto.Type, dto.Name, dto.AccountId);
+        if (category != null) return BadRequest("Existing Category");
 
         var newCategory = new Category
         {
@@ -55,6 +55,9 @@ public class CategoryController(
         var userId = _currentUser.Id();
         if (category.Account.OwnerId != userId) return Forbid();
 
+        var ifCategoryNameExists = await _categoryRepo.IfExists(dto.Type, dto.Name, category.AccountId);
+        if (ifCategoryNameExists != null) return BadRequest("Existing Category");
+
         category.Type = dto.Type;
         category.Name = dto.Name;
 
@@ -72,7 +75,7 @@ public class CategoryController(
         var userId = _currentUser.Id();
         if (category.Account.OwnerId != userId) return Forbid();
 
-        var transactionCount = await _transactionRepo.GetCountByAccountId(category.AccountId);
+        var transactionCount = await _transactionRepo.GetCountByCategoryId(category.Id);
         if (transactionCount > 0) return BadRequest("You cannot delete a category with transactions");
 
         await _categoryRepo.Delete(category);

@@ -1,4 +1,4 @@
-using backend.Dtos;
+using backend.Dtos.Transaction;
 using backend.Models;
 
 namespace backend.Interfaces.Sql;
@@ -9,11 +9,11 @@ public interface ITransactionRepo
 
     Task Update(Transaction entity);
 
-    Task<int> GetCountByAccountId(int accountId);
+    Task<int> GetCountByCategoryId(int categoryId);
 
     Task<Transaction?> GetById(long id);
 
-    Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, QueryParameters query);
+    Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query);
 
     Task<IEnumerable<Transaction>> GetLastDays(int accountId, int days);
 
