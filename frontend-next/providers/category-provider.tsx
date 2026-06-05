@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react"
-import { Category, TransactionType } from "@/types/category"
+import { Category } from "@/types/category"
 import { useAccount } from "./account-provider"
 import { categoryApi } from "@/api/category"
 import axios from "axios"
@@ -14,7 +14,6 @@ interface CategoryContextType {
   categories: Category[]
   loading: boolean
   loadCategories: () => Promise<void>
-  createCategory: (type: TransactionType, name: string) => Promise<void>
 }
 
 const CategoryContext = createContext<CategoryContextType | undefined>(
@@ -46,19 +45,8 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
     }
   }, [selectedAccount])
 
-  const createCategory = useCallback(
-    async (type: TransactionType, name: string) => {
-      if (!selectedAccount) return
-      await categoryApi.create(selectedAccount.id, type, name)
-      await loadCategories()
-    },
-    [selectedAccount]
-  )
-
   return (
-    <CategoryContext.Provider
-      value={{ categories, loading, loadCategories, createCategory }}
-    >
+    <CategoryContext.Provider value={{ categories, loading, loadCategories }}>
       {children}
     </CategoryContext.Provider>
   )

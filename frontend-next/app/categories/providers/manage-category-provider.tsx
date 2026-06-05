@@ -8,13 +8,15 @@ import {
   useContext,
   useState,
 } from "react"
-import { Category } from "@/types/category"
+import { Category, TransactionType } from "@/types/category"
 import { categoryApi } from "@/api/category"
 import { useCategory } from "@/providers/category-provider"
+import { useAccount } from "@/providers/account-provider"
 
 interface ManageCategoriesContextType {
   updateCategoryEvent: Category | null
   deleteCategoryEvent: Category | null
+  createCategory: (type: TransactionType, name: string) => Promise<void>
   setUpdateCategoryEvent: Dispatch<SetStateAction<Category | null>>
   cancelUpdateCategoryEvent: () => void
   confirmUpdateCategoryEvent: (category: Category) => Promise<void>
@@ -33,6 +35,16 @@ export function ManageCategoriesProvider({
   children: React.ReactNode
 }) {
   const { loadCategories } = useCategory()
+  const { selectedAccount } = useAccount()
+
+  const createCategory = useCallback(
+    async (type: TransactionType, name: string) => {
+      if (!selectedAccount) return
+      await categoryApi.create(selectedAccount.id, type, name)
+      await loadCategories()
+    },
+    [selectedAccount]
+  )
 
   const [deleteCategoryEvent, setDeleteCategoryEvent] =
     useState<Category | null>(null)
@@ -70,6 +82,7 @@ export function ManageCategoriesProvider({
       value={{
         updateCategoryEvent,
         deleteCategoryEvent,
+        createCategory,
         setUpdateCategoryEvent,
         setDeleteCategoryEvent,
         cancelUpdateCategoryEvent,

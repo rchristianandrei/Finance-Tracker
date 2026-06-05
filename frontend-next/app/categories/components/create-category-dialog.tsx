@@ -7,15 +7,15 @@ import { Plus } from "lucide-react"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useAccount } from "@/providers/account-provider"
-import { useCategory } from "@/providers/category-provider"
 import { CategoryFormValues } from "@/lib/validations/category"
 
 import { CategoryForm } from "./category-form"
 import { useState } from "react"
+import { useManageCategories } from "../providers/manage-category-provider"
 
 export function CreateCategoryDialog() {
   const { selectedAccount } = useAccount()
-  const { createCategory } = useCategory()
+  const { createCategory } = useManageCategories()
 
   const [errorMessage, setErrorMessage] = useState("")
 
