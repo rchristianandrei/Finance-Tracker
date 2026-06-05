@@ -1,14 +1,11 @@
 "use client"
 
-import * as React from "react"
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -19,25 +16,13 @@ import {
 } from "@/components/ui/sidebar"
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-
-const accounts = [
-  {
-    name: "Acme Inc",
-    plan: "Enterprise",
-  },
-  {
-    name: "Acme Corp.",
-    plan: "Startup",
-  },
-  {
-    name: "Evil Corp.",
-    plan: "Free",
-  },
-]
+import { useAccount } from "@/providers/account-provider"
+import { useState } from "react"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
-  const [activeAccount, setActiveAccount] = React.useState(accounts[0])
+  const { accounts, selectedAccount } = useAccount()
+  const [activeAccount, setActiveAccount] = useState(selectedAccount)
 
   if (!activeAccount) {
     return null
@@ -59,7 +44,6 @@ export function AccountSwitcher() {
                 <span className="truncate font-medium">
                   {activeAccount.name}
                 </span>
-                <span className="truncate text-xs">{activeAccount.plan}</span>
               </div>
               <ChevronsUpDownIcon className="ml-auto" />
             </SidebarMenuButton>
