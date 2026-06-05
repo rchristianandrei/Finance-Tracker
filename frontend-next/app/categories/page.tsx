@@ -5,6 +5,10 @@ import { ManageCategoriesProvider } from "./providers/manage-category-provider"
 import { UpdateCategoryDialog } from "./components/update-category-dialog"
 import { DeleteCategoryDialog } from "./components/delete-category-dialog"
 
+export const metadata = {
+  title: "Categories",
+}
+
 export default function Page() {
   return (
     <PrivateRoute>
