@@ -24,6 +24,7 @@ import { Category } from "@/types/category"
 
 import { Edit, Ellipsis, Trash } from "lucide-react"
 import { JSX } from "react"
+import { useManageCategories } from "../providers/manage-category-provider"
 
 export function CategoryTable({
   icon,
@@ -34,6 +35,9 @@ export function CategoryTable({
   title: string
   categories: Category[]
 }) {
+  const { setUpdateCategoryEvent, setDeleteCategoryEvent } =
+    useManageCategories()
+
   return (
     <Card className="flex-1">
       <CardHeader>
@@ -79,12 +83,16 @@ export function CategoryTable({
                         align="end"
                         sideOffset={4}
                       >
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setUpdateCategoryEvent(category)}
+                        >
                           <Edit />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setDeleteCategoryEvent(category)}
+                        >
                           <Trash /> Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
