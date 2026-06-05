@@ -13,6 +13,7 @@ import axios from "axios"
 interface CategoryContextType {
   categories: Category[]
   loading: boolean
+  loadCategories: () => Promise<void>
   createCategory: (type: TransactionType, name: string) => Promise<void>
 }
 
@@ -55,7 +56,9 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <CategoryContext.Provider value={{ categories, loading, createCategory }}>
+    <CategoryContext.Provider
+      value={{ categories, loading, loadCategories, createCategory }}
+    >
       {children}
     </CategoryContext.Provider>
   )

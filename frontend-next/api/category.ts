@@ -13,4 +13,11 @@ export const categoryApi = {
   getCategories: (accountId: number) => {
     return api.get<Category[]>(`/account/${accountId}/categories`)
   },
+  update: (category: Category) => {
+    return api.put(`/category/${category.id}`, {
+      id: category.id,
+      type: category.type,
+      name: category.name,
+    })
+  },
 }

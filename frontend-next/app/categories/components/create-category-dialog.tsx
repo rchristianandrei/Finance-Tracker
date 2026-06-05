@@ -25,6 +25,7 @@ export function CreateCategoryDialog() {
     try {
       await createCategory(values.type === "1" ? 1 : 2, values.name)
       toast.success("Category created successfully")
+      setErrorMessage("")
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const message = err.response?.data ?? err.message

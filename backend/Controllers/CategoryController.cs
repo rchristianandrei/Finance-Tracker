@@ -55,6 +55,9 @@ public class CategoryController(
         var userId = _currentUser.Id();
         if (category.Account.OwnerId != userId) return Forbid();
 
+        var ifCategoryNameExists = await _categoryRepo.IfExists(dto.Type, dto.Name, category.AccountId);
+        if (ifCategoryNameExists != null) return BadRequest("Existing Category");
+
         category.Type = dto.Type;
         category.Name = dto.Name;
 

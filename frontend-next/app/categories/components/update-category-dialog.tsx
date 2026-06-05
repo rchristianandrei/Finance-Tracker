@@ -5,6 +5,8 @@ import { Dialog } from "@/components/ui/dialog"
 import { CategoryFormValues } from "@/lib/validations/category"
 import { useManageCategories } from "../providers/manage-category-provider"
 import { CategoryForm } from "./category-form"
+import axios from "axios"
+import { useState } from "react"
 
 export function UpdateCategoryDialog() {
   const {
@@ -13,8 +15,11 @@ export function UpdateCategoryDialog() {
     confirmUpdateCategoryEvent,
   } = useManageCategories()
 
+  const [errorMessage, setErrorMessage] = useState("")
+
   async function onSubmit(values: CategoryFormValues) {
     if (!updateCategoryEvent) return
+    setErrorMessage("")
     try {
       await confirmUpdateCategoryEvent({
         ...updateCategoryEvent,
@@ -23,8 +28,14 @@ export function UpdateCategoryDialog() {
       })
 
       toast.success("Category updated successfully")
+      setErrorMessage("")
     } catch (err) {
-      toast.error("Failed to update Category")
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data ?? err.message
+        setErrorMessage(message)
+      }
+
+      throw err
     }
   }
 
@@ -39,6 +50,7 @@ export function UpdateCategoryDialog() {
         <CategoryForm
           title="Update Transaction"
           category={updateCategoryEvent}
+          errorMessage={errorMessage}
           onSave={onSubmit}
         ></CategoryForm>
       )}

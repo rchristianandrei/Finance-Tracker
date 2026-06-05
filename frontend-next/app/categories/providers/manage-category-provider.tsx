@@ -10,6 +10,7 @@ import {
 } from "react"
 import { Category } from "@/types/category"
 import { categoryApi } from "@/api/category"
+import { useCategory } from "@/providers/category-provider"
 
 interface ManageCategoriesContextType {
   updateCategoryEvent: Category | null
@@ -31,6 +32,8 @@ export function ManageCategoriesProvider({
 }: {
   children: React.ReactNode
 }) {
+  const { loadCategories } = useCategory()
+
   const [deleteCategoryEvent, setDeleteCategoryEvent] =
     useState<Category | null>(null)
 
@@ -40,8 +43,9 @@ export function ManageCategoriesProvider({
   const confirmUpdateCategoryEvent = useCallback(
     async (category: Category) => {
       if (!updateCategoryEvent) return
-      //   await categoryApi.update(category)
+      await categoryApi.update(category)
       setUpdateCategoryEvent(null)
+      loadCategories()
     },
     [updateCategoryEvent]
   )
