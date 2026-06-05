@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/providers/auth-provider"
+import { UserLoading } from "../user-loading"
 
 export function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -15,7 +16,7 @@ export function PrivateRoute({ children }: { children: React.ReactNode }) {
   }, [user, loading, router])
 
   if (loading) {
-    return <div>Loading...</div>
+    return <UserLoading />
   }
 
   if (!user) {
