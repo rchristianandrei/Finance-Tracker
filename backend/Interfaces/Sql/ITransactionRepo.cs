@@ -9,7 +9,7 @@ public interface ITransactionRepo
 
     Task Update(Transaction entity);
 
-    Task<int> GetCountByAccountId(int accountId);
+    Task<int> GetCountByCategoryId(int categoryId);
 
     Task<Transaction?> GetById(long id);
 

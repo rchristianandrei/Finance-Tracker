@@ -75,7 +75,7 @@ public class CategoryController(
         var userId = _currentUser.Id();
         if (category.Account.OwnerId != userId) return Forbid();
 
-        var transactionCount = await _transactionRepo.GetCountByAccountId(category.AccountId);
+        var transactionCount = await _transactionRepo.GetCountByCategoryId(category.Id);
         if (transactionCount > 0) return BadRequest("You cannot delete a category with transactions");
 
         await _categoryRepo.Delete(category);

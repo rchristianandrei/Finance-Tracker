@@ -20,9 +20,9 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         await _context.SaveChangesAsync();
     }
 
-    public async Task<int> GetCountByAccountId(int accountId)
+    public async Task<int> GetCountByCategoryId(int categoryId)
     {
-        return await _context.Transactions.CountAsync(t => t.AccountId == accountId);
+        return await _context.Transactions.CountAsync(t => t.CategoryId == categoryId);
     }
 
     public async Task<Transaction?> GetById(long id)

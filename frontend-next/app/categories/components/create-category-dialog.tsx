@@ -19,6 +19,11 @@ export function CreateCategoryDialog() {
 
   const [errorMessage, setErrorMessage] = useState("")
 
+  function onOpenDialogChange(open: boolean) {
+    if (open) return
+    setErrorMessage("")
+  }
+
   async function onSubmit(values: CategoryFormValues) {
     if (!selectedAccount) return
     setErrorMessage("")
@@ -37,7 +42,7 @@ export function CreateCategoryDialog() {
   }
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={onOpenDialogChange}>
       <DialogTrigger asChild>
         <Button variant="outline">
           <Plus />

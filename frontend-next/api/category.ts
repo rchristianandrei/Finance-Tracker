@@ -20,4 +20,7 @@ export const categoryApi = {
       name: category.name,
     })
   },
+  delete: (categoryId: number) => {
+    return api.delete(`/category/${categoryId}`)
+  },
 }

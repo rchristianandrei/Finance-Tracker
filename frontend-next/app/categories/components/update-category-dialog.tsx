@@ -6,7 +6,7 @@ import { CategoryFormValues } from "@/lib/validations/category"
 import { useManageCategories } from "../providers/manage-category-provider"
 import { CategoryForm } from "./category-form"
 import axios from "axios"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export function UpdateCategoryDialog() {
   const {
@@ -16,6 +16,11 @@ export function UpdateCategoryDialog() {
   } = useManageCategories()
 
   const [errorMessage, setErrorMessage] = useState("")
+
+  useEffect(() => {
+    if (updateCategoryEvent) return
+    setErrorMessage("")
+  }, [updateCategoryEvent])
 
   async function onSubmit(values: CategoryFormValues) {
     if (!updateCategoryEvent) return
@@ -48,7 +53,7 @@ export function UpdateCategoryDialog() {
     >
       {updateCategoryEvent && (
         <CategoryForm
-          title="Update Transaction"
+          title="Update Category"
           category={updateCategoryEvent}
           errorMessage={errorMessage}
           onSave={onSubmit}

@@ -56,8 +56,9 @@ export function ManageCategoriesProvider({
 
   const confirmDeleteCategoryEvent = useCallback(async () => {
     if (!deleteCategoryEvent) return
-    // await categoryApi.delete(deleteCategoryEvent.id)
+    await categoryApi.delete(deleteCategoryEvent.id)
     setDeleteCategoryEvent(null)
+    loadCategories()
   }, [deleteCategoryEvent])
 
   const cancelDeleteCategoryEvent = useCallback(() => {
