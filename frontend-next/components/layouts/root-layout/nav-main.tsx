@@ -1,21 +1,13 @@
 "use client"
 
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboard, ScanBarcode } from "lucide-react"
+import { LayoutDashboard, ScanBarcode, Tags } from "lucide-react"
 import Link from "next/link"
 
 const items = [
@@ -28,6 +20,11 @@ const items = [
     title: "Transactions",
     url: "/transactions",
     icon: <ScanBarcode />,
+  },
+  {
+    title: "Categories",
+    url: "/categories",
+    icon: <Tags />,
   },
 ]
 

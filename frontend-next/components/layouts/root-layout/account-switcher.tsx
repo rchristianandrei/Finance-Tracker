@@ -17,36 +17,34 @@ import {
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAccount } from "@/providers/account-provider"
-import { useState } from "react"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
   const { accounts, selectedAccount } = useAccount()
-  const [activeAccount, setActiveAccount] = useState(selectedAccount)
-
-  if (!activeAccount) {
-    return null
-  }
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground">
-                <AvatarFallback>{activeAccount.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {activeAccount.name}
-                </span>
-              </div>
-              <ChevronsUpDownIcon className="ml-auto" />
-            </SidebarMenuButton>
+            {selectedAccount && (
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                <Avatar className="flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground">
+                  <AvatarFallback>
+                    {selectedAccount.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">
+                    {selectedAccount.name}
+                  </span>
+                </div>
+                <ChevronsUpDownIcon className="ml-auto" />
+              </SidebarMenuButton>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-fit"
@@ -60,7 +58,9 @@ export function AccountSwitcher() {
             {accounts.map((account, index) => (
               <DropdownMenuItem
                 key={account.name}
-                onClick={() => setActiveAccount(account)}
+                onClick={() => {
+                  console.log("Select Account")
+                }}
                 className="gap-2 p-2"
               >
                 <Avatar className="flex size-6 items-center justify-center">
