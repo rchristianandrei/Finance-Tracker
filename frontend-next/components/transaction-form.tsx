@@ -36,7 +36,6 @@ import { transactionSchema } from "@/lib/validations/transaction"
 import { TransactionFormValues } from "@/lib/validations/transaction"
 import { Field, FieldError, FieldLabel } from "./ui/field"
 import { useEffect, useState } from "react"
-import { useAccount } from "@/providers/account-provider"
 import { Spinner } from "./ui/spinner"
 import { useCategory } from "@/providers/category-provider"
 import { Transaction } from "@/types/transaction"
@@ -50,7 +49,6 @@ export function TransactionForm({
   transaction?: Transaction
   onSave: (values: TransactionFormValues) => Promise<void>
 }) {
-  const { selectedAccount } = useAccount()
   const { categories } = useCategory()
 
   const [categoryOpen, setCategoryOpen] = useState(false)
@@ -75,7 +73,6 @@ export function TransactionForm({
   }, [selectedType])
 
   async function onSubmit(values: TransactionFormValues) {
-    if (!selectedAccount) return
     if (isSubmitting) return
     setIsSubmitting(true)
 

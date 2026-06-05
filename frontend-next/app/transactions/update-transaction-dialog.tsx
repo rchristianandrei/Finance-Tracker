@@ -2,7 +2,7 @@
 
 import { TransactionFormValues } from "@/lib/validations/transaction"
 import { toast } from "sonner"
-import { TransactionForm } from "@/components/transactionForm"
+import { TransactionForm } from "@/components/transaction-form"
 import { useManageTransactions } from "./providers/manage-transactions-provider"
 import { Dialog } from "@/components/ui/dialog"
 

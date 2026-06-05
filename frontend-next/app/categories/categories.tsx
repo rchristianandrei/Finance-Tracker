@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useCategory } from "@/providers/category-provider"
-import { Plus } from "lucide-react"
+import { BanknoteArrowDown, BanknoteArrowUp, Plus } from "lucide-react"
 import { useMemo, useState } from "react"
-import { CategoryTable } from "./category-table"
+import { CategoryTable } from "./components/category-table"
+import { CreateCategoryDialog } from "./components/create-category-dialog"
 
 export function Categories() {
   const { categories } = useCategory()
@@ -32,18 +33,17 @@ export function Categories() {
               setSearch(e.target.value)
             }}
           />
-          <Button variant="outline">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Category
-          </Button>
+          <CreateCategoryDialog />
         </CardContent>
       </Card>
       <div className="flex flex-1 flex-col gap-4 overflow-auto md:flex-row">
         <CategoryTable
+          icon={<BanknoteArrowUp />}
           title="Income"
           categories={filteredCategories.filter((c) => c.type === 2)}
         />
         <CategoryTable
+          icon={<BanknoteArrowDown />}
           title="Expense"
           categories={filteredCategories.filter((c) => c.type === 1)}
         />

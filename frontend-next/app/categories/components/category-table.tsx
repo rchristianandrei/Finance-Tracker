@@ -23,18 +23,23 @@ import {
 import { Category } from "@/types/category"
 
 import { Edit, Ellipsis, Trash } from "lucide-react"
+import { JSX } from "react"
 
 export function CategoryTable({
+  icon,
   title,
   categories,
 }: {
+  icon: JSX.Element
   title: string
   categories: Category[]
 }) {
   return (
     <Card className="flex-1">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="flex gap-2">
+          {icon} {title}
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col overflow-auto">
         <Table>
