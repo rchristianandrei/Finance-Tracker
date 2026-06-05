@@ -1,26 +1,37 @@
 "use client"
 
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-
-import { Button } from "@/components/ui/button"
-
+import axios from "axios"
+import { toast } from "sonner"
 import { Plus } from "lucide-react"
 
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { useAccount } from "@/providers/account-provider"
-import { toast } from "sonner"
-import { CategoryForm } from "./category-form"
+import { useCategory } from "@/providers/category-provider"
 import { CategoryFormValues } from "@/lib/validations/category"
+
+import { CategoryForm } from "./category-form"
+import { useState } from "react"
 
 export function CreateCategoryDialog() {
   const { selectedAccount } = useAccount()
+  const { createCategory } = useCategory()
+
+  const [errorMessage, setErrorMessage] = useState("")
 
   async function onSubmit(values: CategoryFormValues) {
     if (!selectedAccount) return
+    setErrorMessage("")
     try {
+      await createCategory(values.type === "1" ? 1 : 2, values.name)
       toast.success("Category created successfully")
     } catch (err) {
-      console.error(err)
-      toast.error("Failed to create category")
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data ?? err.message
+        setErrorMessage(message)
+      }
+
+      throw err
     }
   }
 
@@ -33,7 +44,11 @@ export function CreateCategoryDialog() {
         </Button>
       </DialogTrigger>
 
-      <CategoryForm title="Create Category" onSave={onSubmit} />
+      <CategoryForm
+        title="Create Category"
+        errorMessage={errorMessage}
+        onSave={onSubmit}
+      />
     </Dialog>
   )
 }

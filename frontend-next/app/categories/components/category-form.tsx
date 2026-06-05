@@ -23,10 +23,12 @@ import { CategoryFormValues, categorySchema } from "@/lib/validations/category"
 export function CategoryForm({
   title,
   category,
+  errorMessage,
   onSave,
 }: {
   title: string
   category?: Category
+  errorMessage?: string
   onSave: (values: CategoryFormValues) => Promise<void>
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -46,6 +48,7 @@ export function CategoryForm({
     try {
       await onSave(values)
       form.reset()
+    } catch (err) {
     } finally {
       setIsSubmitting(false)
     }
@@ -75,13 +78,12 @@ export function CategoryForm({
                   className="flex gap-6"
                 >
                   <div className="flex items-center gap-2">
-                    <RadioGroupItem value="1" id="expense" />
-                    <label htmlFor="expense">Expense</label>
-                  </div>
-
-                  <div className="flex items-center gap-2">
                     <RadioGroupItem value="2" id="income" />
                     <label htmlFor="income">Income</label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="1" id="expense" />
+                    <label htmlFor="expense">Expense</label>
                   </div>
                 </RadioGroup>
 
@@ -111,6 +113,10 @@ export function CategoryForm({
               </Field>
             )}
           />
+
+          {errorMessage && (
+            <FieldError className="text-center">{errorMessage}</FieldError>
+          )}
 
           <Button type="submit" className="w-full">
             {isSubmitting ? <Spinner className="ml-2" /> : "Save"}

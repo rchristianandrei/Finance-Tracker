@@ -32,7 +32,7 @@ public class CategoryController(
         if (count >= 10) return BadRequest("You're exceeding the max limit of 10");
 
         var category = await _categoryRepo.IfExists(dto.Type, dto.Name, dto.AccountId);
-        if (category != null) return BadRequest("Existsing Category");
+        if (category != null) return BadRequest("Existing Category");
 
         var newCategory = new Category
         {
