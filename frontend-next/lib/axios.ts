@@ -29,7 +29,6 @@ api.interceptors.response.use(
     )
       return Promise.reject(error)
 
-    original._retry = true
     try {
       await api.post("/auth/refresh")
       return api(original)
