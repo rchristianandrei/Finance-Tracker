@@ -19,6 +19,7 @@ public class AuthController(
     IGoogleCredentialRepo _googleCredRepo,
     IConfiguration _config,
     IJwtService _jwtService,
+    IRefreshTokenService _refreshTokenService,
     ICurrentUserService _currentUserService,
     IAuthCookiesService _authCookiesService,
     IUserRepo _userRepo,
@@ -73,6 +74,9 @@ public class AuthController(
             var token = _jwtService.GenerateToken(user);
             _authCookiesService.AttachAuthCookies(token);
 
+            var rawRefresh = await _refreshTokenService.CreateAsync(user.Id);
+            _authCookiesService.AttachRefreshCookie(rawRefresh);
+
             return Ok(new { status = user.Status, user = user.ToDto() });
         }
         catch (InvalidJwtException)
@@ -82,9 +86,15 @@ public class AuthController(
     }
 
     [HttpPost("logout")]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
-        _authCookiesService.RemoveAuthCookies();
+        var raw = _authCookiesService.GetRefreshToken();
+        if (!string.IsNullOrEmpty(raw))
+        {
+            var token = await _refreshTokenService.ValidateAsync(raw);
+            if (token is not null) await _refreshTokenService.RevokeAsync(token);
+        }
+        _authCookiesService.ClearAuthCookies();
         return Ok();
     }
 
@@ -99,5 +109,27 @@ public class AuthController(
         if (user == null) return Unauthorized();
 
         return Ok(user.ToDto());
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh()
+    {
+        var raw = _authCookiesService.GetRefreshToken();
+        Console.WriteLine($"[Refresh] cookie present: {!string.IsNullOrEmpty(raw)}");
+        if (string.IsNullOrEmpty(raw))
+            return Unauthorized("No refresh token.");
+
+        var refreshToken = await _refreshTokenService.ValidateAsync(raw);
+        if (refreshToken is null)
+            return Unauthorized("Invalid or expired refresh token.");
+
+        await _refreshTokenService.RevokeAsync(refreshToken);
+        var newRaw = await _refreshTokenService.CreateAsync(refreshToken.UserId);
+        _authCookiesService.AttachRefreshCookie(newRaw);
+
+        var newJwt = _jwtService.GenerateToken(refreshToken.User);
+        _authCookiesService.AttachAuthCookies(newJwt);
+
+        return Ok(new { status = refreshToken.User.Status, user = refreshToken.User.ToDto() });
     }
 }

@@ -12,6 +12,7 @@ public class AuthCookiesService(
     private readonly JwtSettings _jwtSettings = _jwtSettingsAccessor.Value;
 
     public readonly static string AuthKey = "Authorization";
+    public readonly static string RefreshKey = "refreshToken";
 
     public void AttachAuthCookies(string token)
     {
@@ -24,14 +25,23 @@ public class AuthCookiesService(
         });
     }
 
-    public void RemoveAuthCookies()
+    public void AttachRefreshCookie(string rawToken)
     {
-        _httpContextAccessor?.HttpContext?.Response.Cookies.Append(AuthKey, "", new CookieOptions
+        _httpContextAccessor.HttpContext!.Response.Cookies.Append(RefreshKey, rawToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddDays(-1)
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
+    }
+
+    public string? GetRefreshToken() =>
+        _httpContextAccessor.HttpContext?.Request.Cookies[RefreshKey];
+
+    public void ClearAuthCookies()
+    {
+        _httpContextAccessor.HttpContext!.Response.Cookies.Delete(AuthKey);
+        _httpContextAccessor.HttpContext!.Response.Cookies.Delete(RefreshKey);
     }
 }
