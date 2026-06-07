@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { formatDate } from "@/lib/format-date"
 import { cn } from "@/lib/utils"
 import { useAccount } from "@/providers/account-provider"
 import { DashboardType } from "@/types/dashboard"
@@ -203,7 +204,7 @@ export default function DashboardPage() {
               <TooltipProvider>
                 {dashboardData?.transactions.map((transaction, index) => (
                   <TableRow key={index}>
-                    <TableCell>{transaction.date.toDateString()}</TableCell>
+                    <TableCell>{formatDate(transaction.date)}</TableCell>
 
                     <TableCell className="max-w-50 truncate">
                       <Tooltip>

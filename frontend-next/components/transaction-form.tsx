@@ -62,7 +62,7 @@ export function TransactionForm({
       category: transaction?.category ?? "",
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
-      date: transaction?.date ?? undefined,
+      date: transaction?.date ?? new Date(),
     },
   })
 
@@ -249,38 +249,70 @@ export function TransactionForm({
           <Controller
             name="date"
             control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Date</FieldLabel>
+            render={({ field, fieldState }) => {
+              const timeValue = field.value ? format(field.value, "HH:mm") : ""
 
-                <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      {field.value ? format(field.value, "PPP") : "Select date"}
-                    </Button>
-                  </PopoverTrigger>
+              return (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Date & Time</FieldLabel>
 
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={(date) => {
-                        field.onChange(date)
-                        setDateOpen(false) // 👈 close on select
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                  <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        {field.value
+                          ? format(field.value, "PPP p")
+                          : "Select date & time"}
+                      </Button>
+                    </PopoverTrigger>
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
+                    <PopoverContent className="w-auto gap-0 p-4">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          if (!date) return
+
+                          const current = field.value ?? new Date()
+
+                          date.setHours(current.getHours())
+                          date.setMinutes(current.getMinutes())
+
+                          field.onChange(date)
+                        }}
+                      />
+
+                      <input
+                        type="time"
+                        value={timeValue}
+                        onChange={(e) => {
+                          const [hours, minutes] = e.target.value
+                            .split(":")
+                            .map(Number)
+
+                          const date = field.value
+                            ? new Date(field.value)
+                            : new Date()
+
+                          date.setHours(hours)
+                          date.setMinutes(minutes)
+
+                          field.onChange(date)
+                        }}
+                        className="w-full rounded border px-2 py-1"
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )
+            }}
           />
 
           <Button type="submit" className="w-full">

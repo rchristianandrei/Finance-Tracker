@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useManageTransactions } from "./providers/manage-transactions-provider"
 import { Transaction } from "@/types/transaction"
+import { formatDate } from "@/lib/format-date"
 
 export function Transactions() {
   const { transactions, setUpdateTransactionEvent, setDeleteTransactionEvent } =
@@ -70,7 +71,7 @@ export function Transactions() {
               <TooltipProvider>
                 {transactions.map((transaction, index) => (
                   <TableRow key={index}>
-                    <TableCell>{transaction.date.toDateString()}</TableCell>
+                    <TableCell>{formatDate(transaction.date)}</TableCell>
 
                     <TableCell className="max-w-50 truncate">
                       <Tooltip>
