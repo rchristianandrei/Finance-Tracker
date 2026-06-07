@@ -6,7 +6,7 @@
   package = "@netlify/plugin-nextjs"
 
 [[redirects]]
-  from = "/api/*"
+  from = "/backend/*"
   to = "https://finance-tracker-backend-iwct.onrender.com/:splat"
   status = 200
   force = true
