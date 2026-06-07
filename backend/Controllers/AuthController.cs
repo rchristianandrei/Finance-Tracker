@@ -115,7 +115,6 @@ public class AuthController(
     public async Task<IActionResult> Refresh()
     {
         var raw = _authCookiesService.GetRefreshToken();
-        Console.WriteLine($"[Refresh] cookie present: {!string.IsNullOrEmpty(raw)}");
         if (string.IsNullOrEmpty(raw))
             return Unauthorized("No refresh token.");
 
