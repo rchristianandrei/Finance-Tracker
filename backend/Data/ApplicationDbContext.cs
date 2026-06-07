@@ -6,6 +6,7 @@ namespace backend.Data;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<LocalCredential> LocalCredentials { get; set; }
     public DbSet<GoogleCredential> GoogleCredentials { get; set; }
     public DbSet<VerifyAccount> VerifyAccounts { get; set; }
@@ -41,6 +42,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasMany(u => u.Transactions)
             .WithOne(a => a.User)
             .HasForeignKey(a => a.UserId);
+
+        modelBuilder.Entity<RefreshToken>(b =>
+        {
+            b.HasIndex(r => r.TokenHash).IsUnique();
+            b.HasIndex(r => r.UserId);
+        });
 
         modelBuilder.Entity<LocalCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<LocalCredential>().HasIndex(u => u.Email).IsUnique();

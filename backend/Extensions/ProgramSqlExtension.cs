@@ -1,11 +1,12 @@
 using backend.Data;
 using backend.Interfaces.Sql;
 using backend.Repositories.Sql;
+using backend.Services.Sql;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Extensions;
 
-public static class ProgramMySqlExtension
+public static class ProgramSqlExtension
 {
     public static IServiceCollection AddMySql(this IServiceCollection services, IConfiguration configuration)
     {
@@ -20,6 +21,7 @@ public static class ProgramMySqlExtension
         }));
 
         services.AddScoped<IUserRepo, UserRepo>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IGoogleCredentialRepo, GoogleCredentialRepo>();
         services.AddScoped<ILocalCredentialRepo, LocalCredentialRepo>();
         services.AddScoped<IAccountRepo, AccountRepo>();
