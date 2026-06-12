@@ -97,7 +97,7 @@ public class AccountController(
 
         foreach (var transaction in transactions)
         {
-            if (transaction.Type == TransactionType.INCOME)
+            if (transaction.Category.Type == TransactionType.INCOME)
             {
                 income += transaction.Amount;
 
@@ -106,7 +106,7 @@ public class AccountController(
 
                 incomeBreakdown[transaction.Category.Name] += transaction.Amount;
             }
-            else if (transaction.Type == TransactionType.EXPENSE)
+            else if (transaction.Category.Type == TransactionType.EXPENSE)
             {
                 expenses += transaction.Amount;
 
