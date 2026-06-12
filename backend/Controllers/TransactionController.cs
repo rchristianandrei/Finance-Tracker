@@ -52,7 +52,6 @@ public class TransactionController(
         {
             UserId = id,
             AccountId = value.AccountId,
-            Type = value.Type,
             CategoryId = category.Id,
             Amount = value.Amount,
             Description = value.Description,
@@ -99,7 +98,6 @@ public class TransactionController(
             await _categoryRepo.Create(category);
         }
 
-        transaction.Type = value.Type;
         transaction.Category = category;
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
@@ -122,7 +120,7 @@ public class TransactionController(
 
         var account = await _accountRepo.GetById(transaction.AccountId);
         if (account == null) return NotFound("Account not found");
-        switch (transaction.Type)
+        switch (transaction.Category.Type)
         {
             case TransactionType.INCOME:
                 account.Balance -= transaction.Amount;

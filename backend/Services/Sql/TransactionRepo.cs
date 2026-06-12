@@ -41,7 +41,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
         if (query.TransactionType != null)
         {
-            queryable = queryable.Where(t => t.Type == query.TransactionType);
+            queryable = queryable.Where(t => t.Category.Type == query.TransactionType);
         }
 
         if (query.Categories != null && query.Categories.Length > 0)
