@@ -27,6 +27,8 @@ public class User
     [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
     [JsonIgnore]
+    public RefreshToken? RefreshToken { get; set; }
+    [JsonIgnore]
     public ICollection<Account> Accounts { get; set; } = [];
     [JsonIgnore]
     public DefaultAccount? DefaultAccount { get; set; }

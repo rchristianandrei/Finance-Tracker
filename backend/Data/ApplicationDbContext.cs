@@ -43,10 +43,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithOne(a => a.User)
             .HasForeignKey(a => a.UserId);
 
+        modelBuilder.Entity<User>(b =>
+        {
+            b.HasOne(u => u.RefreshToken).WithOne(r => r.User).HasForeignKey<RefreshToken>(r => r.UserId);
+        });
+
         modelBuilder.Entity<RefreshToken>(b =>
         {
+            b.HasKey(r => r.UserId);
             b.HasIndex(r => r.TokenHash).IsUnique();
-            b.HasIndex(r => r.UserId);
         });
 
         modelBuilder.Entity<LocalCredential>().HasKey(u => u.UserId);
