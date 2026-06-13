@@ -27,18 +27,24 @@ export function Transactions() {
   const { transactions, setUpdateTransactionEvent, setDeleteTransactionEvent } =
     useManageTransactions()
 
-  const grouped = useMemo(() => {
-    return transactions.reduce<Record<string, Transaction[]>>((acc, item) => {
-      const date = item.date.toLocaleDateString("en-CA").split("T")[0] // YYYY-MM-DD
+  const grouped = useMemo(
+    () =>
+      transactions.reduce<Record<string, Transaction[]>>((acc, item) => {
+        const date = item.date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
 
-      if (!acc[date]) {
-        acc[date] = []
-      }
+        if (!acc[date]) {
+          acc[date] = []
+        }
 
-      acc[date].push(item)
-      return acc
-    }, {})
-  }, [transactions])
+        acc[date].push(item)
+        return acc
+      }, {}),
+    [transactions]
+  )
 
   const onUpdateClick = (transaction: Transaction) => {
     setUpdateTransactionEvent(transaction)
@@ -65,13 +71,7 @@ export function Transactions() {
             {Object.entries(grouped).map(([date, items]) => (
               <Card key={date}>
                 <CardHeader>
-                  <CardTitle>
-                    {new Date(date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </CardTitle>
+                  <CardTitle>{date}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {items.map((transaction) => (
