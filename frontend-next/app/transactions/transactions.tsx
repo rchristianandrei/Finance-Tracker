@@ -29,7 +29,7 @@ export function Transactions() {
 
   const grouped = useMemo(() => {
     return transactions.reduce<Record<string, Transaction[]>>((acc, item) => {
-      const date = item.date.toISOString().split("T")[0] // YYYY-MM-DD
+      const date = item.date.toLocaleDateString("en-CA").split("T")[0] // YYYY-MM-DD
 
       if (!acc[date]) {
         acc[date] = []
