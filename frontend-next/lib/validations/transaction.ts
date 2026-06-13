@@ -6,9 +6,12 @@ export const transactionSchema = z.object({
   category: z
     .string()
     .min(1, "Category is required")
-    .max(50, "Name must be 50 characters or less"),
+    .max(50, "Category must be 50 characters or less"),
 
-  description: z.string().min(1, "Description is required"),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(30, "Description must be 30 characters or less"),
 
   amount: z
     .number({
