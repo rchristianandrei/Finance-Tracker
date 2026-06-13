@@ -157,8 +157,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.RefreshToken", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -173,10 +176,15 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("UserId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens");
                 });
@@ -354,8 +362,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.RefreshToken", b =>
                 {
                     b.HasOne("backend.Models.User", "User")
-                        .WithOne("RefreshToken")
-                        .HasForeignKey("backend.Models.RefreshToken", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -429,8 +437,6 @@ namespace backend.Migrations
                     b.Navigation("GoogleCredential");
 
                     b.Navigation("LocalCredential");
-
-                    b.Navigation("RefreshToken");
 
                     b.Navigation("Transactions");
                 });

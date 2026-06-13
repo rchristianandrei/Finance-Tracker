@@ -20,8 +20,6 @@ public class RefreshTokenService(ApplicationDbContext db) : IRefreshTokenService
         var raw = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         var hash = Hash(raw);
 
-        await db.RefreshTokens.Where(r => r.UserId == userId).ExecuteDeleteAsync();
-
         db.RefreshTokens.Add(new RefreshToken
         {
             UserId = userId,
