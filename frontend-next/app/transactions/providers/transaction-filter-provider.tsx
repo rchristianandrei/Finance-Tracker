@@ -138,6 +138,7 @@ export function TransactionFilterProvider({
 
   const changeDate = (range: DateRange | undefined) => {
     navigate({
+      page: "1",
       from: range?.from
         ? format(range.from, "yyyy-MM-dd'T'00:00:00.000")
         : undefined,
