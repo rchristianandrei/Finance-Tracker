@@ -25,8 +25,7 @@ api.interceptors.response.use(
     const original = error.config
 
     if (
-      error.code === "ERR_CANCELED" ||
-      error.response?.status === 401 ||
+      (error.code === "ERR_CANCELED" || error.response?.status === 401) &&
       !original._retry
     ) {
       try {
