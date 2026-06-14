@@ -37,11 +37,32 @@ export function TransactionFilterProvider({
   const searchParams = useSearchParams()
   const { categories } = useCategory()
 
+  const createQueryString = useCallback(
+    (updates: Record<string, string | undefined>) => {
+      const params = new URLSearchParams(searchParams.toString())
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (!value) {
+          params.delete(key)
+        } else {
+          params.set(key, value)
+        }
+      })
+
+      if (params.get("page") === "1") {
+        params.delete("page")
+      }
+
+      return params.toString()
+    },
+    [searchParams]
+  )
+
   const navigate = useCallback(
     (updates: Record<string, string | undefined>) => {
       router.replace(`${pathname}?${createQueryString(updates)}`)
     },
-    [router, pathname]
+    [router, pathname, createQueryString]
   )
 
   const search = useMemo(() => searchParams.get("search") ?? "", [searchParams])
@@ -102,27 +123,6 @@ export function TransactionFilterProvider({
     const page = searchParams.get("page")
     return page ? Number(page) : 1
   }, [searchParams])
-
-  const createQueryString = useCallback(
-    (updates: Record<string, string | undefined>) => {
-      const params = new URLSearchParams(searchParams.toString())
-
-      Object.entries(updates).forEach(([key, value]) => {
-        if (!value) {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-
-      if (params.get("page") === "1") {
-        params.delete("page")
-      }
-
-      return params.toString()
-    },
-    [searchParams]
-  )
 
   const dateRange: DateRange | undefined = useMemo(() => {
     const from = searchParams.get("from")
