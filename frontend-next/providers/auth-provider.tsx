@@ -27,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         if (axios.isAxiosError(err)) return
       } finally {
-        console.log("Done Auth Loading")
         setLoading(false)
       }
     })()
