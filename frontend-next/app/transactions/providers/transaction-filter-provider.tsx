@@ -53,7 +53,6 @@ export function TransactionFilterProvider({
         params.delete("page")
       }
 
-      console.log("createQueryString result:", params.toString())
       return params.toString()
     },
     [searchParams]
@@ -61,9 +60,7 @@ export function TransactionFilterProvider({
 
   const navigate = useCallback(
     (updates: Record<string, string | undefined>) => {
-      const qs = createQueryString(updates)
-      console.log("navigating to:", `${pathname}?${qs}`)
-      router.replace(`${pathname}?${qs}`)
+      router.replace(`${pathname}?${createQueryString(updates)}`)
     },
     [router, pathname, createQueryString]
   )
