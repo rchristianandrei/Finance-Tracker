@@ -25,8 +25,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setUser(data)
       } catch (err) {
-        if (axios.isCancel(err)) return
+        if (axios.isAxiosError(err)) return
       } finally {
+        console.log("Done Auth Loading")
         setLoading(false)
       }
     })()
