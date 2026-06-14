@@ -154,8 +154,7 @@ export function TransactionFilterProvider({
   }
 
   const clearFilters = () => {
-    router.replace(pathname)
-    router.refresh()
+    router.replace(`${pathname}?`)
   }
 
   return (
