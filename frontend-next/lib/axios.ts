@@ -9,7 +9,10 @@ const api = axios.create({
 
 axiosRetry(api, {
   retries: 3,
-  retryDelay: (retryCount) => retryCount * 2000, // 2s, 4s, 6s
+  retryDelay: (count) => {
+    console.log("retry", count)
+    return count * 2000
+  },
   retryCondition: (error) => {
     const url = error.config?.url ?? ""
     if (url.includes("/auth/refresh")) return false
