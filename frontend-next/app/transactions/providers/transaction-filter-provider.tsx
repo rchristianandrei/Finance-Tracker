@@ -137,16 +137,6 @@ export function TransactionFilterProvider({
   }, [searchParams])
 
   const changeDate = (range: DateRange | undefined) => {
-    if (!range?.from && !range?.to) {
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete("from")
-      params.delete("to")
-      params.delete("page")
-
-      const qs = params.toString()
-      window.location.assign(qs ? `${pathname}?${qs}` : pathname)
-      return
-    }
     navigate({
       page: "1",
       from: range?.from
@@ -164,7 +154,7 @@ export function TransactionFilterProvider({
   }
 
   const clearFilters = () => {
-    window.location.assign(pathname)
+    router.replace(pathname)
   }
 
   return (
