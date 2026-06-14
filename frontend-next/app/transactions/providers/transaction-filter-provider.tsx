@@ -37,36 +37,30 @@ export function TransactionFilterProvider({
   const searchParams = useSearchParams()
   const { categories } = useCategory()
 
-  const createQueryString = useCallback(
-    (updates: Record<string, string | undefined>) => {
-      const params = new URLSearchParams(searchParams.toString())
+  const createQueryString = (updates: Record<string, string | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString())
 
-      Object.entries(updates).forEach(([key, value]) => {
-        if (!value) {
-          params.delete(key)
-        } else {
-          params.set(key, value)
-        }
-      })
-
-      if (params.get("page") === "1") {
-        params.delete("page")
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value) {
+        params.delete(key)
+      } else {
+        params.set(key, value)
       }
+    })
 
-      console.log("createQueryString result:", params.toString())
-      return params.toString()
-    },
-    [searchParams]
-  )
+    if (params.get("page") === "1") {
+      params.delete("page")
+    }
 
-  const navigate = useCallback(
-    (updates: Record<string, string | undefined>) => {
-      const qs = createQueryString(updates)
-      console.log("navigating to:", `${pathname}?${qs}`)
-      router.replace(`${pathname}?${qs}`)
-    },
-    [router, pathname, createQueryString]
-  )
+    console.log("createQueryString result:", params.toString())
+    return params.toString()
+  }
+
+  const navigate = (updates: Record<string, string | undefined>) => {
+    const qs = createQueryString(updates)
+    console.log("navigating to:", `${pathname}?${qs}`)
+    router.replace(`${pathname}?${qs}`)
+  }
 
   const search = useMemo(() => searchParams.get("search") ?? "", [searchParams])
 
