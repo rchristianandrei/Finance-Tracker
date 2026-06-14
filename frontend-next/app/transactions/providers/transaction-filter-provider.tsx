@@ -145,6 +145,9 @@ export function TransactionFilterProvider({
 
       to: range?.to ? format(range.to, "yyyy-MM-dd'T'00:00:00.000") : undefined,
     })
+    if (!range?.from && !range?.to) {
+      router.refresh()
+    }
   }
 
   const goToPage = (newPage: number) => {
@@ -155,6 +158,7 @@ export function TransactionFilterProvider({
 
   const clearFilters = () => {
     router.replace(pathname)
+    router.refresh()
   }
 
   return (
