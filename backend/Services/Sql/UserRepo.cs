@@ -4,7 +4,7 @@ using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Repositories.Sql;
+namespace backend.Services.Sql;
 
 public class UserRepo(
     ApplicationDbContext _context,

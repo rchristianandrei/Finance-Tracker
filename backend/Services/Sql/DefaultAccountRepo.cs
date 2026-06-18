@@ -2,7 +2,7 @@ using backend.Data;
 using backend.Interfaces.Sql;
 using backend.Models;
 
-namespace backend.Repositories.Sql;
+namespace backend.Services.Sql;
 
 public class DefaultAccountRepo(ApplicationDbContext _context) : IDefaultAccountRepo
 {

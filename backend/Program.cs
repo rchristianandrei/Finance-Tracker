@@ -1,13 +1,7 @@
 using backend;
 using backend.Data;
 using backend.Extensions;
-using backend.Interfaces;
-using backend.Interfaces.Utils;
-using backend.Models;
-using backend.Services;
-using backend.Services.Utils;
 using backend.Settings;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 DotNetEnv.Env.Load();
@@ -22,15 +16,8 @@ builder.Services.AddSingleton(emailSettings);
 builder.Services
     .AddJwt(builder.Configuration)
     .AddMySql(builder.Configuration)
+    .AddUtils()
     .AddRateLimiting();
-
-// Identity
-builder.Services.AddScoped<IPasswordHasher<LocalCredential>, PasswordHasher<LocalCredential>>();
-
-// Services
-builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<IOtpService, OtpService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
 
 // CORS
 var policyName = builder.Services.ConfigureCors(builder.Configuration);

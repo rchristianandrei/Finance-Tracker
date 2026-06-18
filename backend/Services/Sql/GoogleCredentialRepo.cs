@@ -3,7 +3,7 @@ using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend.Repositories.Sql;
+namespace backend.Services.Sql;
 
 public class GoogleCredentialRepo(ApplicationDbContext _context) : IGoogleCredentialRepo
 {
