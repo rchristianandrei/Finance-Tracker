@@ -8,10 +8,6 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure
-var emailSettings = builder.Configuration.GetSection(nameof(EmailSettings)).Get<EmailSettings>() ?? throw new InvalidOperationException("EmailSettings section is missing or invalid");
-builder.Services.AddSingleton(emailSettings);
-
 // Extensions
 builder.Services
     .AddJwt(builder.Configuration)
