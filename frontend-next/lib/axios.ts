@@ -9,10 +9,8 @@ const api = axios.create({
 
 axiosRetry(api, {
   retries: 3,
-  retryDelay: (count) => count * 2000,
+  retryDelay: (count) => count * 1250,
   retryCondition: (error) => {
-    const url = error.config?.url ?? ""
-    if (url.includes("/auth/refresh")) return false
     return (
       axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error)
     )
@@ -26,13 +24,10 @@ api.interceptors.response.use(
 
     if (
       (error.code === "ERR_CANCELED" || error.response?.status === 401) &&
-      !original._retry
+      !original?.url?.includes("/auth/refresh")
     ) {
       try {
-        original._retry = true
-
         await api.post("/auth/refresh")
-
         return api(original)
       } catch {
         return Promise.reject(error)

@@ -22,8 +22,7 @@ public class AuthController(
     IRefreshTokenService _refreshTokenService,
     ICurrentUserService _currentUserService,
     IAuthCookiesService _authCookiesService,
-    IUserRepo _userRepo,
-    IEmailService _emailService
+    IUserRepo _userRepo
 ) : ControllerBase
 {
     [Transaction]
@@ -61,7 +60,6 @@ public class AuthController(
                     Subject = payload.Subject
                 };
                 await _googleCredRepo.Create(googleCreds);
-                _ = _emailService.SendRegisterNotification(user);
             }
             else
             {

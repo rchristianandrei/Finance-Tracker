@@ -16,8 +16,7 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class UserController(
     IUserRepo _userRepo,
-    ICurrentUserService _currentUserService,
-    IEmailService _emailService
+    ICurrentUserService _currentUserService
 ) : ControllerBase
 {
     [HttpGet]
@@ -43,13 +42,6 @@ public class UserController(
         {
             user.Status = dto.Status;
             user.IsAdmin = dto.IsAdmin;
-
-            switch (user.Status)
-            {
-                case Enums.UserStatus.ACTIVE:
-                    _ = _emailService.SendApprovalNotification(user.GoogleCredential!.Email);
-                    break;
-            }
         }
 
         await _userRepo.Update(user);
@@ -68,7 +60,6 @@ public class UserController(
         if (user.Id == currentUserId) return BadRequest("Unable to delete yourself");
 
         await _userRepo.Delete(user);
-        await _emailService.SendUserDeleteNotification(user.GoogleCredential!.Email);
 
         return NoContent();
     }
