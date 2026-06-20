@@ -7,4 +7,7 @@ export const accountApi = {
       "/account"
     )
   },
+  createAccount: (values: { name: string; isDefault: boolean }) => {
+    return api.post<Account>(`/account`, { name: values.name })
+  },
 }

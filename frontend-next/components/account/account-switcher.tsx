@@ -14,9 +14,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, PlusIcon } from "lucide-react"
+import { Check, ChevronsUpDownIcon, PlusIcon } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAccount } from "@/providers/account-provider"
+import { CreateAccountDialog } from "./create-account-dialog"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
@@ -57,7 +58,7 @@ export function AccountSwitcher() {
             </DropdownMenuLabel>
             {accounts.map((account, index) => (
               <DropdownMenuItem
-                key={account.name}
+                key={account.id}
                 onClick={() => {
                   console.log("Select Account")
                 }}
@@ -70,17 +71,12 @@ export function AccountSwitcher() {
                 </Avatar>
 
                 {account.name}
+
+                {account.id === selectedAccount?.id && <Check />}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <PlusIcon className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">
-                Add Account
-              </div>
-            </DropdownMenuItem>
+            <CreateAccountDialog />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

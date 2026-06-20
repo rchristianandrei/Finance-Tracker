@@ -1,6 +1,13 @@
 import { accountApi } from "@/api/account"
 import { Account } from "@/types/account"
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { useAuth } from "./auth-provider"
 import axios from "axios"
 
@@ -8,6 +15,7 @@ interface AccountContextType {
   accounts: Account[]
   selectedAccount: Account | null
   loading: boolean
+  createAccount: (values: { name: string; isDefault: boolean }) => Promise<void>
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -43,8 +51,19 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     })()
   }, [user])
 
+  const createAccount = useCallback(
+    async (values: { name: string; isDefault: boolean }) => {
+      const response = await accountApi.createAccount(values)
+      const createdAccount = response.data
+      setAccounts((prev) => [...prev, createdAccount])
+    },
+    []
+  )
+
   return (
-    <AccountContext.Provider value={{ accounts, selectedAccount, loading }}>
+    <AccountContext.Provider
+      value={{ accounts, selectedAccount, loading, createAccount }}
+    >
       {children}
     </AccountContext.Provider>
   )
