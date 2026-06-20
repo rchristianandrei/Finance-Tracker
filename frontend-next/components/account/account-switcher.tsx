@@ -27,10 +27,12 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import { Badge } from "@/components/ui/badge"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
-  const { accounts, selectedAccount, setSelectedAccount } = useAccount()
+  const { accounts, defaultAccount, selectedAccount, setSelectedAccount } =
+    useAccount()
   const [updateAccount, setUpdateAccount] = useState<Account | null>(null)
 
   return (
@@ -82,7 +84,18 @@ export function AccountSwitcher() {
                         </AvatarFallback>
                       </Avatar>
 
-                      {account.name}
+                      <div className="flex flex-col">
+                        <span>{account.name}</span>
+
+                        {account.id === defaultAccount?.id && (
+                          <Badge
+                            variant="default"
+                            className="mt-1 h-4 w-fit px-1 text-[10px]"
+                          >
+                            Default
+                          </Badge>
+                        )}
+                      </div>
 
                       {account.id === selectedAccount?.id && <Check />}
                     </DropdownMenuItem>
