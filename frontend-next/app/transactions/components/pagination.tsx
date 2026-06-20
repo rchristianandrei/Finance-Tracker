@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ChevronDown } from "lucide-react"
-import { useManageTransactions } from "./providers/manage-transactions-provider"
-import { useTransactionFilter } from "./providers/transaction-filter-provider"
+import { useManageTransactions } from "../providers/manage-transactions-provider"
+import { useTransactionFilter } from "../providers/transaction-filter-provider"
 
 export function Pagination() {
   const { currentPage, goToPage } = useTransactionFilter()

@@ -3,21 +3,24 @@
 import { TransactionFormValues } from "@/lib/validations/transaction"
 import { toast } from "sonner"
 import { TransactionForm } from "@/components/transaction-form"
-import { useManageTransactions } from "./providers/manage-transactions-provider"
+import { useManageTransactions } from "../providers/manage-transactions-provider"
 import { Dialog } from "@/components/ui/dialog"
+import { Transaction } from "@/types/transaction"
 
-export function UpdateTransactionDialog() {
-  const {
-    updateTransactionEvent,
-    cancelUpdateTransactionEvent,
-    confirmUpdateTransactionEvent,
-  } = useManageTransactions()
+export function UpdateTransactionDialog({
+  transaction,
+  onClose,
+}: {
+  transaction: Transaction
+  onClose: () => void
+}) {
+  const { updateTransaction } = useManageTransactions()
 
   async function onSubmit(values: TransactionFormValues) {
-    if (!updateTransactionEvent) return
+    if (!transaction) return
     try {
-      await confirmUpdateTransactionEvent({
-        ...updateTransactionEvent,
+      await updateTransaction({
+        ...transaction,
         type: values.type === "1" ? 1 : 2,
         category: values.category,
         description: values.description,
@@ -26,22 +29,18 @@ export function UpdateTransactionDialog() {
       })
 
       toast.success("Transaction updated successfully")
+      onClose()
     } catch (err) {
       toast.error("Failed to update transaction")
     }
   }
 
   return (
-    <Dialog
-      open={updateTransactionEvent != null}
-      onOpenChange={(value) => {
-        cancelUpdateTransactionEvent()
-      }}
-    >
-      {updateTransactionEvent && (
+    <Dialog open={transaction != null} onOpenChange={onClose}>
+      {transaction && (
         <TransactionForm
           title="Update Transaction"
-          transaction={updateTransactionEvent}
+          transaction={transaction}
           onSave={onSubmit}
         ></TransactionForm>
       )}

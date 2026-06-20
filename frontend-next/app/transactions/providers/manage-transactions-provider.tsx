@@ -6,8 +6,6 @@ import { Transaction } from "@/types/transaction"
 import axios from "axios"
 import {
   createContext,
-  Dispatch,
-  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -21,14 +19,8 @@ interface ManageTransactionsContextType {
   loading: boolean
   totalTransactions: number
   selectedCategories: string[]
-  updateTransactionEvent: Transaction | null
-  deleteTransactionEvent: Transaction | null
-  setUpdateTransactionEvent: Dispatch<SetStateAction<Transaction | null>>
-  cancelUpdateTransactionEvent: () => void
-  confirmUpdateTransactionEvent: (transaction: Transaction) => Promise<void>
-  setDeleteTransactionEvent: Dispatch<SetStateAction<Transaction | null>>
-  cancelDeleteTransactionEvent: () => void
-  confirmDeleteTransactionEvent: () => Promise<void>
+  updateTransaction: (transaction: Transaction) => Promise<void>
+  deleteTransaction: (transactionId: number) => Promise<void>
 }
 
 const ManageTransactionsContext = createContext<
@@ -49,12 +41,6 @@ export function ManageTransactionsProvider({
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalTransactions, setTotalTransactions] = useState(0)
   const [loading, setLoading] = useState(true)
-
-  const [deleteTransactionEvent, setDeleteTransactionEvent] =
-    useState<Transaction | null>(null)
-
-  const [updateTransactionEvent, setUpdateTransactionEvent] =
-    useState<Transaction | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -98,30 +84,21 @@ export function ManageTransactionsProvider({
     currentPage,
   ])
 
-  const confirmUpdateTransactionEvent = useCallback(
+  const updateTransaction = useCallback(
     async (transaction: Transaction) => {
-      if (!updateTransactionEvent) return
       await transactionApi.update(transaction)
-      setUpdateTransactionEvent(null)
       router.refresh()
     },
-    [updateTransactionEvent]
+    [router]
   )
 
-  const cancelUpdateTransactionEvent = useCallback(() => {
-    setUpdateTransactionEvent(null)
-  }, [])
-
-  const confirmDeleteTransactionEvent = useCallback(async () => {
-    if (!deleteTransactionEvent) return
-    await transactionApi.delete(deleteTransactionEvent.id)
-    setDeleteTransactionEvent(null)
-    router.refresh()
-  }, [deleteTransactionEvent])
-
-  const cancelDeleteTransactionEvent = useCallback(() => {
-    setDeleteTransactionEvent(null)
-  }, [])
+  const deleteTransaction = useCallback(
+    async (transactionId: number) => {
+      await transactionApi.delete(transactionId)
+      router.refresh()
+    },
+    [router]
+  )
 
   return (
     <ManageTransactionsContext.Provider
@@ -130,14 +107,8 @@ export function ManageTransactionsProvider({
         loading,
         totalTransactions,
         selectedCategories,
-        updateTransactionEvent,
-        deleteTransactionEvent,
-        setUpdateTransactionEvent,
-        setDeleteTransactionEvent,
-        cancelUpdateTransactionEvent,
-        confirmUpdateTransactionEvent,
-        cancelDeleteTransactionEvent,
-        confirmDeleteTransactionEvent,
+        updateTransaction,
+        deleteTransaction,
       }}
     >
       {children}
