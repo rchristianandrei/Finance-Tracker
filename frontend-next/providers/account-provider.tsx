@@ -23,6 +23,7 @@ interface AccountContextType {
     name: string
     isDefault: boolean
   }) => Promise<void>
+  deleteAccount: (accountId: number) => Promise<void>
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -90,6 +91,18 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     []
   )
 
+  const deleteAccount = useCallback(
+    async (accountId: number) => {
+      await accountApi.deleteAccount(accountId)
+
+      if (selectedAccountId === accountId)
+        setSelectedAccountId(defaultAccountId)
+
+      setAccounts((prev) => prev.filter((a) => a.id !== accountId))
+    },
+    [selectedAccountId, defaultAccountId]
+  )
+
   return (
     <AccountContext.Provider
       value={{
@@ -100,6 +113,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         createAccount,
         setSelectedAccount,
         updateAccount,
+        deleteAccount,
       }}
     >
       {children}

@@ -28,12 +28,23 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { Badge } from "@/components/ui/badge"
+import { DeleteAccountDialog } from "./delete-account-dialog"
+import { toast } from "sonner"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
   const { accounts, defaultAccount, selectedAccount, setSelectedAccount } =
     useAccount()
   const [updateAccount, setUpdateAccount] = useState<Account | null>(null)
+  const [deleteAccount, setDeleteAccount] = useState<Account | null>(null)
+
+  const onDeleteAccount = (account: Account) => {
+    if (defaultAccount?.id === account.id) {
+      toast.error("Cannot delete the default account")
+      return
+    }
+    setDeleteAccount(account)
+  }
 
   return (
     <>
@@ -88,10 +99,7 @@ export function AccountSwitcher() {
                         <span>{account.name}</span>
 
                         {account.id === defaultAccount?.id && (
-                          <Badge
-                            variant="default"
-                            className="mt-1 h-4 w-fit px-1 text-[10px]"
-                          >
+                          <Badge variant="default" className="h-4 text-[10px]">
                             Default
                           </Badge>
                         )}
@@ -109,7 +117,7 @@ export function AccountSwitcher() {
                     <ContextMenuItem
                       className="text-destructive"
                       onClick={() => {
-                        // delete account logic
+                        onDeleteAccount(account)
                       }}
                     >
                       Delete
@@ -129,6 +137,12 @@ export function AccountSwitcher() {
           onClose={() => {
             setUpdateAccount(null)
           }}
+        />
+      )}
+      {deleteAccount && (
+        <DeleteAccountDialog
+          account={deleteAccount}
+          onClose={() => setDeleteAccount(null)}
         />
       )}
     </>

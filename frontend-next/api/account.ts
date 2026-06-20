@@ -16,4 +16,7 @@ export const accountApi = {
       isDefault: values.isDefault,
     })
   },
+  deleteAccount: (accountId: number) => {
+    return api.delete(`/account/${accountId}`)
+  },
 }
