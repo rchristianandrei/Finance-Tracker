@@ -14,7 +14,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Check, ChevronsUpDownIcon } from "lucide-react"
+import { Check, ChevronsUpDownIcon, Edit, Trash } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useAccount } from "@/providers/account-provider"
 import { CreateAccountDialog } from "./create-account-dialog"
@@ -99,7 +99,10 @@ export function AccountSwitcher() {
                         <span>{account.name}</span>
 
                         {account.id === defaultAccount?.id && (
-                          <Badge variant="default" className="h-4 text-[10px]">
+                          <Badge
+                            variant="secondary"
+                            className="h-4 px-1 text-[10px]"
+                          >
                             Default
                           </Badge>
                         )}
@@ -111,7 +114,7 @@ export function AccountSwitcher() {
 
                   <ContextMenuContent>
                     <ContextMenuItem onClick={() => setUpdateAccount(account)}>
-                      Edit
+                      <Edit /> Edit
                     </ContextMenuItem>
 
                     <ContextMenuItem
@@ -120,7 +123,7 @@ export function AccountSwitcher() {
                         onDeleteAccount(account)
                       }}
                     >
-                      Delete
+                      <Trash /> Delete
                     </ContextMenuItem>
                   </ContextMenuContent>
                 </ContextMenu>

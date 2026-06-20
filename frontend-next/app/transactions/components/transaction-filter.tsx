@@ -31,7 +31,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useMemo, useState } from "react"
-import { useTransactionFilter } from "./providers/transaction-filter-provider"
+import { useTransactionFilter } from "../providers/transaction-filter-provider"
 
 export function TransactionFilter() {
   const {

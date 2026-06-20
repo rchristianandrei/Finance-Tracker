@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useManageTransactions } from "./providers/manage-transactions-provider"
+import { useManageTransactions } from "../providers/manage-transactions-provider"
 import { useState } from "react"
 import {
   Tooltip,
@@ -20,27 +20,26 @@ import {
 } from "@/components/ui/tooltip"
 import axios from "axios"
 import { FieldError } from "@/components/ui/field"
+import { Transaction } from "@/types/transaction"
 
-export function DeleteTransactionDialog() {
-  const {
-    deleteTransactionEvent,
-    cancelDeleteTransactionEvent,
-    confirmDeleteTransactionEvent,
-  } = useManageTransactions()
+export function DeleteTransactionDialog({
+  transaction,
+  onClose,
+}: {
+  transaction: Transaction
+  onClose: () => void
+}) {
+  const { deleteTransaction } = useManageTransactions()
 
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
-  const onCancel = () => {
-    cancelDeleteTransactionEvent()
-  }
-
   const onConfirm = async () => {
     setIsLoading(true)
     try {
-      await confirmDeleteTransactionEvent()
+      await deleteTransaction(transaction.id)
+      onClose()
     } catch (error) {
-      if (axios.isAxiosError(error)) return
       setErrorMessage("Unable to delete the transaction")
     } finally {
       setIsLoading(false)
@@ -48,8 +47,8 @@ export function DeleteTransactionDialog() {
   }
 
   return (
-    <AlertDialog open={deleteTransactionEvent !== null}>
-      {deleteTransactionEvent && (
+    <AlertDialog open={transaction !== null}>
+      {transaction && (
         <TooltipProvider>
           <AlertDialogContent className="w-[95vw] max-w-xl!">
             <AlertDialogHeader>
@@ -67,11 +66,9 @@ export function DeleteTransactionDialog() {
 
                 <Tooltip>
                   <TooltipTrigger className="max-w-50 truncate">
-                    {deleteTransactionEvent.description}
+                    {transaction.description}
                   </TooltipTrigger>
-                  <TooltipContent>
-                    {deleteTransactionEvent.description}
-                  </TooltipContent>
+                  <TooltipContent>{transaction.description}</TooltipContent>
                 </Tooltip>
               </div>
 
@@ -79,19 +76,17 @@ export function DeleteTransactionDialog() {
                 <span className="font-medium">Amount</span>
                 <span
                   className={
-                    deleteTransactionEvent.type === 2
-                      ? "text-green-600"
-                      : "text-red-600"
+                    transaction.type === 2 ? "text-green-600" : "text-red-600"
                   }
                 >
-                  ₱{deleteTransactionEvent.amount.toLocaleString()}
+                  {transaction.amount.toLocaleString()}
                 </span>
               </div>
 
               <div className="flex flex-wrap justify-between">
                 <span className="font-medium">Type</span>
                 <span className="capitalize">
-                  {deleteTransactionEvent.type === 1 ? "Expense" : "Income"}
+                  {transaction.type === 1 ? "Expense" : "Income"}
                 </span>
               </div>
 
@@ -99,17 +94,15 @@ export function DeleteTransactionDialog() {
                 <span className="font-medium">Category</span>
                 <Tooltip>
                   <TooltipTrigger className="max-w-50 truncate">
-                    {deleteTransactionEvent.category}
+                    {transaction.category}
                   </TooltipTrigger>
-                  <TooltipContent>
-                    {deleteTransactionEvent.category}
-                  </TooltipContent>
+                  <TooltipContent>{transaction.category}</TooltipContent>
                 </Tooltip>
               </div>
 
               <div className="flex flex-wrap justify-between">
                 <span className="font-medium">Date</span>
-                <span>{deleteTransactionEvent.date.toDateString()}</span>
+                <span>{transaction.date.toDateString()}</span>
               </div>
             </div>
 
@@ -118,7 +111,7 @@ export function DeleteTransactionDialog() {
             )}
 
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading} onClick={onCancel}>
+              <AlertDialogCancel disabled={isLoading} onClick={onClose}>
                 Cancel
               </AlertDialogCancel>
 
