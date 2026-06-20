@@ -39,6 +39,25 @@ public class AccountController(
         };
         await _accountRepo.Create(account);
 
+        if (dto.IsDefault)
+        {
+            var defaultAccount = await _defaultAccountRepo.GetById(userId);
+            if (defaultAccount == null)
+            {
+                defaultAccount = new DefaultAccount
+                {
+                    UserId = userId,
+                    AccountId = account.Id
+                };
+                await _defaultAccountRepo.Create(defaultAccount);
+            }
+            else
+            {
+                defaultAccount.AccountId = account.Id;
+                await _defaultAccountRepo.Update(defaultAccount);
+            }
+        }
+
         return Ok(account.ToDto());
     }
 

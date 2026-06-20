@@ -8,6 +8,6 @@ export const accountApi = {
     )
   },
   createAccount: (values: { name: string; isDefault: boolean }) => {
-    return api.post<Account>(`/account`, { name: values.name })
+    return api.post<Account>(`/account`, values)
   },
 }
