@@ -2,7 +2,7 @@ import * as React from "react"
 
 import { NavMain } from "@/components/layouts/root-layout/nav-main"
 import { NavUser } from "@/components/layouts/root-layout/nav-user"
-import { AccountSwitcher } from "@/components/layouts/root-layout/account-switcher"
+import { AccountSwitcher } from "@/components/account/account-switcher"
 import {
   Sidebar,
   SidebarContent,
