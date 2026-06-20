@@ -21,7 +21,7 @@ import { CreateAccountDialog } from "./create-account-dialog"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
-  const { accounts, selectedAccount } = useAccount()
+  const { accounts, selectedAccount, setSelectedAccount } = useAccount()
 
   return (
     <SidebarMenu>
@@ -60,7 +60,7 @@ export function AccountSwitcher() {
               <DropdownMenuItem
                 key={account.id}
                 onClick={() => {
-                  console.log("Select Account")
+                  setSelectedAccount(account.id)
                 }}
                 className="gap-2 p-2"
               >

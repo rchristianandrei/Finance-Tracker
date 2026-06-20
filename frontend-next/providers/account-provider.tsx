@@ -16,6 +16,7 @@ interface AccountContextType {
   selectedAccount: Account | null
   loading: boolean
   createAccount: (values: { name: string; isDefault: boolean }) => Promise<void>
+  setSelectedAccount: (accountId: number) => void
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -60,9 +61,19 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     []
   )
 
+  const setSelectedAccount = useCallback((accountId: number) => {
+    setSelectedAccountId(accountId)
+  }, [])
+
   return (
     <AccountContext.Provider
-      value={{ accounts, selectedAccount, loading, createAccount }}
+      value={{
+        accounts,
+        selectedAccount,
+        loading,
+        createAccount,
+        setSelectedAccount,
+      }}
     >
       {children}
     </AccountContext.Provider>
