@@ -10,7 +10,6 @@ import { AccountFormValues } from "@/lib/validations/account"
 import { DropdownMenuItem } from "../ui/dropdown-menu"
 import { useState } from "react"
 import { useAccount } from "@/providers/account-provider"
-import { accountApi } from "@/api/account"
 
 export function CreateAccountDialog() {
   const { accounts, createAccount } = useAccount()

@@ -13,10 +13,16 @@ import axios from "axios"
 
 interface AccountContextType {
   accounts: Account[]
+  defaultAccount: Account | null
   selectedAccount: Account | null
   loading: boolean
   createAccount: (values: { name: string; isDefault: boolean }) => Promise<void>
   setSelectedAccount: (accountId: number) => void
+  updateAccount: (values: {
+    id: number
+    name: string
+    isDefault: boolean
+  }) => Promise<void>
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -25,10 +31,15 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
 
   const [accounts, setAccounts] = useState<Account[]>([])
+  const [defaultAccountId, setDefaultAccountId] = useState<number | null>(null)
   const [selectedAccountId, setSelectedAccountId] = useState<number | null>(
     null
   )
   const [loading, setLoading] = useState(true)
+
+  const defaultAccount = useMemo(() => {
+    return accounts.find((account) => account.id === defaultAccountId) || null
+  }, [accounts, defaultAccountId])
 
   const selectedAccount = useMemo(() => {
     return accounts.find((account) => account.id === selectedAccountId) || null
@@ -43,6 +54,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         const data = response.data
 
         setAccounts(data.accounts)
+        setDefaultAccountId(data.defaultAccount?.id || null)
         setSelectedAccountId(data.defaultAccount?.id || null)
       } catch (err) {
         if (axios.isCancel(err)) return
@@ -56,6 +68,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     async (values: { name: string; isDefault: boolean }) => {
       const response = await accountApi.createAccount(values)
       const createdAccount = response.data
+      if (values.isDefault) setDefaultAccountId(createdAccount.id)
       setAccounts((prev) => [...prev, createdAccount])
     },
     []
@@ -65,14 +78,28 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     setSelectedAccountId(accountId)
   }, [])
 
+  const updateAccount = useCallback(
+    async (values: { id: number; name: string; isDefault: boolean }) => {
+      const response = await accountApi.updateAccount(values)
+      const updatedAccount = response.data
+      if (values.isDefault) setDefaultAccountId(updatedAccount.id)
+      setAccounts((prev) =>
+        prev.map((a) => (a.id === updatedAccount.id ? updatedAccount : a))
+      )
+    },
+    []
+  )
+
   return (
     <AccountContext.Provider
       value={{
         accounts,
+        defaultAccount,
         selectedAccount,
         loading,
         createAccount,
         setSelectedAccount,
+        updateAccount,
       }}
     >
       {children}
