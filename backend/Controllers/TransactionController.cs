@@ -51,7 +51,6 @@ public class TransactionController(
         var transaction = new Transaction
         {
             UserId = id,
-            AccountId = value.AccountId,
             CategoryId = category.Id,
             Amount = value.Amount,
             Description = value.Description,
@@ -73,7 +72,7 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
-        var account = await _accountRepo.GetById(transaction.AccountId);
+        var account = await _accountRepo.GetById(transaction.Category.AccountId);
         if (account == null) return NotFound("Account not found");
         switch (value.Type)
         {
@@ -118,7 +117,7 @@ public class TransactionController(
         var transaction = await _transactionService.GetById(id);
         if (transaction == null) return NoContent();
 
-        var account = await _accountRepo.GetById(transaction.AccountId);
+        var account = await _accountRepo.GetById(transaction.Category.AccountId);
         if (account == null) return NotFound("Account not found");
         switch (transaction.Category.Type)
         {
