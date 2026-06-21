@@ -10,6 +10,7 @@ import {
 } from "react"
 import { useAuth } from "./auth-provider"
 import axios from "axios"
+import { manageSession } from "@/lib/session-storage"
 
 interface AccountContextType {
   accounts: Account[]
@@ -17,7 +18,7 @@ interface AccountContextType {
   selectedAccount: Account | null
   loading: boolean
   createAccount: (values: { name: string; isDefault: boolean }) => Promise<void>
-  setSelectedAccount: (accountId: number) => void
+  setSelectedAccount: (accountId: number | null) => void
   updateAccount: (values: {
     id: number
     name: string
@@ -56,7 +57,10 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
         setAccounts(data.accounts)
         setDefaultAccountId(data.defaultAccount?.id || null)
-        setSelectedAccountId(data.defaultAccount?.id || null)
+        setSelectedAccount(
+          (manageSession.getSelectedAccountId() ?? data.defaultAccount?.id) ||
+            null
+        )
       } catch (err) {
         if (axios.isCancel(err)) return
       } finally {
@@ -75,9 +79,13 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     []
   )
 
-  const setSelectedAccount = useCallback((accountId: number) => {
-    setSelectedAccountId(accountId)
-  }, [])
+  const setSelectedAccount = useCallback(
+    (accountId: number | null) => {
+      setSelectedAccountId(accountId ?? defaultAccountId)
+      manageSession.setSelectedAccountId(accountId ?? defaultAccountId)
+    },
+    [defaultAccountId]
+  )
 
   const updateAccount = useCallback(
     async (values: { id: number; name: string; isDefault: boolean }) => {
