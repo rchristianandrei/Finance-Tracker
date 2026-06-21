@@ -32,7 +32,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query)
     {
-        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.AccountId == accountId);
+        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.Category.AccountId == accountId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
@@ -79,7 +79,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return await _context.Transactions
             .Include(t => t.Category)
             .Where(t =>
-                t.AccountId == accountId &&
+                t.Category.AccountId == accountId &&
                 t.CreatedAt >= thirtyDaysAgo &&
                 t.CreatedAt <= now)
             .OrderByDescending(t => t.CreatedAt)

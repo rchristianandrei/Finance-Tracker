@@ -73,10 +73,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasMany(u => u.Categories)
             .WithOne(d => d.Account)
             .HasForeignKey(l => l.AccountId);
-        modelBuilder.Entity<Account>()
-            .HasMany(u => u.Transactions)
-            .WithOne(d => d.Account)
-            .HasForeignKey(l => l.AccountId);
 
         modelBuilder.Entity<DefaultAccount>().HasKey(d => d.UserId);
 
