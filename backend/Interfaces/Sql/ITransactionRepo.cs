@@ -1,3 +1,4 @@
+using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
 using backend.Models;
 
@@ -15,7 +16,7 @@ public interface ITransactionRepo
 
     Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query);
 
-    Task<IEnumerable<Transaction>> GetLastDays(int accountId, int days);
+    Task<DashboardDto> GetDashboard(int userId);
 
     Task Delete(Transaction transaction);
 }

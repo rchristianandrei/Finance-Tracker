@@ -1,43 +1,19 @@
 "use client"
 
-import { transactionApi } from "@/api/transactions"
+import { reportsApi } from "@/api/reports"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { formatDate } from "@/lib/format-date"
-import { cn } from "@/lib/utils"
-import { useAccount } from "@/providers/account-provider"
+import { useAuth } from "@/providers/auth-provider"
 import { DashboardType } from "@/types/dashboard"
 import {
   BanknoteArrowDown,
   BanknoteArrowUp,
   CircleDollarSign,
-  Receipt,
   TrendingDown,
   TrendingUp,
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip as RechartsTooltip,
-} from "recharts"
+import { PieGraph } from "./pie-graph"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -58,19 +34,16 @@ const EXPENSE_COLORS = [
 ]
 
 export default function DashboardPage() {
-  const { selectedAccount } = useAccount()
+  const { user } = useAuth()
   const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
 
   useEffect(() => {
-    if (!selectedAccount) return
     ;(async () => {
-      const response = await transactionApi.getDashboard(selectedAccount.id)
-
-      const data = response.data
-
-      setDashboardData(data)
+      if (!user) return
+      const response = await reportsApi.getDashboard()
+      setDashboardData(response.data)
     })()
-  }, [selectedAccount])
+  }, [user])
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -84,7 +57,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-blue-600">
-              {dashboardData ? dashboardData.balance.toLocaleString() : ""}
+              {dashboardData ? dashboardData.netAmount.toLocaleString() : ""}
             </p>
           </CardContent>
         </Card>
@@ -97,7 +70,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-green-600">
-              {dashboardData ? dashboardData.income.toLocaleString() : ""}
+              {dashboardData ? dashboardData.totalIncome.toLocaleString() : ""}
             </p>
           </CardContent>
         </Card>
@@ -110,14 +83,14 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-red-600">
-              {dashboardData ? dashboardData.expenses.toLocaleString() : ""}
+              {dashboardData ? dashboardData.totalExpense.toLocaleString() : ""}
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* CHARTS */}
-      <div className="grid grid-cols-1 gap-4 md:flex-1 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* INCOME PIE */}
         <Card>
           <CardHeader className="flex items-center gap-2">
@@ -126,26 +99,10 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={dashboardData?.incomeBreakdown || []}
-                  dataKey="value"
-                  nameKey="key"
-                  outerRadius={110}
-                  label
-                >
-                  {dashboardData?.incomeBreakdown.map((_, index) => (
-                    <Cell
-                      key={index}
-                      fill={INCOME_COLORS[index % INCOME_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-
-                <RechartsTooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <PieGraph
+              transactionBreakdown={dashboardData?.incomeByAccount || []}
+              cellColors={INCOME_COLORS}
+            />
           </CardContent>
         </Card>
 
@@ -157,106 +114,13 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={dashboardData?.expensesBreakdown || []}
-                  dataKey="value"
-                  nameKey="key"
-                  outerRadius={110}
-                  label
-                >
-                  {dashboardData?.expensesBreakdown.map((_, index) => (
-                    <Cell
-                      key={index}
-                      fill={EXPENSE_COLORS[index % EXPENSE_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-
-                <RechartsTooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <PieGraph
+              transactionBreakdown={dashboardData?.expenseByAccount || []}
+              cellColors={EXPENSE_COLORS}
+            />
           </CardContent>
         </Card>
       </div>
-
-      {/* TRANSACTIONS */}
-      <Card className="flex flex-1 flex-col overflow-auto">
-        <CardHeader className="flex items-center gap-2">
-          <Receipt></Receipt>
-          <CardTitle>This Month Transactions</CardTitle>
-        </CardHeader>
-
-        <CardContent className="flex flex-1 flex-col overflow-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              <TooltipProvider>
-                {dashboardData?.transactions.map((transaction, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{formatDate(transaction.date)}</TableCell>
-
-                    <TableCell className="max-w-50 truncate">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="block cursor-help truncate">
-                            {transaction.category}
-                          </span>
-                        </TooltipTrigger>
-
-                        <TooltipContent>
-                          <p>{transaction.category}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-
-                    <TableCell className="max-w-50 truncate font-medium">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="block cursor-help truncate">
-                            {transaction.description}
-                          </span>
-                        </TooltipTrigger>
-
-                        <TooltipContent>
-                          <p>{transaction.description}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-
-                    <TableCell>
-                      <span
-                        className={cn(
-                          `rounded-full px-2 py-1 text-xs font-medium`,
-                          transaction.type === 2
-                            ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                            : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                        )}
-                      >
-                        {transaction.type === 2 ? "Income" : "Expense"}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="text-right font-semibold">
-                      {transaction.amount.toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TooltipProvider>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   )
 }

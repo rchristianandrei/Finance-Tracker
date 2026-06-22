@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
 using backend.Interfaces.Sql;
 using backend.Models;
@@ -72,19 +73,70 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return (transactions, count);
     }
 
-    public async Task<IEnumerable<Transaction>> GetLastDays(int accountId, int days)
+    public async Task<DashboardDto> GetDashboard(int userId)
     {
-        var now = DateTime.UtcNow;
-        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-days);
-        return await _context.Transactions
-            .Include(t => t.Category)
-            .Where(t =>
-                t.Category.AccountId == accountId &&
-                t.CreatedAt >= thirtyDaysAgo &&
-                t.CreatedAt <= now)
-            .OrderByDescending(t => t.CreatedAt)
-            .AsNoTracking()
+        var transactions = await _context.Transactions
+            .Where(t => t.Category.Account.OwnerId == userId)
+            .Select(t => new
+            {
+                t.Amount,
+                t.Category.Type,
+                AccountId = t.Category.Account.Id,
+                AccountName = t.Category.Account.Name
+            })
             .ToListAsync();
+
+        var totalIncome = transactions
+            .Where(x => x.Type == Enums.TransactionType.INCOME)
+            .Sum(x => x.Amount);
+
+        var totalExpense = transactions
+            .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+            .Sum(x => x.Amount);
+
+        var netAmount = totalIncome - totalExpense;
+
+        var incomeByAccount = transactions
+            .Where(x => x.Type == Enums.TransactionType.INCOME)
+            .GroupBy(x => new { x.AccountId, x.AccountName })
+            .Select(g => new AccountSummaryDto
+            {
+                AccountId = g.Key.AccountId,
+                AccountName = g.Key.AccountName,
+                Amount = g.Sum(x => x.Amount),
+                Percentage = totalIncome == 0
+                    ? 0
+                    : (g.Sum(x => x.Amount) / totalIncome) * 100
+            })
+            .OrderByDescending(x => x.Amount)
+            .ToList();
+
+        var expenseByAccount = transactions
+            .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+            .GroupBy(x => new { x.AccountId, x.AccountName })
+            .Select(g => new AccountSummaryDto
+            {
+                AccountId = g.Key.AccountId,
+                AccountName = g.Key.AccountName,
+                Amount = g.Sum(x => x.Amount),
+                Percentage = totalExpense == 0
+                    ? 0
+                    : (g.Sum(x => x.Amount) / totalExpense) * 100
+            })
+            .OrderByDescending(x => x.Amount)
+            .ToList();
+
+        var dashboard = new DashboardDto
+        {
+            TotalIncome = totalIncome,
+            TotalExpense = totalExpense,
+            NetAmount = netAmount,
+
+            IncomeByAccount = incomeByAccount,
+            ExpenseByAccount = expenseByAccount
+        };
+
+        return dashboard;
     }
 
     public async Task Delete(Transaction transaction)
