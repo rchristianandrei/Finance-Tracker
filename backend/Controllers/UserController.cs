@@ -1,6 +1,5 @@
 using backend.Dtos;
 using backend.Dtos.User;
-using backend.Interfaces;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
@@ -16,7 +15,8 @@ namespace backend.Controllers;
 [Route("api/[controller]")]
 public class UserController(
     IUserRepo _userRepo,
-    ICurrentUserService _currentUserService
+    ICurrentUserService _currentUserService,
+    ITransactionRepo _transactionsRepo
 ) : ControllerBase
 {
     [HttpGet]
@@ -24,6 +24,14 @@ public class UserController(
     {
         var (users, count) = await _userRepo.GetAll(query);
         return Ok(new { data = users.Select(u => u.ToDto()), totalCount = count });
+    }
+
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> GetDashboard()
+    {
+        var userId = _currentUserService.Id();
+        var dashboardData = await _transactionsRepo.GetDashboard(userId);
+        return Ok(dashboardData);
     }
 
     [HttpPut("{id}")]

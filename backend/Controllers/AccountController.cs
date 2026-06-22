@@ -104,51 +104,6 @@ public class AccountController(
         });
     }
 
-    [HttpGet("{accountId}/dashboard")]
-    public async Task<IActionResult> Dashboard(int accountId)
-    {
-        var expensesBreakdown = new Dictionary<string, double>();
-        var incomeBreakdown = new Dictionary<string, double>();
-        var expenses = 0.00;
-        var income = 0.00;
-
-        var transactions = await _transactionService.GetLastDays(accountId, 30);
-
-        foreach (var transaction in transactions)
-        {
-            if (transaction.Category.Type == TransactionType.INCOME)
-            {
-                income += transaction.Amount;
-
-                if (!incomeBreakdown.ContainsKey(transaction.Category.Name))
-                    incomeBreakdown.Add(transaction.Category.Name, 0);
-
-                incomeBreakdown[transaction.Category.Name] += transaction.Amount;
-            }
-            else if (transaction.Category.Type == TransactionType.EXPENSE)
-            {
-                expenses += transaction.Amount;
-
-                if (!expensesBreakdown.ContainsKey(transaction.Category.Name))
-                    expensesBreakdown.Add(transaction.Category.Name, 0);
-
-                expensesBreakdown[transaction.Category.Name] += transaction.Amount;
-            }
-        }
-
-        var transactionDtos = transactions.Select(t => t.ToDto());
-
-        return Ok(new
-        {
-            Balance = income - expenses,
-            Income = income,
-            Expenses = expenses,
-            ExpensesBreakdown = expensesBreakdown.ToArray(),
-            IncomeBreakdown = incomeBreakdown.ToArray(),
-            Transactions = transactionDtos
-        });
-    }
-
     [Transaction]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAccount(int id, [FromBody] UpdateAccountDto dto)

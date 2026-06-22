@@ -1,16 +1,14 @@
-import { TransactionType } from "./category"
+export type AccountSummary = {
+  accountId: number
+  accountName: string
+  amount: number
+  percentage: number
+}
 
 export type DashboardType = {
-  balance: number
-  income: number
-  expenses: number
-  expensesBreakdown: { key: string; value: number }[]
-  incomeBreakdown: { key: string; value: number }[]
-  transactions: {
-    date: Date
-    category: string
-    description: string
-    amount: number
-    type: TransactionType
-  }[]
+  totalIncome: number
+  totalExpense: number
+  netAmount: number
+  incomeByAccount: AccountSummary[]
+  expenseByAccount: AccountSummary[]
 }
