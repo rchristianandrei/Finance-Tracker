@@ -39,6 +39,7 @@ import { useEffect, useState } from "react"
 import { Spinner } from "./ui/spinner"
 import { useCategory } from "@/providers/category-provider"
 import { Transaction } from "@/types/transaction"
+import { ShowSelectedAccount } from "./show-selected-account"
 
 export function TransactionForm({
   title,
@@ -92,7 +93,7 @@ export function TransactionForm({
           Enter the transaction details below and click save.
         </DialogDescription>
       </DialogHeader>
-
+      <ShowSelectedAccount />
       <fieldset disabled={isSubmitting}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Controller

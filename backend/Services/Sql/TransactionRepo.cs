@@ -126,6 +126,23 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             .OrderByDescending(x => x.Amount)
             .ToList();
 
+        var accountBalances = transactions
+            .GroupBy(x => new { x.AccountId, x.AccountName })
+            .Select(g => new AccountBalanceDto
+            {
+                AccountId = g.Key.AccountId,
+                AccountName = g.Key.AccountName,
+
+                TotalIncome = g
+                    .Where(x => x.Type == Enums.TransactionType.INCOME)
+                    .Sum(x => x.Amount),
+
+                TotalExpense = g
+                    .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+                    .Sum(x => x.Amount)
+            })
+            .ToList();
+
         var dashboard = new DashboardDto
         {
             TotalIncome = totalIncome,
@@ -133,7 +150,9 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             NetAmount = netAmount,
 
             IncomeByAccount = incomeByAccount,
-            ExpenseByAccount = expenseByAccount
+            ExpenseByAccount = expenseByAccount,
+
+            Accounts = accountBalances
         };
 
         return dashboard;
