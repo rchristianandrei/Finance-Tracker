@@ -19,6 +19,7 @@ import { useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { Category } from "@/types/category"
 import { CategoryFormValues, categorySchema } from "@/lib/validations/category"
+import { ShowSelectedAccount } from "@/components/show-selected-account"
 
 export function CategoryForm({
   title,
@@ -62,7 +63,7 @@ export function CategoryForm({
           Enter the category details below and click save.
         </DialogDescription>
       </DialogHeader>
-
+      <ShowSelectedAccount />
       <fieldset disabled={isSubmitting}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Controller
