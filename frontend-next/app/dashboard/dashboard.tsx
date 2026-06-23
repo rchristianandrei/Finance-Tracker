@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react"
 
 import { PieGraph } from "./pie-graph"
+import { Accounts } from "./accounts"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -46,7 +47,7 @@ export default function DashboardPage() {
   }, [user])
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {/* SUMMARY CARDS */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>
@@ -121,6 +122,9 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Accounts */}
+      {dashboardData && <Accounts accountSummaries={dashboardData.accounts} />}
     </div>
   )
 }

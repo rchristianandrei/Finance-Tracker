@@ -8,4 +8,6 @@ public class DashboardDto
 
     public List<AccountSummaryDto> IncomeByAccount { get; set; } = [];
     public List<AccountSummaryDto> ExpenseByAccount { get; set; } = [];
+
+    public List<AccountBalanceDto> Accounts { get; set; } = [];
 }
