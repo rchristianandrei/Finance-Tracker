@@ -59,7 +59,8 @@ public class TransactionController(
 
         await _transactionService.Create(transaction);
 
-        return Ok();
+        transaction.Category = category;
+        return Ok(transaction.ToDto());
     }
 
     [Transaction]

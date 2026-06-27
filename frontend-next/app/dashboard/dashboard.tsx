@@ -15,6 +15,7 @@ import { useEffect, useState } from "react"
 
 import { PieGraph } from "./pie-graph"
 import { Accounts } from "./accounts"
+import { useAddTransaction } from "@/providers/add-transaction-provider"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -36,6 +37,7 @@ const EXPENSE_COLORS = [
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { transactionAdded } = useAddTransaction()
   const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function DashboardPage() {
       const response = await reportsApi.getDashboard()
       setDashboardData(response.data)
     })()
-  }, [user])
+  }, [user, transactionAdded])
 
   return (
     <div className="flex flex-col gap-4">

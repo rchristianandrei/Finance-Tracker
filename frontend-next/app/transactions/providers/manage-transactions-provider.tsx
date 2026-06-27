@@ -3,7 +3,6 @@
 import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/account-provider"
 import { Transaction } from "@/types/transaction"
-import axios from "axios"
 import {
   createContext,
   useCallback,
@@ -12,7 +11,8 @@ import {
   useState,
 } from "react"
 import { useTransactionFilter } from "./transaction-filter-provider"
-import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useAddTransaction } from "@/providers/add-transaction-provider"
 
 interface ManageTransactionsContextType {
   transactions: Transaction[]
@@ -32,8 +32,8 @@ export function ManageTransactionsProvider({
 }: {
   children: React.ReactNode
 }) {
-  const router = useRouter()
   const { selectedAccount } = useAccount()
+  const { transactionAdded } = useAddTransaction()
 
   const { dateRange, type, selectedCategories, currentPage, search } =
     useTransactionFilter()
@@ -45,8 +45,25 @@ export function ManageTransactionsProvider({
   useEffect(() => {
     const controller = new AbortController()
 
-    ;(async () => {
+    getTransactions(controller)
+
+    return () => {
+      controller.abort()
+    }
+  }, [
+    transactionAdded,
+    selectedAccount,
+    search,
+    type,
+    selectedCategories,
+    dateRange,
+    currentPage,
+  ])
+
+  const getTransactions = useCallback(
+    async (controller?: AbortController) => {
       if (!selectedAccount) return
+      setLoading(true)
 
       let filter = {
         search: search ?? undefined,
@@ -56,48 +73,40 @@ export function ManageTransactionsProvider({
         endDate: dateRange?.to ?? undefined,
         page: currentPage,
       }
+
       try {
         const transactionsData = await transactionApi.readTransactions(
           selectedAccount.id,
           filter,
-          controller.signal
+          controller?.signal
         )
 
         setTransactions(transactionsData.data)
         setTotalTransactions(transactionsData.totalCount)
-      } catch (err) {
-        if (axios.isCancel(err)) return
+      } catch (error) {
+        toast.error("Unable to fetch transactions")
       } finally {
         setLoading(false)
       }
-    })()
-
-    return () => {
-      controller.abort()
-    }
-  }, [
-    selectedAccount,
-    search,
-    type,
-    selectedCategories,
-    dateRange,
-    currentPage,
-  ])
+    },
+    [selectedAccount, search, type, selectedCategories, dateRange, currentPage]
+  )
 
   const updateTransaction = useCallback(
     async (transaction: Transaction) => {
       await transactionApi.update(transaction)
-      router.refresh()
+      console.log("called")
+      getTransactions()
     },
-    [router]
+    [getTransactions]
   )
 
   const deleteTransaction = useCallback(
     async (transactionId: number) => {
       await transactionApi.delete(transactionId)
-      router.refresh()
+      getTransactions()
     },
-    [router]
+    [getTransactions]
   )
 
   return (
