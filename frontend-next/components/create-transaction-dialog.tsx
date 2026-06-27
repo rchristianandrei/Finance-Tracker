@@ -12,24 +12,31 @@ import { transactionApi } from "@/api/transactions"
 import { useAccount } from "@/providers/account-provider"
 import { toast } from "sonner"
 import { TransactionForm } from "./transaction-form"
+import { useAddTransaction } from "@/providers/add-transaction-provider"
 
 export function CreateTransactionDialog() {
   const { selectedAccount } = useAccount()
+  const { addTransaction } = useAddTransaction()
 
   async function onSubmit(values: TransactionFormValues) {
     if (!selectedAccount) return
     try {
-      await transactionApi.createTransaction(selectedAccount.id, {
-        type: Number(values.type) as TransactionType,
-        category: values.category,
-        description: values.description,
-        amount: values.amount!,
-        date: new Date(values.date),
-      })
+      const response = await transactionApi.createTransaction(
+        selectedAccount.id,
+        {
+          type: Number(values.type) as TransactionType,
+          category: values.category,
+          description: values.description,
+          amount: values.amount!,
+          date: new Date(values.date),
+        }
+      )
 
       toast.success("Transaction created successfully")
+      addTransaction(response.data)
     } catch (err) {
       toast.error("Failed to create transaction")
+      throw err
     }
   }
 

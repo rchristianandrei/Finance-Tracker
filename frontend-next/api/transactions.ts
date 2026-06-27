@@ -19,7 +19,7 @@ export const transactionApi = {
       type: expense.type,
       accountId: accountId,
     }
-    return await api.post(`/transaction`, body)
+    return await api.post<Transaction>(`/transaction`, body)
   },
   readTransactions: async (
     accountId: number,

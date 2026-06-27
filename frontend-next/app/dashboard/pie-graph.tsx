@@ -17,8 +17,8 @@ export function PieGraph({
           nameKey="accountName"
           outerRadius={110}
           label={(props) => {
-            const { accountName, amount } = props.payload
-            return `${amount} (${accountName[0]})`
+            const { percentage } = props.payload
+            return `${percentage.toFixed(2)}%`
           }}
           labelLine={false}
         >
