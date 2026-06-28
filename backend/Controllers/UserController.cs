@@ -27,10 +27,10 @@ public class UserController(
     }
 
     [HttpGet("dashboard")]
-    public async Task<IActionResult> GetDashboard()
+    public async Task<IActionResult> GetDashboard([FromQuery] DashboardQueryParams query)
     {
         var userId = _currentUserService.Id();
-        var dashboardData = await _transactionsRepo.GetDashboard(userId);
+        var dashboardData = await _transactionsRepo.GetDashboard(userId, query);
         return Ok(dashboardData);
     }
 

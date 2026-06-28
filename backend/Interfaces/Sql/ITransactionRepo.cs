@@ -1,3 +1,4 @@
+using backend.Dtos;
 using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
 using backend.Models;
@@ -16,7 +17,7 @@ public interface ITransactionRepo
 
     Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int accountId, TransactionQueryParameters query);
 
-    Task<DashboardDto> GetDashboard(int userId);
+    Task<DashboardDto> GetDashboard(int userId, DashboardQueryParams? query = null);
 
     Task Delete(Transaction transaction);
 }
