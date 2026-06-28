@@ -16,6 +16,7 @@ import { useEffect, useState } from "react"
 import { PieGraph } from "./pie-graph"
 import { Accounts } from "./accounts"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
+import { MonthPicker } from "./month-picker"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -38,18 +39,30 @@ const EXPENSE_COLORS = [
 export default function DashboardPage() {
   const { user } = useAuth()
   const { transactionAdded } = useAddTransaction()
+  const [month, setMonth] = useState<Date>(new Date())
   const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
 
   useEffect(() => {
     ;(async () => {
       if (!user) return
-      const response = await reportsApi.getDashboard()
+      const startDate = new Date(month.getFullYear(), month.getMonth(), 1)
+      const endDate = new Date(
+        month.getFullYear(),
+        month.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      )
+      const response = await reportsApi.getDashboard(startDate, endDate)
       setDashboardData(response.data)
     })()
-  }, [user, transactionAdded])
+  }, [user, transactionAdded, month])
 
   return (
     <div className="flex flex-col gap-4">
+      <MonthPicker month={month} setMonth={setMonth} />
       {/* SUMMARY CARDS */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>

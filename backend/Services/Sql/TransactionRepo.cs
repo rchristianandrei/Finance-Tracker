@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Dtos;
 using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
 using backend.Interfaces.Sql;
@@ -73,10 +74,21 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return (transactions, count);
     }
 
-    public async Task<DashboardDto> GetDashboard(int userId)
+    public async Task<DashboardDto> GetDashboard(int userId, DashboardQueryParams? query = null)
     {
-        var transactions = await _context.Transactions
-            .Where(t => t.Category.Account.OwnerId == userId)
+        var queryable = _context.Transactions.Where(t => t.Category.Account.OwnerId == userId);
+
+        if (query?.StartDate is DateTimeOffset startDate)
+        {
+            queryable = queryable.Where(t => t.Date >= startDate);
+        }
+
+        if (query?.EndDate is DateTimeOffset endDate)
+        {
+            queryable = queryable.Where(t => t.Date <= endDate);
+        }
+
+        var transactions = await queryable
             .Select(t => new
             {
                 t.Amount,

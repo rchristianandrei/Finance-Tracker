@@ -2,7 +2,12 @@ import api from "@/lib/axios"
 import { DashboardType } from "@/types/dashboard"
 
 export const reportsApi = {
-  getDashboard: () => {
-    return api.get<DashboardType>("/user/dashboard")
+  getDashboard: (startDate?: Date, endDate?: Date) => {
+    return api.get<DashboardType>("/user/dashboard", {
+      params: {
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+      },
+    })
   },
 }
