@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { PieGraph } from "./pie-graph"
+import { HorizontalBarGraph } from "./horizontal-bar-chart"
 import { Accounts } from "./accounts"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
@@ -115,7 +115,7 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <PieGraph
+            <HorizontalBarGraph
               transactionBreakdown={dashboardData?.incomeByAccount || []}
               cellColors={INCOME_COLORS}
             />
@@ -130,7 +130,7 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <PieGraph
+            <HorizontalBarGraph
               transactionBreakdown={dashboardData?.expenseByAccount || []}
               cellColors={EXPENSE_COLORS}
             />
