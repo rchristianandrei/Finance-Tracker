@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "recharts"
 
-export function PieGraph({
+export function HorizontalBarGraph({
   transactionBreakdown,
   cellColors,
 }: {
@@ -21,11 +21,11 @@ export function PieGraph({
     <ResponsiveContainer width="100%" height={300}>
       <BarChart
         data={transactionBreakdown}
-        layout="vertical"
+        layout="horizontal"
         margin={{ top: 8, right: 16, left: 16, bottom: 8 }}
       >
-        <XAxis type="number" />
-        <YAxis type="category" dataKey="accountName" width={100} />
+        <YAxis type="number" />
+        <XAxis type="category" dataKey="accountName" width={100} />
         <Tooltip
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null
