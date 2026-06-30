@@ -1,5 +1,14 @@
+import { Account } from "@/types/account"
 import { AccountSummary } from "@/types/dashboard"
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts"
+import {
+  ResponsiveContainer,
+  Bar,
+  Cell,
+  BarChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts"
 
 export function PieGraph({
   transactionBreakdown,
@@ -10,24 +19,36 @@ export function PieGraph({
 }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie
-          data={transactionBreakdown}
-          dataKey="amount"
-          nameKey="accountName"
-          outerRadius={110}
-          label={(props) => {
-            const { percentage } = props.payload
-            return `${percentage.toFixed(2)}%`
+      <BarChart
+        data={transactionBreakdown}
+        layout="vertical"
+        margin={{ top: 8, right: 16, left: 16, bottom: 8 }}
+      >
+        <XAxis type="number" />
+        <YAxis type="category" dataKey="accountName" width={100} />
+        <Tooltip
+          content={({ active, payload }) => {
+            if (!active || !payload?.length) return null
+
+            const item: AccountSummary = payload[0].payload
+
+            return (
+              <div className="rounded-lg border bg-background p-3 shadow">
+                <p className="font-medium">{item.accountName}</p>
+                <p>
+                  {item.amount.toLocaleString()} ({item.percentage.toFixed(2)}%)
+                </p>
+              </div>
+            )
           }}
-          labelLine={false}
-        >
+        />
+
+        <Bar dataKey="amount">
           {transactionBreakdown.map((_, index) => (
             <Cell key={index} fill={cellColors[index % cellColors.length]} />
           ))}
-          <Tooltip />
-        </Pie>
-      </PieChart>
+        </Bar>
+      </BarChart>
     </ResponsiveContainer>
   )
 }
