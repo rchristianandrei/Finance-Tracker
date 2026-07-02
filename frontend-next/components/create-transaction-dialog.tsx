@@ -13,10 +13,12 @@ import { useAccount } from "@/providers/account-provider"
 import { toast } from "sonner"
 import { TransactionForm } from "./transaction-form"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
+import { useState } from "react"
 
 export function CreateTransactionDialog() {
   const { selectedAccount } = useAccount()
   const { addTransaction } = useAddTransaction()
+  const [isOpen, setIsOpen] = useState(false)
 
   async function onSubmit(values: TransactionFormValues) {
     if (!selectedAccount) return
@@ -34,6 +36,7 @@ export function CreateTransactionDialog() {
 
       toast.success("Transaction created successfully")
       addTransaction(response.data)
+      setIsOpen(false)
     } catch (err) {
       toast.error("Failed to create transaction")
       throw err
@@ -41,7 +44,7 @@ export function CreateTransactionDialog() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="default">
           <Plus></Plus>{" "}
