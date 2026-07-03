@@ -106,6 +106,7 @@ export function CategoryForm({
                   {...field}
                   id={field.name}
                   aria-invalid={fieldState.invalid}
+                  autoComplete="off"
                 />
 
                 {fieldState.invalid && (

@@ -2,26 +2,25 @@
 
 import axios from "axios"
 import { toast } from "sonner"
-import { Plus } from "lucide-react"
 
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { Dialog } from "@/components/ui/dialog"
 import { useAccount } from "@/providers/account-provider"
 import { CategoryFormValues } from "@/lib/validations/category"
 
-import { CategoryForm } from "./category-form"
 import { useState } from "react"
-import { useManageCategories } from "../providers/manage-category-provider"
+import { useCategory } from "@/providers/category-provider"
+import { CategoryForm } from "./category-form"
 
-export function CreateCategoryDialog() {
+export function CreateCategoryDialog({ onClose }: { onClose: () => void }) {
   const { selectedAccount } = useAccount()
-  const { createCategory } = useManageCategories()
+  const { createCategory } = useCategory()
 
   const [errorMessage, setErrorMessage] = useState("")
 
   function onOpenDialogChange(open: boolean) {
     if (open) return
     setErrorMessage("")
+    onClose()
   }
 
   async function onSubmit(values: CategoryFormValues) {
@@ -31,25 +30,18 @@ export function CreateCategoryDialog() {
       await createCategory(values.type === "1" ? 1 : 2, values.name)
       toast.success("Category created successfully")
       setErrorMessage("")
+      onClose()
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const message = err.response?.data ?? err.message
         setErrorMessage(message)
       }
-
       throw err
     }
   }
 
   return (
-    <Dialog onOpenChange={onOpenDialogChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Plus />
-          Add Category
-        </Button>
-      </DialogTrigger>
-
+    <Dialog open={true} onOpenChange={onOpenDialogChange}>
       <CategoryForm
         title="Create Category"
         errorMessage={errorMessage}

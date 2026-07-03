@@ -6,6 +6,8 @@ import { TransactionForm } from "@/components/transaction-form"
 import { useManageTransactions } from "../providers/manage-transactions-provider"
 import { Dialog } from "@/components/ui/dialog"
 import { Transaction } from "@/types/transaction"
+import { useState } from "react"
+import { CreateCategoryDialog } from "@/components/category/create-category-dialog"
 
 export function UpdateTransactionDialog({
   transaction,
@@ -15,6 +17,9 @@ export function UpdateTransactionDialog({
   onClose: () => void
 }) {
   const { updateTransaction } = useManageTransactions()
+  const [isOpen, setIsOpen] = useState(true)
+  const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] =
+    useState(false)
 
   async function onSubmit(values: TransactionFormValues) {
     if (!transaction) return
@@ -36,14 +41,34 @@ export function UpdateTransactionDialog({
   }
 
   return (
-    <Dialog open={transaction != null} onOpenChange={onClose}>
-      {transaction && (
-        <TransactionForm
-          title="Update Transaction"
-          transaction={transaction}
-          onSave={onSubmit}
-        ></TransactionForm>
+    <>
+      <Dialog
+        open={isOpen && transaction != null}
+        onOpenChange={(value) => {
+          setIsOpen(value)
+          onClose()
+        }}
+      >
+        {transaction && (
+          <TransactionForm
+            title="Update Transaction"
+            transaction={transaction}
+            onSave={onSubmit}
+            onAddCategoryClick={() => {
+              setIsOpen(false)
+              setIsCreateCategoryDialogOpen(true)
+            }}
+          ></TransactionForm>
+        )}
+      </Dialog>
+      {isCreateCategoryDialogOpen && (
+        <CreateCategoryDialog
+          onClose={() => {
+            setIsCreateCategoryDialogOpen(false)
+            setIsOpen(true)
+          }}
+        />
       )}
-    </Dialog>
+    </>
   )
 }

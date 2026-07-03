@@ -20,14 +20,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-
 import { Calendar } from "@/components/ui/calendar"
 
 import { Controller, useForm } from "react-hook-form"
@@ -40,19 +32,27 @@ import { Spinner } from "./ui/spinner"
 import { useCategory } from "@/providers/category-provider"
 import { Transaction } from "@/types/transaction"
 import { ShowSelectedAccount } from "./show-selected-account"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
+import { Plus } from "lucide-react"
 
 export function TransactionForm({
   title,
   transaction,
   onSave,
+  onAddCategoryClick,
 }: {
   title: string
   transaction?: Transaction
   onSave: (values: TransactionFormValues) => Promise<void>
+  onAddCategoryClick?: () => void
 }) {
   const { categories } = useCategory()
-
-  const [categoryOpen, setCategoryOpen] = useState(false)
   const [dateOpen, setDateOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -130,65 +130,40 @@ export function TransactionForm({
             name="category"
             control={form.control}
             render={({ field, fieldState }) => {
-              const value = field.value ?? ""
-
-              const filtered = categories
-                .filter(
-                  (c) =>
-                    c.type.toString() === selectedType &&
-                    c.name.toLowerCase().includes(value.toLowerCase())
-                )
-                .map((c) => c.name)
+              const filtered = categories.filter(
+                (c) => c.type.toString() === selectedType
+              )
 
               return (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Category</FieldLabel>
 
-                  <div className="relative">
-                    <Input
-                      {...field}
-                      value={value}
-                      autoComplete="off"
-                      onChange={(e) => {
-                        field.onChange(e.target.value)
-                        setCategoryOpen(true)
+                  <div className="grid grid-cols-[1fr_auto] gap-1">
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
                       }}
-                      onFocus={() => setCategoryOpen(true)}
-                      onBlur={() => {
-                        // small delay so clicks still work
-                        setTimeout(() => setCategoryOpen(false), 100)
-                      }}
-                      placeholder="Type or select a category"
-                    />
+                    >
+                      <SelectTrigger className="w-full min-w-0">
+                        <SelectValue placeholder="--Select category--" />
+                      </SelectTrigger>
 
-                    {categoryOpen && (
-                      <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
-                        <Command shouldFilter={false}>
-                          <CommandList>
-                            <CommandEmpty>No results</CommandEmpty>
-
-                            <CommandGroup>
-                              {filtered.map((category) => (
-                                <CommandItem
-                                  key={category}
-                                  value={category}
-                                  onMouseDown={(e) => {
-                                    // prevents blur before click
-                                    e.preventDefault()
-                                  }}
-                                  onSelect={() => {
-                                    field.onChange(category)
-                                    setCategoryOpen(false)
-                                  }}
-                                >
-                                  {category}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </div>
-                    )}
+                      <SelectContent>
+                        {filtered.map((m) => (
+                          <SelectItem key={m.id} value={m.name}>
+                            {m.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      type="button"
+                      onClick={onAddCategoryClick}
+                    >
+                      <Plus />
+                    </Button>
                   </div>
 
                   {fieldState.invalid && (
