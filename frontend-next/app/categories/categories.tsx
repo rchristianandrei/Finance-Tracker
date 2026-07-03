@@ -6,11 +6,14 @@ import { useCategory } from "@/providers/category-provider"
 import { BanknoteArrowDown, BanknoteArrowUp, Plus } from "lucide-react"
 import { useMemo, useState } from "react"
 import { CategoryTable } from "./components/category-table"
-import { CreateCategoryDialog } from "./components/create-category-dialog"
+import { CreateCategoryDialog } from "@/components/category/create-category-dialog"
+import { Button } from "@/components/ui/button"
 
 export function Categories() {
   const { categories } = useCategory()
   const [search, setSearch] = useState("")
+  const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] =
+    useState(false)
 
   const filteredCategories = useMemo(
     () =>
@@ -32,7 +35,19 @@ export function Categories() {
               setSearch(e.target.value)
             }}
           />
-          <CreateCategoryDialog />
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => setIsCreateCategoryDialogOpen(true)}
+          >
+            <Plus />
+            Add Category
+          </Button>
+          {isCreateCategoryDialogOpen && (
+            <CreateCategoryDialog
+              onClose={() => setIsCreateCategoryDialogOpen(false)}
+            />
+          )}
         </CardContent>
       </Card>
       <div className="flex flex-1 flex-col gap-4 overflow-auto md:flex-row">
