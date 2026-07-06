@@ -86,7 +86,12 @@ export function TransactionForm({
   }
 
   return (
-    <DialogContent className="sm:max-w-125">
+    <DialogContent
+      className="sm:max-w-125"
+      onCloseAutoFocus={(e) => {
+        e.preventDefault()
+      }}
+    >
       <DialogHeader>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>
