@@ -28,11 +28,13 @@ var app = builder.Build();
 
 app.MapHealthChecks("/health");
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
 }
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
