@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711132347_RemoveDefaultAccount")]
+    partial class RemoveDefaultAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,6 +25,37 @@ namespace backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("backend.Models.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Balance")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Accounts");
+                });
+
             modelBuilder.Entity("backend.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -29,6 +63,9 @@ namespace backend.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -44,12 +81,9 @@ namespace backend.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AccountId");
 
                     b.ToTable("Categories");
                 });
@@ -123,6 +157,9 @@ namespace backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("integer");
+
                     b.Property<double>("Amount")
                         .HasColumnType("double precision");
 
@@ -147,6 +184,8 @@ namespace backend.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("CategoryId");
 
@@ -190,15 +229,26 @@ namespace backend.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("backend.Models.Category", b =>
+            modelBuilder.Entity("backend.Models.Account", b =>
                 {
-                    b.HasOne("backend.Models.User", "User")
-                        .WithMany("Categories")
-                        .HasForeignKey("UserId")
+                    b.HasOne("backend.Models.User", "Owner")
+                        .WithMany("Accounts")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("backend.Models.Category", b =>
+                {
+                    b.HasOne("backend.Models.Account", "Account")
+                        .WithMany("Categories")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("backend.Models.GoogleCredential", b =>
@@ -225,6 +275,10 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Transaction", b =>
                 {
+                    b.HasOne("backend.Models.Account", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("AccountId");
+
                     b.HasOne("backend.Models.Category", "Category")
                         .WithMany("Transactions")
                         .HasForeignKey("CategoryId")
@@ -242,6 +296,13 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("backend.Models.Account", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("Transactions");
+                });
+
             modelBuilder.Entity("backend.Models.Category", b =>
                 {
                     b.Navigation("Transactions");
@@ -249,7 +310,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.User", b =>
                 {
-                    b.Navigation("Categories");
+                    b.Navigation("Accounts");
 
                     b.Navigation("GoogleCredential");
 

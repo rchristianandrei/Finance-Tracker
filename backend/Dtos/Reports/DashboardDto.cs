@@ -6,8 +6,6 @@ public class DashboardDto
     public double TotalExpense { get; set; }
     public double NetAmount { get; set; }
 
-    public List<AccountSummaryDto> IncomeByAccount { get; set; } = [];
-    public List<AccountSummaryDto> ExpenseByAccount { get; set; } = [];
-
-    public List<AccountBalanceDto> Accounts { get; set; } = [];
+    public List<CategoryAmountDto> IncomeByCategory { get; set; } = [];
+    public List<CategoryAmountDto> ExpenseByCategory { get; set; } = [];
 }

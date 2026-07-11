@@ -1,6 +1,6 @@
 using backend.Attributes;
+using backend.Dtos;
 using backend.Dtos.Transaction;
-using backend.Enums;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
@@ -8,7 +8,6 @@ using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.OpenApi.Reader;
 using Sprache;
 
 namespace backend.Controllers;
@@ -20,7 +19,6 @@ namespace backend.Controllers;
 public class TransactionController(
     ITransactionRepo _transactionService,
     ICurrentUserService _currentUserService,
-    IAccountRepo _accountRepo,
     ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
@@ -30,18 +28,12 @@ public class TransactionController(
     {
         var id = _currentUserService.Id();
 
-        var account = await _accountRepo.GetById(value.AccountId);
-        if (account == null) return NotFound("Account not found");
-
-        account.Balance += value.Type == TransactionType.INCOME ? value.Amount : -value.Amount;
-        await _accountRepo.Update(account);
-
-        var category = await _categoryRepo.IfExists(value.Type, value.Category, account.Id);
+        var category = await _categoryRepo.IfExists(id, value.Type, value.Category);
         if (category == null)
         {
             category = new Category
             {
-                AccountId = account.Id,
+                UserId = id,
                 Type = value.Type,
                 Name = value.Category,
             };
@@ -63,6 +55,27 @@ public class TransactionController(
         return Ok(transaction.ToDto());
     }
 
+    [HttpGet()]
+    public async Task<IActionResult> GetAll([FromQuery] TransactionQueryParameters query)
+    {
+        var userId = _currentUserService.Id();
+        var (transactions, count) = await _transactionService.GetAll(userId, query);
+        var dto = transactions.Select(t => t.ToDto());
+        return Ok(new
+        {
+            totalCount = count,
+            data = dto
+        });
+    }
+
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> GetDashboard([FromQuery] DashboardQueryParams query)
+    {
+        var userId = _currentUserService.Id();
+        var dashboardData = await _transactionService.GetDashboard(userId, query);
+        return Ok(dashboardData);
+    }
+
     [Transaction]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateTransactionDto value)
@@ -73,25 +86,12 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
-        var account = await _accountRepo.GetById(transaction.Category.AccountId);
-        if (account == null) return NotFound("Account not found");
-        switch (value.Type)
-        {
-            case TransactionType.INCOME:
-                account.Balance += value.Amount - transaction.Amount;
-                break;
-            case TransactionType.EXPENSE:
-                account.Balance -= value.Amount - transaction.Amount;
-                break;
-        }
-        await _accountRepo.Update(account);
-
-        var category = await _categoryRepo.IfExists(value.Type, value.Category, account.Id);
+        var category = await _categoryRepo.IfExists(userId, value.Type, value.Category);
         if (category == null)
         {
             category = new Category
             {
-                AccountId = account.Id,
+                UserId = userId,
                 Type = value.Type,
                 Name = value.Category,
             };
@@ -117,19 +117,6 @@ public class TransactionController(
 
         var transaction = await _transactionService.GetById(id);
         if (transaction == null) return NoContent();
-
-        var account = await _accountRepo.GetById(transaction.Category.AccountId);
-        if (account == null) return NotFound("Account not found");
-        switch (transaction.Category.Type)
-        {
-            case TransactionType.INCOME:
-                account.Balance -= transaction.Amount;
-                break;
-            case TransactionType.EXPENSE:
-                account.Balance += transaction.Amount;
-                break;
-        }
-        await _accountRepo.Update(account);
 
         if (transaction.UserId != userId) return Forbid();
         await _transactionService.Delete(transaction);

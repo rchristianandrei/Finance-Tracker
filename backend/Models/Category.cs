@@ -8,8 +8,8 @@ public class Category
 {
     public int Id { get; set; }
 
-    public int AccountId { get; set; }
-    public Account Account { get; set; } = null!;
+    public int UserId { get; set; }
+    public User User { get; set; } = null!;
 
     public TransactionType Type { get; set; } = TransactionType.EXPENSE;
 
