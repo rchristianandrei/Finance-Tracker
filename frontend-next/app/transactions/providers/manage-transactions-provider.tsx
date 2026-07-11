@@ -1,7 +1,6 @@
 "use client"
 
 import { transactionApi } from "@/api/transactions"
-import { useAccount } from "@/providers/account-provider"
 import { Transaction } from "@/types/transaction"
 import {
   createContext,
@@ -13,6 +12,7 @@ import {
 import { useTransactionFilter } from "./transaction-filter-provider"
 import { toast } from "sonner"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
+import axios from "axios"
 
 interface ManageTransactionsContextType {
   transactions: Transaction[]
@@ -32,7 +32,6 @@ export function ManageTransactionsProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { selectedAccount } = useAccount()
   const { transactionAdded } = useAddTransaction()
 
   const { dateRange, type, selectedCategories, currentPage, search } =
@@ -52,7 +51,6 @@ export function ManageTransactionsProvider({
     }
   }, [
     transactionAdded,
-    selectedAccount,
     search,
     type,
     selectedCategories,
@@ -62,7 +60,6 @@ export function ManageTransactionsProvider({
 
   const getTransactions = useCallback(
     async (controller?: AbortController) => {
-      if (!selectedAccount) return
       setLoading(true)
 
       let filter = {
@@ -76,7 +73,6 @@ export function ManageTransactionsProvider({
 
       try {
         const transactionsData = await transactionApi.readTransactions(
-          selectedAccount.id,
           filter,
           controller?.signal
         )
@@ -84,12 +80,13 @@ export function ManageTransactionsProvider({
         setTransactions(transactionsData.data)
         setTotalTransactions(transactionsData.totalCount)
       } catch (error) {
+        if (axios.isCancel(error)) return
         toast.error("Unable to fetch transactions")
       } finally {
         setLoading(false)
       }
     },
-    [selectedAccount, search, type, selectedCategories, dateRange, currentPage]
+    [search, type, selectedCategories, dateRange, currentPage]
   )
 
   const updateTransaction = useCallback(

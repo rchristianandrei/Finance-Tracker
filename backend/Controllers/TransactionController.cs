@@ -1,6 +1,6 @@
 using backend.Attributes;
+using backend.Dtos;
 using backend.Dtos.Transaction;
-using backend.Enums;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
@@ -8,7 +8,6 @@ using backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.OpenApi.Reader;
 using Sprache;
 
 namespace backend.Controllers;
@@ -54,6 +53,27 @@ public class TransactionController(
 
         transaction.Category = category;
         return Ok(transaction.ToDto());
+    }
+
+    [HttpGet()]
+    public async Task<IActionResult> GetAll([FromQuery] TransactionQueryParameters query)
+    {
+        var userId = _currentUserService.Id();
+        var (transactions, count) = await _transactionService.GetAll(userId, query);
+        var dto = transactions.Select(t => t.ToDto());
+        return Ok(new
+        {
+            totalCount = count,
+            data = dto
+        });
+    }
+
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> GetDashboard([FromQuery] DashboardQueryParams query)
+    {
+        var userId = _currentUserService.Id();
+        var dashboardData = await _transactionService.GetDashboard(userId, query);
+        return Ok(dashboardData);
     }
 
     [Transaction]

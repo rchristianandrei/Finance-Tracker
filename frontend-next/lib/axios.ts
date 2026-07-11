@@ -7,15 +7,15 @@ const api = axios.create({
   timeout: 20000,
 })
 
-axiosRetry(api, {
-  retries: 3,
-  retryDelay: (count) => count * 1250,
-  retryCondition: (error) => {
-    return (
-      axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error)
-    )
-  },
-})
+// axiosRetry(api, {
+//   retries: 3,
+//   retryDelay: (count) => count * 1250,
+//   retryCondition: (error) => {
+//     return (
+//       axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error)
+//     )
+//   },
+// })
 
 api.interceptors.response.use(
   (res) => res,

@@ -3,26 +3,19 @@ import { TransactionType } from "@/types/category"
 import { Transaction } from "@/types/transaction"
 
 export const transactionApi = {
-  createTransaction: async (
-    accountId: number,
-    expense: {
-      type: TransactionType
-      category: string
-      amount: number
-      description: string
-      date: Date
-    }
-  ) => {
+  createTransaction: async (expense: {
+    category: string
+    amount: number
+    description: string
+    date: Date
+  }) => {
     const body = {
       ...expense,
       date: expense.date.toISOString(),
-      type: expense.type,
-      accountId: accountId,
     }
     return await api.post<Transaction>(`/transaction`, body)
   },
   readTransactions: async (
-    accountId: number,
     filter?: {
       search?: string
       startDate?: Date
@@ -62,7 +55,7 @@ export const transactionApi = {
     const response = await api.get<{
       totalCount: number
       data: Transaction[]
-    }>(`/account/${accountId}/transactions`, { params, signal })
+    }>(`/transaction`, { params, signal })
 
     response.data.data = response.data.data.map((t) => ({
       ...t,

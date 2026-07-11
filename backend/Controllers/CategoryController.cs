@@ -39,6 +39,15 @@ public class CategoryController(
         return Ok(newCategory.ToDto());
     }
 
+    [HttpGet()]
+    public async Task<IActionResult> GetAll()
+    {
+        var userId = _currentUser.Id();
+        var categories = await _categoryRepo.GetAll(userId);
+
+        return Ok(categories.Select(c => c.ToDto()));
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
     {

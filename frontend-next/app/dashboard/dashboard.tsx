@@ -14,7 +14,6 @@ import {
 import { useEffect, useState } from "react"
 
 import { HorizontalBarGraph } from "./horizontal-bar-chart"
-import { Accounts } from "./accounts"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
 
@@ -116,7 +115,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <HorizontalBarGraph
-              transactionBreakdown={dashboardData?.incomeByAccount || []}
+              transactionBreakdown={dashboardData?.incomeByCategory || []}
               cellColors={INCOME_COLORS}
             />
           </CardContent>
@@ -131,15 +130,12 @@ export default function DashboardPage() {
 
           <CardContent>
             <HorizontalBarGraph
-              transactionBreakdown={dashboardData?.expenseByAccount || []}
+              transactionBreakdown={dashboardData?.expenseByCategory || []}
               cellColors={EXPENSE_COLORS}
             />
           </CardContent>
         </Card>
       </div>
-
-      {/* Accounts */}
-      {dashboardData && <Accounts accountSummaries={dashboardData.accounts} />}
     </div>
   )
 }

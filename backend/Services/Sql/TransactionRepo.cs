@@ -111,6 +111,24 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             TotalIncome = totalIncome,
             TotalExpense = totalExpense,
             NetAmount = netAmount,
+            IncomeByCategory = [.. transactions
+                .Where(x => x.Type == Enums.TransactionType.INCOME)
+                .GroupBy(x => x.Type)
+                .Select(g => new CategoryAmountDto
+                {
+                    Category = g.Key.ToString(),
+                    Amount = g.Sum(x => x.Amount),
+                    Percentage = totalIncome > 0 ? (g.Sum(x => x.Amount) / totalIncome) * 100 : 0
+                })],
+            ExpenseByCategory = [.. transactions
+                .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+                .GroupBy(x => x.Type)
+                .Select(g => new CategoryAmountDto
+                {
+                    Category = g.Key.ToString(),
+                    Amount = g.Sum(x => x.Amount),
+                    Percentage = totalExpense > 0 ? (g.Sum(x => x.Amount) / totalExpense) * 100 : 0
+                })]
         };
 
         return dashboard;
