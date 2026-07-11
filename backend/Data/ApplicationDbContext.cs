@@ -8,7 +8,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<GoogleCredential> GoogleCredentials { get; set; }
-    public DbSet<VerifyAccount> VerifyAccounts { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<DefaultAccount> DefaultAccounts { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -47,9 +46,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<GoogleCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Email).IsUnique();
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Subject).IsUnique();
-
-        modelBuilder.Entity<VerifyAccount>().HasKey(v => v.Email);
-        modelBuilder.Entity<VerifyAccount>().HasIndex(v => v.Token).IsUnique();
 
         modelBuilder.Entity<Account>().HasKey(a => a.Id);
         modelBuilder.Entity<Account>()
