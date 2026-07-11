@@ -8,10 +8,10 @@ namespace backend.Services.Sql;
 
 public class CategoryRepo(ApplicationDbContext _context) : ICategoryRepo
 {
-    public async Task<Category?> IfExists(TransactionType type, string categoryName, int accountId)
+    public async Task<Category?> IfExists(int userId, TransactionType type, string categoryName)
     {
         return await _context.Categories
-            .Where(c => c.AccountId == accountId && c.Type == type && c.Name == categoryName)
+            .Where(c => c.UserId == userId && c.Type == type && c.Name == categoryName)
             .AsNoTracking()
             .FirstOrDefaultAsync();
     }
@@ -22,31 +22,22 @@ public class CategoryRepo(ApplicationDbContext _context) : ICategoryRepo
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Category?> GetById(int id, bool includeAccount = false)
+    public async Task<Category?> GetById(int id)
     {
         var query = _context.Categories.AsQueryable();
-
-        if (includeAccount) query = query.Include(c => c.Account);
 
         return await query
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<ICollection<Category>> GetByAccountId(int accountId)
+    public async Task<ICollection<Category>> GetAll(int userId)
     {
         return await _context.Categories
-            .Where(c => c.AccountId == accountId)
+            .Where(c => c.UserId == userId)
             .OrderBy(c => c.Name)
             .AsNoTracking()
             .ToListAsync();
-    }
-
-    public async Task<int> GetCountByAccountIdAndType(int accountId, TransactionType type)
-    {
-        return await _context.Categories
-            .Where(c => c.AccountId == accountId && c.Type == type)
-            .AsNoTracking().CountAsync();
     }
 
     public async Task Update(Category category)

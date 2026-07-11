@@ -16,7 +16,6 @@ namespace backend.Controllers;
 public class CategoryController(
     ICurrentUserService _currentUser,
     ICategoryRepo _categoryRepo,
-    IAccountRepo _accountRepo,
     ITransactionRepo _transactionRepo
 ) : ControllerBase
 {
@@ -24,19 +23,13 @@ public class CategoryController(
     public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
         var userId = _currentUser.Id();
-        var account = await _accountRepo.GetById(dto.AccountId);
-        if (account == null) return NotFound("Account Not Found");
-        if (account.OwnerId != userId) Forbid();
 
-        var count = await _categoryRepo.GetCountByAccountIdAndType(dto.AccountId, dto.Type);
-        if (count >= 10) return BadRequest("You're exceeding the max limit of 10");
-
-        var category = await _categoryRepo.IfExists(dto.Type, dto.Name, dto.AccountId);
+        var category = await _categoryRepo.IfExists(userId, dto.Type, dto.Name);
         if (category != null) return BadRequest("Existing Category");
 
         var newCategory = new Category
         {
-            AccountId = dto.AccountId,
+            UserId = userId,
             Type = dto.Type,
             Name = dto.Name,
         };
@@ -49,13 +42,13 @@ public class CategoryController(
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
     {
-        var category = await _categoryRepo.GetById(id, includeAccount: true);
+        var category = await _categoryRepo.GetById(id);
         if (category == null) return NotFound("Category not found");
 
         var userId = _currentUser.Id();
-        if (category.Account.OwnerId != userId) return Forbid();
+        if (category.User.Id != userId) return Forbid();
 
-        var ifCategoryNameExists = await _categoryRepo.IfExists(dto.Type, dto.Name, category.AccountId);
+        var ifCategoryNameExists = await _categoryRepo.IfExists(userId, dto.Type, dto.Name);
         if (ifCategoryNameExists != null) return BadRequest("Existing Category");
 
         category.Type = dto.Type;
@@ -69,11 +62,11 @@ public class CategoryController(
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var category = await _categoryRepo.GetById(id, includeAccount: true);
+        var category = await _categoryRepo.GetById(id);
         if (category == null) return NotFound("Category do not exist");
 
         var userId = _currentUser.Id();
-        if (category.Account.OwnerId != userId) return Forbid();
+        if (category.User.Id != userId) return Forbid();
 
         var transactionCount = await _transactionRepo.GetCountByCategoryId(category.Id);
         if (transactionCount > 0) return BadRequest("You cannot delete a category with transactions");

@@ -20,7 +20,6 @@ namespace backend.Controllers;
 public class TransactionController(
     ITransactionRepo _transactionService,
     ICurrentUserService _currentUserService,
-    IAccountRepo _accountRepo,
     ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
@@ -30,18 +29,12 @@ public class TransactionController(
     {
         var id = _currentUserService.Id();
 
-        var account = await _accountRepo.GetById(value.AccountId);
-        if (account == null) return NotFound("Account not found");
-
-        account.Balance += value.Type == TransactionType.INCOME ? value.Amount : -value.Amount;
-        await _accountRepo.Update(account);
-
-        var category = await _categoryRepo.IfExists(value.Type, value.Category, account.Id);
+        var category = await _categoryRepo.IfExists(id, value.Type, value.Category);
         if (category == null)
         {
             category = new Category
             {
-                AccountId = account.Id,
+                UserId = id,
                 Type = value.Type,
                 Name = value.Category,
             };
@@ -73,25 +66,12 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
-        var account = await _accountRepo.GetById(transaction.Category.AccountId);
-        if (account == null) return NotFound("Account not found");
-        switch (value.Type)
-        {
-            case TransactionType.INCOME:
-                account.Balance += value.Amount - transaction.Amount;
-                break;
-            case TransactionType.EXPENSE:
-                account.Balance -= value.Amount - transaction.Amount;
-                break;
-        }
-        await _accountRepo.Update(account);
-
-        var category = await _categoryRepo.IfExists(value.Type, value.Category, account.Id);
+        var category = await _categoryRepo.IfExists(userId, value.Type, value.Category);
         if (category == null)
         {
             category = new Category
             {
-                AccountId = account.Id,
+                UserId = userId,
                 Type = value.Type,
                 Name = value.Category,
             };
@@ -117,19 +97,6 @@ public class TransactionController(
 
         var transaction = await _transactionService.GetById(id);
         if (transaction == null) return NoContent();
-
-        var account = await _accountRepo.GetById(transaction.Category.AccountId);
-        if (account == null) return NotFound("Account not found");
-        switch (transaction.Category.Type)
-        {
-            case TransactionType.INCOME:
-                account.Balance -= transaction.Amount;
-                break;
-            case TransactionType.EXPENSE:
-                account.Balance += transaction.Amount;
-                break;
-        }
-        await _accountRepo.Update(account);
 
         if (transaction.UserId != userId) return Forbid();
         await _transactionService.Delete(transaction);

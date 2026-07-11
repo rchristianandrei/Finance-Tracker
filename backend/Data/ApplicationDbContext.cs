@@ -8,7 +8,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<GoogleCredential> GoogleCredentials { get; set; }
-    public DbSet<Account> Accounts { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
@@ -24,9 +23,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithOne(l => l.User)
             .HasForeignKey<GoogleCredential>(l => l.UserId);
         modelBuilder.Entity<User>()
-            .HasMany(u => u.Accounts)
-            .WithOne(a => a.Owner)
-            .HasForeignKey(a => a.OwnerId);
+            .HasMany(u => u.Categories)
+            .WithOne(c => c.User)
+            .HasForeignKey(c => c.UserId);
         modelBuilder.Entity<User>()
             .HasMany(u => u.Transactions)
             .WithOne(a => a.User)
@@ -41,12 +40,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<GoogleCredential>().HasKey(u => u.UserId);
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Email).IsUnique();
         modelBuilder.Entity<GoogleCredential>().HasIndex(u => u.Subject).IsUnique();
-
-        modelBuilder.Entity<Account>().HasKey(a => a.Id);
-        modelBuilder.Entity<Account>()
-            .HasMany(u => u.Categories)
-            .WithOne(d => d.Account)
-            .HasForeignKey(l => l.AccountId);
 
         modelBuilder.Entity<Category>().HasKey(d => d.Id);
         modelBuilder.Entity<Category>()
