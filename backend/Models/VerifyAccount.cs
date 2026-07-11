@@ -14,6 +14,4 @@ public class VerifyAccount
     public DateTimeOffset ExpiresAt { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
-
-    public LocalCredential LocalCredential { get; set; } = null!;
 }
