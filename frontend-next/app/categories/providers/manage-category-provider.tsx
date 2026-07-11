@@ -8,10 +8,9 @@ import {
   useContext,
   useState,
 } from "react"
-import { Category, TransactionType } from "@/types/category"
+import { Category } from "@/types/category"
 import { categoryApi } from "@/api/category"
 import { useCategory } from "@/providers/category-provider"
-import { useAccount } from "@/providers/account-provider"
 
 interface ManageCategoriesContextType {
   updateCategoryEvent: Category | null
