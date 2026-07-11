@@ -92,16 +92,16 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             .Select(t => new
             {
                 t.Amount,
-                t.Category.Type
+                t.Category
             })
             .ToListAsync();
 
         var totalIncome = transactions
-            .Where(x => x.Type == Enums.TransactionType.INCOME)
+            .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
             .Sum(x => x.Amount);
 
         var totalExpense = transactions
-            .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+            .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
             .Sum(x => x.Amount);
 
         var netAmount = totalIncome - totalExpense;
@@ -112,22 +112,30 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             TotalExpense = totalExpense,
             NetAmount = netAmount,
             IncomeByCategory = [.. transactions
-                .Where(x => x.Type == Enums.TransactionType.INCOME)
-                .GroupBy(x => x.Type)
+                .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
+                .GroupBy(x => new
+                {
+                    x.Category.Id,
+                    x.Category.Name
+                })
                 .Select(g => new CategoryAmountDto
                 {
-                    Category = g.Key.ToString(),
+                    Category = g.Key.Name,
                     Amount = g.Sum(x => x.Amount),
-                    Percentage = totalIncome > 0 ? (g.Sum(x => x.Amount) / totalIncome) * 100 : 0
+                    Percentage = totalIncome > 0 ? g.Sum(x => x.Amount) / totalIncome * 100 : 0
                 })],
             ExpenseByCategory = [.. transactions
-                .Where(x => x.Type == Enums.TransactionType.EXPENSE)
-                .GroupBy(x => x.Type)
+                .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
+                .GroupBy(x => new
+                {
+                    x.Category.Id,
+                    x.Category.Name
+                })
                 .Select(g => new CategoryAmountDto
                 {
-                    Category = g.Key.ToString(),
+                    Category = g.Key.Name,
                     Amount = g.Sum(x => x.Amount),
-                    Percentage = totalExpense > 0 ? (g.Sum(x => x.Amount) / totalExpense) * 100 : 0
+                    Percentage = totalExpense > 0 ? g.Sum(x => x.Amount) / totalExpense * 100 : 0
                 })]
         };
 
