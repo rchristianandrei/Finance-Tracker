@@ -7,6 +7,4 @@ public class UpdateAccountDto
     [Required]
     [MaxLength(20)]
     public string Name { get; set; } = string.Empty;
-
-    public bool IsDefault { get; set; }
 }

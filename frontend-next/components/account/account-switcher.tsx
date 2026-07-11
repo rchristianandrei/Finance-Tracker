@@ -33,14 +33,13 @@ import { toast } from "sonner"
 
 export function AccountSwitcher() {
   const { isMobile } = useSidebar()
-  const { accounts, defaultAccount, selectedAccount, setSelectedAccount } =
-    useAccount()
+  const { accounts, selectedAccount, setSelectedAccount } = useAccount()
   const [updateAccount, setUpdateAccount] = useState<Account | null>(null)
   const [deleteAccount, setDeleteAccount] = useState<Account | null>(null)
 
   const onDeleteAccount = (account: Account) => {
-    if (defaultAccount?.id === account.id) {
-      toast.error("Cannot delete the default account")
+    if (selectedAccount?.id === account.id) {
+      toast.error("Cannot delete the selected account")
       return
     }
     setDeleteAccount(account)
@@ -97,15 +96,6 @@ export function AccountSwitcher() {
 
                       <div className="flex flex-col">
                         <span>{account.name}</span>
-
-                        {account.id === defaultAccount?.id && (
-                          <Badge
-                            variant="secondary"
-                            className="h-4 px-1 text-[10px]"
-                          >
-                            Default
-                          </Badge>
-                        )}
                       </div>
 
                       {account.id === selectedAccount?.id && <Check />}

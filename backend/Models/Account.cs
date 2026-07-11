@@ -18,8 +18,6 @@ public class Account
     public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonIgnore]
-    public DefaultAccount? DefaultAccount { get; set; }
-    [JsonIgnore]
     public ICollection<Category> Categories { get; set; } = [];
     [JsonIgnore]
     public ICollection<Transaction> Transactions { get; set; } = [];

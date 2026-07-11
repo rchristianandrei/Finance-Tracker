@@ -7,13 +7,12 @@ export const accountApi = {
       "/account"
     )
   },
-  createAccount: (values: { name: string; isDefault: boolean }) => {
+  createAccount: (values: { name: string }) => {
     return api.post<Account>(`/account`, values)
   },
-  updateAccount: (values: { id: number; name: string; isDefault: boolean }) => {
+  updateAccount: (values: { id: number; name: string }) => {
     return api.put<Account>(`/account/${values.id}`, {
       name: values.name,
-      isDefault: values.isDefault,
     })
   },
   deleteAccount: (accountId: number) => {

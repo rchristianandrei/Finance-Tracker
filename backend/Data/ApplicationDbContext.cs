@@ -9,7 +9,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<GoogleCredential> GoogleCredentials { get; set; }
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<DefaultAccount> DefaultAccounts { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
@@ -29,10 +28,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithOne(a => a.Owner)
             .HasForeignKey(a => a.OwnerId);
         modelBuilder.Entity<User>()
-            .HasOne(u => u.DefaultAccount)
-            .WithOne(d => d.User)
-            .HasForeignKey<DefaultAccount>(l => l.UserId);
-        modelBuilder.Entity<User>()
             .HasMany(u => u.Transactions)
             .WithOne(a => a.User)
             .HasForeignKey(a => a.UserId);
@@ -49,15 +44,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<Account>().HasKey(a => a.Id);
         modelBuilder.Entity<Account>()
-            .HasOne(u => u.DefaultAccount)
-            .WithOne(d => d.Account)
-            .HasForeignKey<DefaultAccount>(l => l.UserId);
-        modelBuilder.Entity<Account>()
             .HasMany(u => u.Categories)
             .WithOne(d => d.Account)
             .HasForeignKey(l => l.AccountId);
-
-        modelBuilder.Entity<DefaultAccount>().HasKey(d => d.UserId);
 
         modelBuilder.Entity<Category>().HasKey(d => d.Id);
         modelBuilder.Entity<Category>()

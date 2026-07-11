@@ -18,7 +18,6 @@ import { Spinner } from "@/components/ui/spinner"
 import { Account } from "@/types/account"
 import { AccountFormValues, accountSchema } from "@/lib/validations/account"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useAccount } from "@/providers/account-provider"
 
 export function AccountForm({
   title,
@@ -30,15 +29,11 @@ export function AccountForm({
   onSave: (values: AccountFormValues) => Promise<void>
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { defaultAccount } = useAccount()
-
-  const isInitiallyDefault = account?.id === defaultAccount?.id
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
       name: account?.name ?? "",
-      isDefault: isInitiallyDefault,
     },
   })
 
@@ -77,31 +72,6 @@ export function AccountForm({
                   id={field.name}
                   aria-invalid={fieldState.invalid}
                 />
-
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="isDefault"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="isDefault"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isInitiallyDefault}
-                  />
-
-                  <FieldLabel htmlFor="isDefault">
-                    Set as default account
-                  </FieldLabel>
-                </div>
 
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

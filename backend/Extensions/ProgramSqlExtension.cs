@@ -23,7 +23,6 @@ public static class ProgramSqlExtension
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IGoogleCredentialRepo, GoogleCredentialRepo>();
         services.AddScoped<IAccountRepo, AccountRepo>();
-        services.AddScoped<IDefaultAccountRepo, DefaultAccountRepo>();
         services.AddScoped<ICategoryRepo, CategoryRepo>();
         services.AddScoped<ITransactionRepo, TransactionRepo>();
 

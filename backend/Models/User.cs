@@ -27,7 +27,5 @@ public class User
     [JsonIgnore]
     public ICollection<Account> Accounts { get; set; } = [];
     [JsonIgnore]
-    public DefaultAccount? DefaultAccount { get; set; }
-    [JsonIgnore]
     public ICollection<Transaction> Transactions { get; set; } = [];
 }

@@ -8,8 +8,8 @@ namespace backend.Services.Sql;
 
 public class UserRepo(
     ApplicationDbContext _context,
-    IAccountRepo _accountRepo,
-    IDefaultAccountRepo _defaultAccountRepo) : IUserRepo
+    IAccountRepo _accountRepo
+) : IUserRepo
 {
     public async Task<User?> GetById(int id)
     {
@@ -70,13 +70,6 @@ public class UserRepo(
             Balance = 0,
         };
         await _accountRepo.Create(account);
-
-        var defaultAccount = new DefaultAccount
-        {
-            UserId = user.Id,
-            AccountId = account.Id
-        };
-        await _defaultAccountRepo.Create(defaultAccount);
     }
 
     public async Task Update(User user)
