@@ -1,7 +1,6 @@
 using backend;
 using backend.Data;
 using backend.Extensions;
-using backend.Settings;
 using Microsoft.EntityFrameworkCore;
 
 DotNetEnv.Env.Load();
@@ -12,7 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddJwt(builder.Configuration)
     .AddMySql(builder.Configuration)
-    .AddUtils()
     .AddRateLimiting();
 
 // CORS
