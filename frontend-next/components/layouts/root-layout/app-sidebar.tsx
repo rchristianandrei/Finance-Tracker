@@ -2,7 +2,6 @@ import * as React from "react"
 
 import { NavMain } from "@/components/layouts/root-layout/nav-main"
 import { NavUser } from "@/components/layouts/root-layout/nav-user"
-import { AccountSwitcher } from "@/components/account/account-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -14,9 +13,7 @@ import {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <AccountSwitcher />
-      </SidebarHeader>
+      <SidebarHeader>P</SidebarHeader>
       <SidebarContent>
         <NavMain />
       </SidebarContent>

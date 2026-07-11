@@ -1,5 +1,5 @@
 import { Account } from "@/types/account"
-import { AccountSummary } from "@/types/dashboard"
+import { CategorySummary } from "@/types/dashboard"
 import {
   ResponsiveContainer,
   Bar,
@@ -14,7 +14,7 @@ export function HorizontalBarGraph({
   transactionBreakdown,
   cellColors,
 }: {
-  transactionBreakdown: AccountSummary[]
+  transactionBreakdown: CategorySummary[]
   cellColors: string[]
 }) {
   return (
@@ -25,16 +25,16 @@ export function HorizontalBarGraph({
         margin={{ top: 8, right: 16, left: 16, bottom: 8 }}
       >
         <YAxis type="number" />
-        <XAxis type="category" dataKey="accountName" width={100} />
+        <XAxis type="category" dataKey="category" width={100} />
         <Tooltip
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null
 
-            const item: AccountSummary = payload[0].payload
+            const item: CategorySummary = payload[0].payload
 
             return (
               <div className="rounded-lg border bg-background p-3 shadow">
-                <p className="font-medium">{item.accountName}</p>
+                <p className="font-medium">{item.category}</p>
                 <p>
                   {item.amount.toLocaleString()} ({item.percentage.toFixed(2)}%)
                 </p>

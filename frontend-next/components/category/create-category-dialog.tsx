@@ -4,7 +4,6 @@ import axios from "axios"
 import { toast } from "sonner"
 
 import { Dialog } from "@/components/ui/dialog"
-import { useAccount } from "@/providers/account-provider"
 import { CategoryFormValues } from "@/lib/validations/category"
 
 import { useState } from "react"
@@ -12,7 +11,6 @@ import { useCategory } from "@/providers/category-provider"
 import { CategoryForm } from "./category-form"
 
 export function CreateCategoryDialog({ onClose }: { onClose: () => void }) {
-  const { selectedAccount } = useAccount()
   const { createCategory } = useCategory()
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -24,7 +22,6 @@ export function CreateCategoryDialog({ onClose }: { onClose: () => void }) {
   }
 
   async function onSubmit(values: CategoryFormValues) {
-    if (!selectedAccount) return
     setErrorMessage("")
     try {
       await createCategory(values.type === "1" ? 1 : 2, values.name)
