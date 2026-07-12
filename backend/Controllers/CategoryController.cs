@@ -55,7 +55,7 @@ public class CategoryController(
         if (category == null) return NotFound("Category not found");
 
         var userId = _currentUser.Id();
-        if (category.User.Id != userId) return Forbid();
+        if (category.UserId != userId) return Forbid();
 
         var ifCategoryNameExists = await _categoryRepo.IfExists(userId, dto.Type, dto.Name);
         if (ifCategoryNameExists != null) return BadRequest("Existing Category");
@@ -75,7 +75,7 @@ public class CategoryController(
         if (category == null) return NotFound("Category do not exist");
 
         var userId = _currentUser.Id();
-        if (category.User.Id != userId) return Forbid();
+        if (category.UserId != userId) return Forbid();
 
         var transactionCount = await _transactionRepo.GetCountByCategoryId(category.Id);
         if (transactionCount > 0) return BadRequest("You cannot delete a category with transactions");
