@@ -7,13 +7,22 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>P</SidebarHeader>
+      <SidebarHeader>
+        <SidebarMenuButton size="lg">
+          <Avatar className="">
+            <AvatarFallback>PFA</AvatarFallback>
+          </Avatar>
+          <div className="text-lg">Personal Finance App</div>
+        </SidebarMenuButton>
+      </SidebarHeader>
       <SidebarContent>
         <NavMain />
       </SidebarContent>
