@@ -4,6 +4,7 @@ import { Transaction } from "@/types/transaction"
 
 export const transactionApi = {
   createTransaction: async (expense: {
+    type: TransactionType
     category: string
     amount: number
     description: string
