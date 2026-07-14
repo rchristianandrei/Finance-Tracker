@@ -24,6 +24,7 @@ export function CreateTransactionDialog() {
   async function onSubmit(values: TransactionFormValues) {
     try {
       const response = await transactionApi.createTransaction({
+        type: values.type === "1" ? 1 : 2,
         category: values.category,
         description: values.description,
         amount: values.amount!,
