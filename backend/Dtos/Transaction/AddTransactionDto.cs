@@ -6,14 +6,8 @@ namespace backend.Dtos.Transaction;
 
 public class AddTransactionDto
 {
-    public int AccountId { get; set; }
-
     [Required]
-    public TransactionType Type { get; set; }
-
-    [Required]
-    [MaxLength(50)]
-    public string Category { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
 
     [Required]
     [GreaterThanZero(ErrorMessage = "Amount must be greater than zero")]

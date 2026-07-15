@@ -59,7 +59,7 @@ export function TransactionForm({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       type: transaction?.type ? (transaction.type === 1 ? "1" : "2") : "1",
-      category: transaction?.category ?? "",
+      categoryId: transaction?.category.id,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
@@ -69,7 +69,7 @@ export function TransactionForm({
   const selectedType = form.watch("type")
 
   useEffect(() => {
-    form.resetField("category")
+    form.resetField("categoryId")
   }, [selectedType])
 
   async function onSubmit(values: TransactionFormValues) {
@@ -130,7 +130,7 @@ export function TransactionForm({
           />
 
           <Controller
-            name="category"
+            name="categoryId"
             control={form.control}
             render={({ field, fieldState }) => {
               const filtered = categories.filter(
@@ -143,9 +143,9 @@ export function TransactionForm({
 
                   <div className="grid grid-cols-[1fr_auto] gap-1">
                     <Select
-                      value={field.value}
+                      value={field.value?.toString()}
                       onValueChange={(value) => {
-                        field.onChange(value)
+                        field.onChange(Number(value))
                       }}
                     >
                       <SelectTrigger className="w-full min-w-0">
@@ -154,7 +154,7 @@ export function TransactionForm({
 
                       <SelectContent>
                         {filtered.map((m) => (
-                          <SelectItem key={m.id} value={m.name}>
+                          <SelectItem key={m.id} value={m.id.toString()}>
                             {m.name}
                           </SelectItem>
                         ))}

@@ -28,17 +28,9 @@ public class TransactionController(
     {
         var id = _currentUserService.Id();
 
-        var category = await _categoryRepo.IfExists(id, value.Type, value.Category);
-        if (category == null)
-        {
-            category = new Category
-            {
-                UserId = id,
-                Type = value.Type,
-                Name = value.Category,
-            };
-            await _categoryRepo.Create(category);
-        }
+        var category = await _categoryRepo.GetById(value.CategoryId);
+        if (category == null) return BadRequest("Category does not exist");
+        if (category.UserId != id) return Forbid();
 
         var transaction = new Transaction
         {
@@ -86,17 +78,9 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
-        var category = await _categoryRepo.IfExists(userId, value.Type, value.Category);
-        if (category == null)
-        {
-            category = new Category
-            {
-                UserId = userId,
-                Type = value.Type,
-                Name = value.Category,
-            };
-            await _categoryRepo.Create(category);
-        }
+        var category = await _categoryRepo.GetById(value.CategoryId);
+        if (category == null) return BadRequest("Category does not exist");
+        if (category.UserId != userId) return Forbid();
 
         transaction.Category = category;
         transaction.Description = value.Description;

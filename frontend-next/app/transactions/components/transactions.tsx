@@ -79,12 +79,12 @@ export function Transactions() {
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <span className="block cursor-help truncate text-muted-foreground">
-                                    {transaction.category}
+                                    {transaction.category.name}
                                   </span>
                                 </TooltipTrigger>
 
                                 <TooltipContent>
-                                  <p>{transaction.category}</p>
+                                  <p>{transaction.category.name}</p>
                                 </TooltipContent>
                               </Tooltip>
                               <Tooltip>
