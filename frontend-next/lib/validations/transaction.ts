@@ -3,10 +3,7 @@ import z from "zod"
 export const transactionSchema = z.object({
   type: z.enum(["1", "2"]),
 
-  category: z
-    .string()
-    .min(1, "Category is required")
-    .max(50, "Category must be 50 characters or less"),
+  categoryId: z.number().min(1, "Category is required"),
 
   description: z
     .string()

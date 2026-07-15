@@ -94,9 +94,9 @@ export function DeleteTransactionDialog({
                 <span className="font-medium">Category</span>
                 <Tooltip>
                   <TooltipTrigger className="max-w-50 truncate">
-                    {transaction.category}
+                    {transaction.category.name}
                   </TooltipTrigger>
-                  <TooltipContent>{transaction.category}</TooltipContent>
+                  <TooltipContent>{transaction.category.name}</TooltipContent>
                 </Tooltip>
               </div>
 

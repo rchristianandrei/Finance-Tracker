@@ -26,8 +26,7 @@ export function UpdateTransactionDialog({
     try {
       await updateTransaction({
         ...transaction,
-        type: values.type === "1" ? 1 : 2,
-        category: values.category,
+        categoryId: values.categoryId,
         description: values.description,
         amount: values.amount,
         date: values.date,

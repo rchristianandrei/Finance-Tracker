@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using backend.DataAnnotations;
-using backend.Enums;
 
 namespace backend.Dtos.Transaction;
 
@@ -10,11 +9,7 @@ public class UpdateTransactionDto
     public long Id { get; set; }
 
     [Required]
-    public TransactionType Type { get; set; }
-
-    [Required]
-    [MaxLength(50)]
-    public string Category { get; set; } = string.Empty;
+    public int CategoryId { get; set; }
 
     [Required]
     [GreaterThanZero(ErrorMessage = "Amount must be greater than zero")]

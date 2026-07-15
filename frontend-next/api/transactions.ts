@@ -1,11 +1,9 @@
 import api from "@/lib/axios"
-import { TransactionType } from "@/types/category"
 import { Transaction } from "@/types/transaction"
 
 export const transactionApi = {
   createTransaction: async (expense: {
-    type: TransactionType
-    category: string
+    categoryId: number
     amount: number
     description: string
     date: Date
@@ -65,12 +63,18 @@ export const transactionApi = {
 
     return response.data
   },
-  update: (transaction: Transaction) => {
+  update: (updatedValues: {
+    id: number
+    date: Date
+    categoryId: number
+    description: string
+    amount: number
+  }) => {
     const body = {
-      ...transaction,
-      date: transaction.date.toISOString(),
+      ...updatedValues,
+      date: updatedValues.date.toISOString(),
     }
-    return api.put(`/transaction/${transaction.id}`, body)
+    return api.put(`/transaction/${updatedValues.id}`, body)
   },
   delete: (id: number) => {
     return api.delete(`/transaction/${id}`)
