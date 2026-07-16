@@ -16,6 +16,7 @@ import { useEffect, useState } from "react"
 import { HorizontalBarGraph } from "./horizontal-bar-chart"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
+import { VerticalBarGraph } from "./components/vertical-bar-graph"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -40,6 +41,13 @@ export default function DashboardPage() {
   const { transactionAdded } = useAddTransaction()
   const [month, setMonth] = useState<Date>(new Date())
   const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
+
+  const sortedIncomeCategories = dashboardData?.incomeByCategory.sort(
+    (a, b) => b.amount - a.amount
+  )
+  const sortedExpenseCategories = dashboardData?.expenseByCategory.sort(
+    (a, b) => b.amount - a.amount
+  )
 
   useEffect(() => {
     ;(async () => {
@@ -115,7 +123,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <HorizontalBarGraph
-              transactionBreakdown={dashboardData?.incomeByCategory || []}
+              transactionBreakdown={sortedIncomeCategories || []}
               cellColors={INCOME_COLORS}
             />
           </CardContent>
@@ -129,10 +137,17 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <HorizontalBarGraph
-              transactionBreakdown={dashboardData?.expenseByCategory || []}
-              cellColors={EXPENSE_COLORS}
-            />
+            <div className="hidden md:block">
+              <HorizontalBarGraph
+                transactionBreakdown={sortedExpenseCategories || []}
+                cellColors={EXPENSE_COLORS}
+              />
+            </div>
+            <div className="block md:hidden">
+              <VerticalBarGraph
+                categorySummaries={sortedExpenseCategories || []}
+              />
+            </div>
           </CardContent>
         </Card>
       </div>
