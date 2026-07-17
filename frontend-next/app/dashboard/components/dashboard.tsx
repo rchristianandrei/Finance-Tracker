@@ -17,6 +17,7 @@ import { CategoryPieChart } from "./category-pie-chart"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
 import { VerticalBarGraph } from "./vertical-bar-graph"
+import { formatMoney } from "@/lib/format-money"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -81,7 +82,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-blue-600">
-              {dashboardData ? dashboardData.netAmount.toLocaleString() : ""}
+              {dashboardData ? formatMoney(dashboardData.netAmount) : ""}
             </p>
           </CardContent>
         </Card>
@@ -94,7 +95,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-green-600">
-              {dashboardData ? dashboardData.totalIncome.toLocaleString() : ""}
+              {dashboardData ? formatMoney(dashboardData.totalIncome) : ""}
             </p>
           </CardContent>
         </Card>
@@ -107,7 +108,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-red-600">
-              {dashboardData ? dashboardData.totalExpense.toLocaleString() : ""}
+              {dashboardData ? formatMoney(dashboardData.totalExpense) : ""}
             </p>
           </CardContent>
         </Card>

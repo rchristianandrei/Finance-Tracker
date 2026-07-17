@@ -23,6 +23,7 @@ import {
 import { UpdateTransactionDialog } from "./update-transaction-dialog"
 import { DeleteTransactionDialog } from "./delete-transaction-dialog"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
+import { formatMoney } from "@/lib/format-money"
 
 export function Transactions() {
   const { transactions } = useManageTransactions()
@@ -115,10 +116,7 @@ export function Transactions() {
                                       : "expense"
                                   }
                                 >
-                                  {transaction.amount.toLocaleString("en-US", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
+                                  {formatMoney(transaction.amount)}
                                 </TransactionBadge>
                               </div>
                             </div>

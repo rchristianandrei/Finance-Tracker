@@ -1,3 +1,4 @@
+import { formatMoney } from "@/lib/format-money"
 import { CategorySummary } from "@/types/dashboard"
 import {
   ResponsiveContainer,
@@ -65,7 +66,7 @@ export function CategoryPieChart({
               <div className="rounded-lg border bg-background p-3 shadow">
                 <p className="font-medium">{item.category}</p>
                 <p>
-                  {item.amount.toLocaleString()} ({item.percentage.toFixed(2)}%)
+                  {formatMoney(item.amount)} ({item.percentage.toFixed(2)}%)
                 </p>
               </div>
             )

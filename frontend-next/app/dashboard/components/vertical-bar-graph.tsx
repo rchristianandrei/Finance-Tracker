@@ -2,6 +2,7 @@ import { CategorySummary } from "@/types/dashboard"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
+import { formatMoney } from "@/lib/format-money"
 
 export function VerticalBarGraph({
   categorySummaries,
@@ -34,10 +35,7 @@ export function VerticalBarGraph({
             <div className="flex flex-col gap-1 text-right">
               <div>
                 <TransactionBadge type={type}>
-                  {categorySummary.amount.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {formatMoney(categorySummary.amount)}
                 </TransactionBadge>
               </div>
               <div>{categorySummary.percentage.toFixed(2)} %</div>
