@@ -8,7 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import DashboardPage from "./dashboard"
+import DashboardPage from "./components/dashboard"
 
 export const metadata = {
   title: "Dashboard",

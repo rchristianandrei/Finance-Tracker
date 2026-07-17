@@ -11,12 +11,13 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
-import { HorizontalBarGraph } from "./horizontal-bar-chart"
+import { CategoryPieChart } from "./category-pie-chart"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
-import { VerticalBarGraph } from "./components/vertical-bar-graph"
+import { VerticalBarGraph } from "./vertical-bar-graph"
+import { formatMoney } from "@/lib/format-money"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -42,12 +43,13 @@ export default function DashboardPage() {
   const [month, setMonth] = useState<Date>(new Date())
   const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
 
-  const sortedIncomeCategories = dashboardData?.incomeByCategory.sort(
-    (a, b) => b.amount - a.amount
-  )
-  const sortedExpenseCategories = dashboardData?.expenseByCategory.sort(
-    (a, b) => b.amount - a.amount
-  )
+  const sortedIncomeCategories = useMemo(() => {
+    return dashboardData?.incomeByCategory.sort((a, b) => b.amount - a.amount)
+  }, [dashboardData])
+
+  const sortedExpenseCategories = useMemo(() => {
+    return dashboardData?.expenseByCategory.sort((a, b) => b.amount - a.amount)
+  }, [dashboardData])
 
   useEffect(() => {
     ;(async () => {
@@ -80,7 +82,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-blue-600">
-              {dashboardData ? dashboardData.netAmount.toLocaleString() : ""}
+              {dashboardData ? formatMoney(dashboardData.netAmount) : ""}
             </p>
           </CardContent>
         </Card>
@@ -93,7 +95,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-green-600">
-              {dashboardData ? dashboardData.totalIncome.toLocaleString() : ""}
+              {dashboardData ? formatMoney(dashboardData.totalIncome) : ""}
             </p>
           </CardContent>
         </Card>
@@ -106,7 +108,7 @@ export default function DashboardPage() {
 
           <CardContent>
             <p className="text-3xl font-bold text-red-600">
-              {dashboardData ? dashboardData.totalExpense.toLocaleString() : ""}
+              {dashboardData ? formatMoney(dashboardData.totalExpense) : ""}
             </p>
           </CardContent>
         </Card>
@@ -122,10 +124,18 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <HorizontalBarGraph
-              transactionBreakdown={sortedIncomeCategories || []}
-              cellColors={INCOME_COLORS}
-            />
+            <div>
+              <CategoryPieChart
+                transactionBreakdown={sortedIncomeCategories || []}
+                cellColors={INCOME_COLORS}
+              />
+            </div>
+            <div>
+              <VerticalBarGraph
+                categorySummaries={sortedIncomeCategories || []}
+                type="income"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -137,15 +147,16 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <div className="hidden md:block">
-              <HorizontalBarGraph
+            <div>
+              <CategoryPieChart
                 transactionBreakdown={sortedExpenseCategories || []}
                 cellColors={EXPENSE_COLORS}
               />
             </div>
-            <div className="block md:hidden">
+            <div>
               <VerticalBarGraph
                 categorySummaries={sortedExpenseCategories || []}
+                type="expense"
               />
             </div>
           </CardContent>

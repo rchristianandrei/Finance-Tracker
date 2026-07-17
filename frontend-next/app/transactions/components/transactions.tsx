@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/context-menu"
 import { UpdateTransactionDialog } from "./update-transaction-dialog"
 import { DeleteTransactionDialog } from "./delete-transaction-dialog"
+import { TransactionBadge } from "@/components/transaction/transcation-badge"
+import { formatMoney } from "@/lib/format-money"
 
 export function Transactions() {
   const { transactions } = useManageTransactions()
@@ -107,19 +109,15 @@ export function Transactions() {
                                     minute: "2-digit",
                                   })}
                                 </span>
-                                <span
-                                  className={cn(
-                                    `rounded-full px-2 py-1 text-xs font-medium`,
+                                <TransactionBadge
+                                  type={
                                     transaction.type === 2
-                                      ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                                      : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                                  )}
+                                      ? "income"
+                                      : "expense"
+                                  }
                                 >
-                                  {transaction.amount.toLocaleString("en-US", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}
-                                </span>
+                                  {formatMoney(transaction.amount)}
+                                </TransactionBadge>
                               </div>
                             </div>
                           </div>
