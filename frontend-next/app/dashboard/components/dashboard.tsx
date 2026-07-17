@@ -13,10 +13,10 @@ import {
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 
-import { HorizontalBarGraph } from "./horizontal-bar-chart"
+import { CategoryPieChart } from "./category-pie-chart"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
-import { VerticalBarGraph } from "./components/vertical-bar-graph"
+import { VerticalBarGraph } from "./vertical-bar-graph"
 
 const INCOME_COLORS = [
   "#166534", // green-800
@@ -123,13 +123,13 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <div className="hidden md:block">
-              <HorizontalBarGraph
+            <div>
+              <CategoryPieChart
                 transactionBreakdown={sortedIncomeCategories || []}
                 cellColors={INCOME_COLORS}
               />
             </div>
-            <div className="block md:hidden">
+            <div>
               <VerticalBarGraph
                 categorySummaries={sortedIncomeCategories || []}
                 type="income"
@@ -146,13 +146,13 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <div className="hidden md:block">
-              <HorizontalBarGraph
+            <div>
+              <CategoryPieChart
                 transactionBreakdown={sortedExpenseCategories || []}
                 cellColors={EXPENSE_COLORS}
               />
             </div>
-            <div className="block md:hidden">
+            <div>
               <VerticalBarGraph
                 categorySummaries={sortedExpenseCategories || []}
                 type="expense"
