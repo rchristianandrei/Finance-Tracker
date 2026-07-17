@@ -12,30 +12,10 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
-
-import { CategoryPieChart } from "./category-pie-chart"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
 import { VerticalBarGraph } from "./vertical-bar-graph"
 import { formatMoney } from "@/lib/format-money"
-
-const INCOME_COLORS = [
-  "#166534", // green-800
-  "#15803d", // green-700
-  "#16a34a", // green-600
-  "#22c55e", // green-500
-  "#4ade80", // green-400
-  "#86efac", // green-300
-]
-
-const EXPENSE_COLORS = [
-  "#991b1b", // red-800
-  "#b91c1c", // red-700
-  "#dc2626", // red-600
-  "#ef4444", // red-500
-  "#f87171", // red-400
-  "#fca5a5", // red-300
-]
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -124,18 +104,10 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <div>
-              <CategoryPieChart
-                transactionBreakdown={sortedIncomeCategories || []}
-                cellColors={INCOME_COLORS}
-              />
-            </div>
-            <div>
-              <VerticalBarGraph
-                categorySummaries={sortedIncomeCategories || []}
-                type="income"
-              />
-            </div>
+            <VerticalBarGraph
+              categorySummaries={sortedIncomeCategories || []}
+              type="income"
+            />
           </CardContent>
         </Card>
 
@@ -147,18 +119,10 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <div>
-              <CategoryPieChart
-                transactionBreakdown={sortedExpenseCategories || []}
-                cellColors={EXPENSE_COLORS}
-              />
-            </div>
-            <div>
-              <VerticalBarGraph
-                categorySummaries={sortedExpenseCategories || []}
-                type="expense"
-              />
-            </div>
+            <VerticalBarGraph
+              categorySummaries={sortedExpenseCategories || []}
+              type="expense"
+            />
           </CardContent>
         </Card>
       </div>
