@@ -11,7 +11,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { HorizontalBarGraph } from "./horizontal-bar-chart"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
@@ -42,12 +42,13 @@ export default function DashboardPage() {
   const [month, setMonth] = useState<Date>(new Date())
   const [dashboardData, setDashboardData] = useState<DashboardType | null>(null)
 
-  const sortedIncomeCategories = dashboardData?.incomeByCategory.sort(
-    (a, b) => b.amount - a.amount
-  )
-  const sortedExpenseCategories = dashboardData?.expenseByCategory.sort(
-    (a, b) => b.amount - a.amount
-  )
+  const sortedIncomeCategories = useMemo(() => {
+    return dashboardData?.incomeByCategory.sort((a, b) => b.amount - a.amount)
+  }, [dashboardData])
+
+  const sortedExpenseCategories = useMemo(() => {
+    return dashboardData?.expenseByCategory.sort((a, b) => b.amount - a.amount)
+  }, [dashboardData])
 
   useEffect(() => {
     ;(async () => {
@@ -122,10 +123,18 @@ export default function DashboardPage() {
           </CardHeader>
 
           <CardContent>
-            <HorizontalBarGraph
-              transactionBreakdown={sortedIncomeCategories || []}
-              cellColors={INCOME_COLORS}
-            />
+            <div className="hidden md:block">
+              <HorizontalBarGraph
+                transactionBreakdown={sortedIncomeCategories || []}
+                cellColors={INCOME_COLORS}
+              />
+            </div>
+            <div className="block md:hidden">
+              <VerticalBarGraph
+                categorySummaries={sortedIncomeCategories || []}
+                type="income"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -146,6 +155,7 @@ export default function DashboardPage() {
             <div className="block md:hidden">
               <VerticalBarGraph
                 categorySummaries={sortedExpenseCategories || []}
+                type="expense"
               />
             </div>
           </CardContent>
