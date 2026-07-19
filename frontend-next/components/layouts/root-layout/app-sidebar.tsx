@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { NavMain } from "@/components/layouts/root-layout/nav-main"
+import { NavAdmin } from "@/components/layouts/root-layout/nav-admin"
 import { NavUser } from "@/components/layouts/root-layout/nav-user"
 import {
   Sidebar,
@@ -25,6 +26,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
+        <NavAdmin />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
