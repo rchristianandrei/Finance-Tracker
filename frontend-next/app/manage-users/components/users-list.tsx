@@ -1,5 +1,6 @@
 "use client"
 
+import { userApi } from "@/api/users"
 import { Pagination } from "@/components/filters/pagination"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -8,35 +9,25 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { User } from "@/types/user"
 import { Edit, Trash, Users } from "lucide-react"
-
-const list: User[] = [
-  {
-    id: 1,
-    firstName: "Andrei",
-    lastName: "Reyes",
-    createdAt: new Date(),
-    isAdmin: true,
-    status: 1,
-  },
-  {
-    id: 2,
-    firstName: "Andrei",
-    lastName: "Reyes",
-    createdAt: new Date(),
-    isAdmin: true,
-    status: 1,
-  },
-]
+import { useEffect, useState } from "react"
 
 export function UsersList() {
+  const [users, setUsers] = useState<User[]>([])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const response = await userApi.readUsers()
+        setUsers(response)
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
   return (
     <Card>
       <CardHeader>
@@ -45,11 +36,11 @@ export function UsersList() {
             <Users />
             <CardTitle>Users</CardTitle>
           </div>
-          <Pagination />
+          {/* <Pagination /> */}
         </div>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {list.map((user) => (
+        {users.map((user) => (
           <Card key={user.id}>
             <CardContent>
               <ContextMenu>

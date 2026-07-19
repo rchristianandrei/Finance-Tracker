@@ -10,7 +10,7 @@ export default () => {
       <AdminRoute>
         <RootLayout>
           <div className="flex flex-col gap-4">
-            <Filters />
+            {/* <Filters /> */}
             <UsersList />
           </div>
         </RootLayout>
