@@ -41,12 +41,14 @@ export const userApi = {
 
     const response = await api.get<{ data: User[]; totalCount: number }>(
       "user",
-      { params }
+      { params, signal }
     )
 
-    return response.data.data.map((u) => ({
+    response.data.data = response.data.data.map((u) => ({
       ...u,
       createdAt: new Date(u.createdAt),
     }))
+
+    return response.data
   },
 }

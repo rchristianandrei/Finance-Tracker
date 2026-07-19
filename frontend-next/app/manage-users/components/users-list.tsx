@@ -1,7 +1,5 @@
 "use client"
 
-import { userApi } from "@/api/users"
-import { Pagination } from "@/components/filters/pagination"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ContextMenu,
@@ -10,23 +8,12 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { cn } from "@/lib/utils"
-import { User } from "@/types/user"
 import { Edit, Trash, Users } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useManageUsers } from "../providers/manage-users-provider"
+import { UserPagination } from "./user-pagination"
 
 export function UsersList() {
-  const [users, setUsers] = useState<User[]>([])
-
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const response = await userApi.readUsers()
-        setUsers(response)
-      } catch (error) {
-        console.log(error)
-      }
-    })()
-  }, [])
+  const { users } = useManageUsers()
 
   return (
     <Card>
@@ -36,7 +23,7 @@ export function UsersList() {
             <Users />
             <CardTitle>Users</CardTitle>
           </div>
-          {/* <Pagination /> */}
+          <UserPagination />
         </div>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-2">
