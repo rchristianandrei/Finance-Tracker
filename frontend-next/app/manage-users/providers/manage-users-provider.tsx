@@ -27,7 +27,7 @@ export function ManageUsersProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { currentPage } = useUserFilter()
+  const { search, currentPage } = useUserFilter()
 
   const [users, setUsers] = useState<User[]>([])
   const [totalUsers, setTotalUsers] = useState(0)
@@ -39,13 +39,15 @@ export function ManageUsersProvider({
     return () => {
       abortController.abort()
     }
-  }, [currentPage])
+  }, [search, currentPage])
 
   const getUsers = useCallback(
     async (signal?: AbortSignal) => {
-      console.log("load user")
       try {
-        const response = await userApi.readUsers({ page: currentPage }, signal)
+        const response = await userApi.readUsers(
+          { search: search, page: currentPage },
+          signal
+        )
         setUsers(response.data)
         setTotalUsers(response.totalCount)
       } catch (error) {
@@ -54,7 +56,7 @@ export function ManageUsersProvider({
         toast.error("Unable to load users")
       }
     },
-    [currentPage]
+    [search, currentPage]
   )
 
   return (

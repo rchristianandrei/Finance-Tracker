@@ -4,7 +4,9 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { createContext, useCallback, useContext, useMemo } from "react"
 
 interface UserFilterContextType {
+  search: string
   currentPage: number
+  changeSearch: (value: string) => void
   goToPage: (page: number) => void
 }
 
@@ -17,6 +19,7 @@ export function UserFilterProvider({
 }: {
   children: React.ReactNode
 }) {
+  const searchKey = "search"
   const pageKey = "page"
 
   const router = useRouter()
@@ -24,8 +27,17 @@ export function UserFilterProvider({
   const searchParams = useSearchParams()
 
   const navigate = useCallback(
-    (filter: { page: number | undefined | null }) => {
+    (filter: {
+      search?: string | undefined | null
+      page?: number | undefined | null
+    }) => {
       const params = new URLSearchParams(searchParams.toString())
+
+      if (filter.search) {
+        params.set(searchKey, filter.search.toString())
+      } else if (filter.search === "") {
+        params.delete(searchKey)
+      }
 
       if (filter.page) {
         params.set(pageKey, filter.page.toString())
@@ -38,6 +50,22 @@ export function UserFilterProvider({
     [searchParams, router, pathname]
   )
 
+  // Search
+  const search = useMemo(
+    () => searchParams.get(searchKey) ?? "",
+    [searchParams]
+  )
+
+  const changeSearch = useCallback(
+    (value: string) => {
+      navigate({
+        search: value.trim() ?? null,
+      })
+    },
+    [navigate]
+  )
+
+  // Page
   const currentPage = useMemo(() => {
     const page = searchParams.get(pageKey)
     return page ? Number(page) : 1
@@ -55,7 +83,9 @@ export function UserFilterProvider({
   return (
     <UserFilterContext.Provider
       value={{
+        search,
         currentPage,
+        changeSearch,
         goToPage,
       }}
     >
