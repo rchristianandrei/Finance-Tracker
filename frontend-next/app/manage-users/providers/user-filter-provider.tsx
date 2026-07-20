@@ -56,13 +56,7 @@ export function UserFilterProvider({
         ? `${pathname}?${params.toString()}`
         : pathname
 
-      console.log("replace:", url)
-
-      router.push(url)
-
-      setTimeout(() => {
-        console.log(window.location.href)
-      }, 100)
+      router.replace(url)
     },
     [searchParams, pathname, router]
   )
