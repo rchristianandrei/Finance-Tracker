@@ -11,7 +11,7 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && user && !user.isAdmin) {
-      router.push("/dashboard")
+      router.replace("/dashboard")
     }
   }, [user, loading, router])
 

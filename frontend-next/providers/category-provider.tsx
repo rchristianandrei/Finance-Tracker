@@ -8,6 +8,7 @@ import {
 import { Category, TransactionType } from "@/types/category"
 import { categoryApi } from "@/api/category"
 import axios from "axios"
+import { useAuth } from "./auth-provider"
 
 interface CategoryContextType {
   categories: Category[]
@@ -21,12 +22,14 @@ const CategoryContext = createContext<CategoryContextType | undefined>(
 )
 
 export function CategoryProvider({ children }: { children: React.ReactNode }) {
+  const { loading: isLoggingIn } = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (isLoggingIn) return
     loadCategories()
-  }, [])
+  }, [isLoggingIn])
 
   const loadCategories = useCallback(async () => {
     try {
