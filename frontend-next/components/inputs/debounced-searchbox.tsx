@@ -1,7 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 
 export function DebouncedSearchBox({
@@ -20,6 +20,12 @@ export function DebouncedSearchBox({
   const changeSearch = useDebouncedCallback((value: string) => {
     onValueChange?.(value)
   }, delay ?? 500)
+
+  useEffect(() => {
+    return () => {
+      changeSearch.cancel()
+    }
+  }, [])
 
   return (
     <Input

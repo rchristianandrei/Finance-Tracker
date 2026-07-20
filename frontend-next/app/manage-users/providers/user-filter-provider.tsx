@@ -1,7 +1,13 @@
 "use client"
 
-import { usePathname, useSearchParams } from "next/navigation"
-import { createContext, useCallback, useContext, useMemo } from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react"
 
 interface UserFilterContextType {
   search: string
@@ -24,6 +30,11 @@ export function UserFilterProvider({
 
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    console.log("URL changed:", pathname, searchParams.toString())
+  }, [pathname, searchParams, router])
 
   const navigate = useCallback(
     (filter: { search?: string; page?: number | undefined | null }) => {
@@ -45,9 +56,15 @@ export function UserFilterProvider({
         ? `${pathname}?${params.toString()}`
         : pathname
 
-      window.history.replaceState({}, "", url)
+      console.log("replace:", url)
+
+      router.push(url)
+
+      setTimeout(() => {
+        console.log(window.location.href)
+      }, 100)
     },
-    [searchParams, pathname]
+    [searchParams, pathname, router]
   )
 
   // Search
