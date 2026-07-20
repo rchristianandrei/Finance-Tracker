@@ -32,15 +32,6 @@ export function ManageUsersProvider({
   const [users, setUsers] = useState<User[]>([])
   const [totalUsers, setTotalUsers] = useState(0)
 
-  useEffect(() => {
-    const abortController = new AbortController()
-    getUsers(abortController.signal)
-
-    return () => {
-      abortController.abort()
-    }
-  }, [search, currentPage])
-
   const getUsers = useCallback(
     async (signal?: AbortSignal) => {
       try {
@@ -58,6 +49,15 @@ export function ManageUsersProvider({
     },
     [search, currentPage]
   )
+
+  useEffect(() => {
+    const abortController = new AbortController()
+    getUsers(abortController.signal)
+
+    return () => {
+      abortController.abort()
+    }
+  }, [getUsers])
 
   return (
     <ManageUsersContext.Provider value={{ users, totalUsers }}>

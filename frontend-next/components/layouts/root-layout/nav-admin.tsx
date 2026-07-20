@@ -21,7 +21,6 @@ const items = [
 
 export function NavAdmin() {
   const { user } = useAuth()
-
   if (!user || !user.isAdmin) {
     return null
   }
@@ -33,7 +32,7 @@ export function NavAdmin() {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild tooltip={item.title}>
-              <Link href={item.url}>
+              <Link href={item.url} prefetch={false}>
                 {item.icon}
                 <span>{item.title}</span>
               </Link>
