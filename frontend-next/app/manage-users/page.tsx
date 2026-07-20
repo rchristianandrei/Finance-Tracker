@@ -14,7 +14,7 @@ export default () => {
           <UserFilterProvider>
             <ManageUsersProvider>
               <div className="flex flex-col gap-4">
-                {/* <Filters /> */}
+                <Filters />
                 <UsersList />
               </div>
             </ManageUsersProvider>
