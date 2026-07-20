@@ -27,10 +27,7 @@ export function UserFilterProvider({
   const searchParams = useSearchParams()
 
   const navigate = useCallback(
-    (filter: {
-      search?: string | undefined | null
-      page?: number | undefined | null
-    }) => {
+    (filter: { search?: string; page?: number | undefined | null }) => {
       const params = new URLSearchParams(searchParams.toString())
 
       if (filter.search) {
@@ -45,7 +42,17 @@ export function UserFilterProvider({
         params.delete(pageKey)
       }
 
-      router.replace(`${pathname}?${params.toString()}`)
+      const url = params.toString()
+        ? `${pathname}?${params.toString()}`
+        : pathname
+
+      console.log({
+        pathname,
+        url,
+        current: window.location.pathname + window.location.search,
+      })
+
+      window.history.replaceState({}, "", url)
     },
     [searchParams, router, pathname]
   )
@@ -59,7 +66,7 @@ export function UserFilterProvider({
   const changeSearch = useCallback(
     (value: string) => {
       navigate({
-        search: value.trim() ?? null,
+        search: value.trim(),
       })
     },
     [navigate]
