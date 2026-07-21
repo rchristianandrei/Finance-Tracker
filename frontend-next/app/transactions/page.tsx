@@ -8,6 +8,8 @@ export const metadata = {
   title: "Transactions",
 }
 
+export const dynamic = "force-dynamic"
+
 export default function TransactionsPage() {
   return (
     <PrivateRoute>

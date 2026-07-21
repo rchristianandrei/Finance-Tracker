@@ -32,10 +32,11 @@ import {
 } from "@/components/ui/tooltip"
 import { useMemo, useState } from "react"
 import { useTransactionFilter } from "../providers/transaction-filter-provider"
+import { DebouncedSearchBox } from "@/components/inputs/debounced-searchbox"
 
 export function TransactionFilter() {
   const {
-    search: querySearch,
+    search,
     type,
     dateRange,
     selectedCategories,
@@ -47,8 +48,6 @@ export function TransactionFilter() {
     clearFilters,
   } = useTransactionFilter()
 
-  const [search, setSearch] = useState(querySearch ?? "")
-
   const allSelected = useMemo(
     () => selectedCategories.length === 0,
     [selectedCategories]
@@ -58,14 +57,10 @@ export function TransactionFilter() {
     <Card>
       <CardContent className="flex flex-wrap items-center gap-3">
         {/* Search */}
-        <Input
-          placeholder="Search transactions..."
+        <DebouncedSearchBox
           value={search}
-          className="w-full md:w-75"
-          onChange={(e) => {
-            setSearch(e.target.value)
-            changeSearch(e.target.value)
-          }}
+          placeholder="Search transactions..."
+          onValueChange={changeSearch}
         />
 
         {/* Type */}
