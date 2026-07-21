@@ -7,6 +7,10 @@ import { ManageUsersProvider } from "./providers/manage-users-provider"
 import { UserFilterProvider } from "./providers/user-filter-provider"
 import { Suspense } from "react"
 
+export const metadata = {
+  title: "Manage Users",
+}
+
 export const dynamic = "force-dynamic"
 
 export default () => {
