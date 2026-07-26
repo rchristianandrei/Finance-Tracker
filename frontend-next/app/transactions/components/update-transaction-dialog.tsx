@@ -2,7 +2,7 @@
 
 import { TransactionFormValues } from "@/lib/validations/transaction"
 import { toast } from "sonner"
-import { TransactionForm } from "@/components/transaction-form"
+import { TransactionForm } from "@/components/transaction/transaction-form"
 import { useManageTransactions } from "../providers/manage-transactions-provider"
 import { Dialog } from "@/components/ui/dialog"
 import { Transaction } from "@/types/transaction"
@@ -25,7 +25,8 @@ export function UpdateTransactionDialog({
     if (!transaction) return
     try {
       await updateTransaction({
-        ...transaction,
+        id: transaction.id,
+        accountId: values.accountId,
         categoryId: values.categoryId,
         description: values.description,
         amount: values.amount,

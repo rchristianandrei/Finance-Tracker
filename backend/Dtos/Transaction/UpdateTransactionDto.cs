@@ -9,6 +9,9 @@ public class UpdateTransactionDto
     public long Id { get; set; }
 
     [Required]
+    public int AccountId { get; set; }
+
+    [Required]
     public int CategoryId { get; set; }
 
     [Required]

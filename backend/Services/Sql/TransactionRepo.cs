@@ -34,7 +34,10 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query)
     {
-        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.Category.UserId == userId);
+        var queryable = _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .Where(t => t.Category.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {

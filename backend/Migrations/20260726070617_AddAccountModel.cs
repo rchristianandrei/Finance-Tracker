@@ -92,6 +92,12 @@ namespace backend.Migrations
                     GROUP BY "AccountId"
                 ) t
                 WHERE a."Id" = t."AccountId";
+
+                UPDATE "Transactions" t
+                SET "Amount" = ABS(t."Amount")
+                FROM "Categories" c
+                WHERE t."CategoryId" = c."Id"
+                AND c."Type" = 1;
                 """);
         }
 

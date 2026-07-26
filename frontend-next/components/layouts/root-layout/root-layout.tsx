@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { DynamicBreadcrumb } from "./DynamicBreadcrumb"
-import { CreateTransactionDialog } from "@/components/create-transaction-dialog"
+import { CreateTransactionDialog } from "@/components/transaction/create-transaction-dialog"
 import { AddTransactionProvider } from "@/providers/add-transaction-provider"
 
 export function RootLayout({ children }: { children: React.ReactNode }) {

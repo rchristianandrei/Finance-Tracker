@@ -29,15 +29,30 @@ public class TransactionController(
     [HttpPost()]
     public async Task<IActionResult> Create([FromBody] AddTransactionDto value)
     {
-        var id = _currentUserService.Id();
+        var userId = _currentUserService.Id();
+
+        var account = await _accountRepo.GetAccountById(value.AccountId);
+        if (account == null) return BadRequest("Account does not exist");
+        if (account.UserId != userId) return Forbid();
 
         var category = await _categoryRepo.GetById(value.CategoryId);
         if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != id) return Forbid();
+        if (category.UserId != userId) return Forbid();
+
+        // Update Associated Account Balance
+        if (category.Type == Enums.TransactionType.INCOME)
+        {
+            account.Balance += value.Amount;
+        }
+        else
+        {
+            account.Balance -= value.Amount;
+        }
 
         var transaction = new Transaction
         {
-            UserId = id,
+            AccountId = account.Id,
+            UserId = userId,
             CategoryId = category.Id,
             Amount = value.Amount,
             Description = value.Description,
@@ -128,9 +143,32 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
+        var account = await _accountRepo.GetAccountById(value.AccountId);
+        if (account == null) return BadRequest("Account does not exist");
+        if (account.UserId != userId) return Forbid();
+
         var category = await _categoryRepo.GetById(value.CategoryId);
         if (category == null) return BadRequest("Category does not exist");
         if (category.UserId != userId) return Forbid();
+
+        // Update Associated Account Balance
+        if (transaction.Category.Type == Enums.TransactionType.INCOME)
+        {
+            account.Balance -= transaction.Amount;
+        }
+        else
+        {
+            account.Balance += transaction.Amount;
+        }
+
+        if (category.Type == Enums.TransactionType.INCOME)
+        {
+            account.Balance += value.Amount;
+        }
+        else
+        {
+            account.Balance -= value.Amount;
+        }
 
         transaction.Category = category;
         transaction.Description = value.Description;

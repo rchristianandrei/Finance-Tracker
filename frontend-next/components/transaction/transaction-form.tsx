@@ -26,9 +26,9 @@ import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { transactionSchema } from "@/lib/validations/transaction"
 import { TransactionFormValues } from "@/lib/validations/transaction"
-import { Field, FieldError, FieldLabel } from "./ui/field"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { useEffect, useState } from "react"
-import { Spinner } from "./ui/spinner"
+import { Spinner } from "@/components/ui/spinner"
 import { useCategory } from "@/providers/category-provider"
 import { Transaction } from "@/types/transaction"
 import {
@@ -37,8 +37,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select"
+} from "@/components/ui/select"
 import { Plus } from "lucide-react"
+import { useAccount } from "@/providers/account-provider"
 
 export function TransactionForm({
   title,
@@ -51,6 +52,7 @@ export function TransactionForm({
   onSave: (values: TransactionFormValues) => Promise<void>
   onAddCategoryClick?: () => void
 }) {
+  const { accounts } = useAccount()
   const { categories } = useCategory()
   const [dateOpen, setDateOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -58,8 +60,9 @@ export function TransactionForm({
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
+      accountId: transaction?.account.id ?? 0,
       type: transaction?.type ? (transaction.type === 1 ? "1" : "2") : "1",
-      categoryId: transaction?.category.id,
+      categoryId: transaction?.category.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
@@ -75,7 +78,6 @@ export function TransactionForm({
   async function onSubmit(values: TransactionFormValues) {
     if (isSubmitting) return
     setIsSubmitting(true)
-
     try {
       await onSave(values)
       form.reset()
@@ -99,6 +101,46 @@ export function TransactionForm({
       </DialogHeader>
       <fieldset disabled={isSubmitting}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Controller
+            name="accountId"
+            control={form.control}
+            render={({ field, fieldState }) => {
+              return (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Account</FieldLabel>
+
+                  <div className="grid grid-cols-[1fr_auto] gap-1">
+                    <Select
+                      value={field.value?.toString()}
+                      onValueChange={(value) => {
+                        field.onChange(Number(value))
+                      }}
+                    >
+                      <SelectTrigger className="w-full min-w-0">
+                        <SelectValue placeholder="Select Account" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {accounts.map((a) => (
+                          <SelectItem key={a.id} value={a.id.toString()}>
+                            {a.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {/* <Button variant="outline" type="button">
+                      <Plus />
+                    </Button> */}
+                  </div>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )
+            }}
+          />
+
           <Controller
             name="type"
             control={form.control}
@@ -149,7 +191,7 @@ export function TransactionForm({
                       }}
                     >
                       <SelectTrigger className="w-full min-w-0">
-                        <SelectValue placeholder="--Select category--" />
+                        <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
 
                       <SelectContent>

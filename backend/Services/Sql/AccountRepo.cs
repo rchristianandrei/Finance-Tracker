@@ -12,6 +12,11 @@ public class AccountRepo(ApplicationDbContext _context)
         await _context.SaveChangesAsync();
     }
 
+    public async Task<Account?> GetAccountById(int id)
+    {
+        return await _context.Accounts.FindAsync(id);
+    }
+
     public async Task<IEnumerable<Account>> GetAccountsByUserId(int userId)
     {
         return await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();

@@ -43,7 +43,6 @@ export function ManageUsersProvider({
         setTotalUsers(response.totalCount)
       } catch (error) {
         if (axios.isCancel(error)) return
-        console.log(error)
         toast.error("Unable to load users")
       }
     },
