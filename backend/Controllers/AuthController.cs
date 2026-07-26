@@ -46,7 +46,7 @@ public class AuthController(
                 user = new User
                 {
                     FirstName = payload.GivenName,
-                    LastName = payload.FamilyName
+                    LastName = payload.FamilyName ?? "Null"
                 };
                 await _userRepo.Create(user);
 
