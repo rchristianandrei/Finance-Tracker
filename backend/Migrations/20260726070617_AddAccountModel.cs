@@ -74,6 +74,24 @@ namespace backend.Migrations
                 FROM "Accounts" a
                 WHERE t."UserId" = a."UserId"
                 AND a."Name" = 'Default';
+
+                UPDATE "Transactions" t
+                SET "Amount" = -ABS(t."Amount")
+                FROM "Categories" c
+                WHERE t."CategoryId" = c."Id"
+                AND c."Type" = 1;
+
+                UPDATE "Accounts" a
+                SET "Balance" = COALESCE(t."Balance", 0)
+                FROM (
+                    SELECT
+                        "AccountId",
+                        SUM("Amount") AS "Balance"
+                    FROM "Transactions"
+                    WHERE "AccountId" IS NOT NULL
+                    GROUP BY "AccountId"
+                ) t
+                WHERE a."Id" = t."AccountId";
                 """);
         }
 

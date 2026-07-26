@@ -1,3 +1,5 @@
+using backend.Dtos.Account;
+
 namespace backend.Dtos.Reports;
 
 public class DashboardDto
@@ -8,4 +10,5 @@ public class DashboardDto
 
     public List<CategoryAmountDto> IncomeByCategory { get; set; } = [];
     public List<CategoryAmountDto> ExpenseByCategory { get; set; } = [];
+    public IEnumerable<AccountDto> Accounts { get; set; } = [];
 }

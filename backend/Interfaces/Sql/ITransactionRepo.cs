@@ -17,7 +17,7 @@ public interface ITransactionRepo
 
     Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query);
 
-    Task<DashboardDto> GetDashboard(int userId, DashboardQueryParams? query = null);
+    Task<IEnumerable<Transaction>> GetDashboard(int userId, DashboardQueryParams? query = null);
 
     Task Delete(Transaction transaction);
 }
