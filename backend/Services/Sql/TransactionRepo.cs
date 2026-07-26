@@ -29,7 +29,11 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
     public async Task<Transaction?> GetById(long id)
     {
-        return await _context.Transactions.Include(t => t.Category).AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+        return await _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query)

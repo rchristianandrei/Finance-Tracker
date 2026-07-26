@@ -151,16 +151,17 @@ public class TransactionController(
         if (category == null) return BadRequest("Category does not exist");
         if (category.UserId != userId) return Forbid();
 
-        // Update Associated Account Balance
+        // Update Old Account
         if (transaction.Category.Type == Enums.TransactionType.INCOME)
         {
-            account.Balance -= transaction.Amount;
+            transaction.Account.Balance -= transaction.Amount;
         }
         else
         {
-            account.Balance += transaction.Amount;
+            transaction.Account.Balance += transaction.Amount;
         }
 
+        // New Old Account
         if (category.Type == Enums.TransactionType.INCOME)
         {
             account.Balance += value.Amount;

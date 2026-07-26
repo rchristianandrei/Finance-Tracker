@@ -12,8 +12,8 @@ public class Transaction
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public int? AccountId { get; set; }
-    public Account? Account { get; set; } = null;
+    public int AccountId { get; set; }
+    public Account Account { get; set; } = null!;
 
     public int CategoryId { get; set; } = 0;
     [JsonIgnore]
