@@ -22,12 +22,16 @@ const CategoryContext = createContext<CategoryContextType | undefined>(
 )
 
 export function CategoryProvider({ children }: { children: React.ReactNode }) {
-  const { loading: isLoggingIn } = useAuth()
+  const { loading: isLoggingIn, user } = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (isLoggingIn) return
+    if (!user) {
+      setLoading(false)
+      return
+    }
     loadCategories()
   }, [isLoggingIn])
 

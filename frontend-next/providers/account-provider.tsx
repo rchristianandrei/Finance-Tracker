@@ -21,12 +21,16 @@ interface AccountContextType {
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
 
 export function AccountProvider({ children }: { children: React.ReactNode }) {
-  const { loading: isLoggingIn } = useAuth()
+  const { loading: isLoggingIn, user } = useAuth()
   const [accounts, setAccounts] = useState<Account[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (isLoggingIn) return
+    if (!user) {
+      setLoading(false)
+      return
+    }
     loadCategories()
   }, [isLoggingIn])
 
