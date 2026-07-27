@@ -9,13 +9,13 @@ import { TransactionType } from "@/types/category"
 import axios from "axios"
 import { useAuth } from "./auth-provider"
 import { Account } from "@/types/account"
-import { accountApi } from "@/api/account"
+import { accountApi, CreateAccountRequest } from "@/api/account"
 
 interface AccountContextType {
   accounts: Account[]
   loading: boolean
-  loadCategories: () => Promise<void>
-  createCategory: (type: TransactionType, name: string) => Promise<void>
+  loadAccounts: () => Promise<void>
+  createAccount: (data: CreateAccountRequest) => Promise<void>
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -31,10 +31,10 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
       return
     }
-    loadCategories()
+    loadAccounts()
   }, [isLoggingIn])
 
-  const loadCategories = useCallback(async () => {
+  const loadAccounts = useCallback(async () => {
     try {
       const response = await accountApi.getAccounts()
       const data = response.data
@@ -47,17 +47,14 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const createCategory = useCallback(
-    async (type: TransactionType, name: string) => {
-      //   await categoryApi.create(type, name)
-      await loadCategories()
-    },
-    []
-  )
+  const createAccount = useCallback(async (data: CreateAccountRequest) => {
+    await accountApi.create(data)
+    await loadAccounts()
+  }, [])
 
   return (
     <AccountContext.Provider
-      value={{ accounts, loading, loadCategories, createCategory }}
+      value={{ accounts, loading, loadAccounts, createAccount }}
     >
       {children}
     </AccountContext.Provider>

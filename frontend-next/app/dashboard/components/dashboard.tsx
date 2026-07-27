@@ -8,7 +8,6 @@ import {
   BanknoteArrowDown,
   BanknoteArrowUp,
   CircleDollarSign,
-  Plus,
   TrendingDown,
   TrendingUp,
 } from "lucide-react"
@@ -17,8 +16,7 @@ import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
 import { VerticalBarGraph } from "./vertical-bar-graph"
 import { formatMoney } from "@/lib/format-money"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { AccountsSection } from "./accounts-section"
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -97,32 +95,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader className="flex items-center gap-2">
-          <CardTitle>Accounts</CardTitle>
-        </CardHeader>
-        <CardContent className="grid-cols-3-1 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-          {dashboardData &&
-            dashboardData.accounts.map((a) => (
-              <Card key={a.id} className="gap-1">
-                <CardHeader>
-                  <CardTitle>{a.name}</CardTitle>
-                </CardHeader>
-                <CardContent
-                  className={cn(
-                    "text-2xl",
-                    a.balance >= 0 ? "text-green-600" : "text-destructive"
-                  )}
-                >
-                  {formatMoney(a.balance)}
-                </CardContent>
-              </Card>
-            ))}
-          <Button variant="ghost" className="h-full">
-            <Plus /> Create New Account
-          </Button>
-        </CardContent>
-      </Card>
+      <AccountsSection />
 
       {/* CHARTS */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
