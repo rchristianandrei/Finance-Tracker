@@ -21,4 +21,10 @@ public class AccountRepo(ApplicationDbContext _context)
     {
         return await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();
     }
+
+    public async Task Delete(Account account)
+    {
+        _context.Accounts.Remove(account);
+        await _context.SaveChangesAsync();
+    }
 }

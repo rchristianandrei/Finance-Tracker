@@ -39,6 +39,7 @@ export function CreateAccountDialog({
       })
       toast.success("Account created successfully")
       onClose?.()
+      setIsOpen(false)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const message = err.response?.data ?? err.message

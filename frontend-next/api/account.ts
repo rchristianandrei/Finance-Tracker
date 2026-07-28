@@ -14,5 +14,7 @@ export const accountApi = {
     return api.get<Account[]>(`/account`)
   },
   update: () => {},
-  delete: () => {},
+  delete: (accountId: number) => {
+    return api.delete<Account[]>(`/account/${accountId}`)
+  },
 }

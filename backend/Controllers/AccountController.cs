@@ -3,6 +3,7 @@ using backend.Dtos.Account;
 using backend.Interfaces.Utils;
 using backend.Mappers;
 using backend.Models;
+using backend.Services.Sql;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,11 @@ namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController(ApplicationDbContext _context, ICurrentUserService _currentUserService) : ControllerBase
+public class AccountController(
+    ApplicationDbContext _context,
+    ICurrentUserService _currentUserService,
+    AccountRepo _accountRepo
+) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAccountDto dto)
@@ -38,5 +43,19 @@ public class AccountController(ApplicationDbContext _context, ICurrentUserServic
         var accounts = await _context.Accounts.Where(a => a.UserId == id).ToListAsync();
 
         return Ok(accounts.Select(a => a.ToDto()));
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var account = await _accountRepo.GetAccountById(id);
+        if (account == null) return NotFound("Account does not exist");
+
+        var userId = _currentUserService.Id();
+        if (account.UserId != userId) return Forbid();
+
+        await _accountRepo.Delete(account);
+
+        return NoContent();
     }
 }

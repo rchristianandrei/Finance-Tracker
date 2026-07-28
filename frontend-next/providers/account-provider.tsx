@@ -16,6 +16,7 @@ interface AccountContextType {
   loading: boolean
   loadAccounts: () => Promise<void>
   createAccount: (data: CreateAccountRequest) => Promise<void>
+  deleteAccount: (accountId: number) => Promise<void>
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -52,9 +53,14 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     await loadAccounts()
   }, [])
 
+  const deleteAccount = useCallback(async (accountId: number) => {
+    await accountApi.delete(accountId)
+    await loadAccounts()
+  }, [])
+
   return (
     <AccountContext.Provider
-      value={{ accounts, loading, loadAccounts, createAccount }}
+      value={{ accounts, loading, loadAccounts, createAccount, deleteAccount }}
     >
       {children}
     </AccountContext.Provider>

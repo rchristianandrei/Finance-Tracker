@@ -17,11 +17,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import axios from "axios"
 import { FieldError } from "@/components/ui/field"
 import { Account } from "@/types/account"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
 import { formatMoney } from "@/lib/format-money"
+import { useAccount } from "@/providers/account-provider"
 
 export function DeleteAccountDialog({
   account,
@@ -30,13 +30,14 @@ export function DeleteAccountDialog({
   account: Account
   onClose: () => void
 }) {
+  const { deleteAccount } = useAccount()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
   const onConfirm = async () => {
     setIsLoading(true)
     try {
-      //   await deleteTransaction(transaction.id)
+      await deleteAccount(account.id)
       onClose()
     } catch (error) {
       setErrorMessage("Unable to delete the account")
