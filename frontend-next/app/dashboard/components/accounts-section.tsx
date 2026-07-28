@@ -1,3 +1,5 @@
+"use client"
+
 import { CreateAccountDialog } from "@/components/account/create-account-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -26,12 +28,12 @@ export function AccountsSection() {
 
   return (
     <>
-      <Card>
-        <CardHeader className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-4 md:justify-between">
           <CardTitle>Accounts</CardTitle>
           <CreateAccountDialog />
-        </CardHeader>
-        <CardContent className="grid-cols-3-1 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+        </div>
+        <div className="grid-cols-3-1 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account) => (
             <ContextMenu key={account.id}>
               <ContextMenuTrigger asChild>
@@ -41,7 +43,7 @@ export function AccountsSection() {
                   </CardHeader>
                   <CardContent
                     className={cn(
-                      "text-2xl",
+                      "text-xl font-bold",
                       account.balance >= 0
                         ? "text-green-600"
                         : "text-destructive"
@@ -66,8 +68,8 @@ export function AccountsSection() {
               </ContextMenuContent>
             </ContextMenu>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
       {updateAccountEvent && (
         <UpdateAccountDialog
           account={updateAccountEvent}
