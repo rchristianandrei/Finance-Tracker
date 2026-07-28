@@ -24,6 +24,7 @@ public static class ProgramSqlExtension
         services.AddScoped<IGoogleCredentialRepo, GoogleCredentialRepo>();
         services.AddScoped<ICategoryRepo, CategoryRepo>();
         services.AddScoped<ITransactionRepo, TransactionRepo>();
+        services.AddScoped<AccountRepo>();
 
         return services;
     }

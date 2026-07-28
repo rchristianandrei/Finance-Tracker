@@ -29,12 +29,19 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
     public async Task<Transaction?> GetById(long id)
     {
-        return await _context.Transactions.Include(t => t.Category).AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+        return await _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query)
     {
-        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.Category.UserId == userId);
+        var queryable = _context.Transactions
+            .Include(t => t.Account)
+            .Include(t => t.Category)
+            .Where(t => t.Category.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
@@ -74,9 +81,9 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return (transactions, count);
     }
 
-    public async Task<DashboardDto> GetDashboard(int userId, DashboardQueryParams? query = null)
+    public async Task<IEnumerable<Transaction>> GetDashboard(int userId, DashboardQueryParams? query = null)
     {
-        var queryable = _context.Transactions.Where(t => t.Category.UserId == userId);
+        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.Category.UserId == userId);
 
         if (query?.StartDate is DateTimeOffset startDate)
         {
@@ -88,58 +95,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             queryable = queryable.Where(t => t.Date <= endDate);
         }
 
-        var transactions = await queryable
-            .Select(t => new
-            {
-                t.Amount,
-                t.Category
-            })
-            .ToListAsync();
-
-        var totalIncome = transactions
-            .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
-            .Sum(x => x.Amount);
-
-        var totalExpense = transactions
-            .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
-            .Sum(x => x.Amount);
-
-        var netAmount = totalIncome - totalExpense;
-
-        var dashboard = new DashboardDto
-        {
-            TotalIncome = totalIncome,
-            TotalExpense = totalExpense,
-            NetAmount = netAmount,
-            IncomeByCategory = [.. transactions
-                .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
-                .GroupBy(x => new
-                {
-                    x.Category.Id,
-                    x.Category.Name
-                })
-                .Select(g => new CategoryAmountDto
-                {
-                    Category = g.Key.Name,
-                    Amount = g.Sum(x => x.Amount),
-                    Percentage = totalIncome > 0 ? g.Sum(x => x.Amount) / totalIncome * 100 : 0
-                })],
-            ExpenseByCategory = [.. transactions
-                .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
-                .GroupBy(x => new
-                {
-                    x.Category.Id,
-                    x.Category.Name
-                })
-                .Select(g => new CategoryAmountDto
-                {
-                    Category = g.Key.Name,
-                    Amount = g.Sum(x => x.Amount),
-                    Percentage = totalExpense > 0 ? g.Sum(x => x.Amount) / totalExpense * 100 : 0
-                })]
-        };
-
-        return dashboard;
+        return await queryable.ToListAsync();
     }
 
     public async Task Delete(Transaction transaction)

@@ -1,3 +1,5 @@
+import { Account } from "./account"
+
 export type CategorySummary = {
   category: string
   amount: number
@@ -10,4 +12,5 @@ export type DashboardType = {
   netAmount: number
   incomeByCategory: CategorySummary[]
   expenseByCategory: CategorySummary[]
+  accounts: Account[]
 }

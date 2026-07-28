@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.Services.Sql;
 
 public class UserRepo(
-    ApplicationDbContext _context
+    ApplicationDbContext _context,
+    AccountRepo _accountRepo
 ) : IUserRepo
 {
     public async Task<User?> GetById(int id)
@@ -60,6 +61,12 @@ public class UserRepo(
     {
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+
+        await _accountRepo.Create(new Account
+        {
+            Name = "Default",
+            UserId = user.Id
+        });
     }
 
     public async Task Update(User user)

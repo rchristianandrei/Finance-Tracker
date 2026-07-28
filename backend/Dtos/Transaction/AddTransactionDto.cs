@@ -7,6 +7,9 @@ namespace backend.Dtos.Transaction;
 public class AddTransactionDto
 {
     [Required]
+    public int AccountId { get; set; }
+
+    [Required]
     public int CategoryId { get; set; }
 
     [Required]

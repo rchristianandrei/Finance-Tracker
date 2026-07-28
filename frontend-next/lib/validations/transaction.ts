@@ -1,6 +1,7 @@
 import z from "zod"
 
 export const transactionSchema = z.object({
+  accountId: z.number().min(1, "Account is required"),
   type: z.enum(["1", "2"]),
 
   categoryId: z.number().min(1, "Category is required"),

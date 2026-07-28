@@ -16,6 +16,7 @@ import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { MonthPicker } from "./month-picker"
 import { VerticalBarGraph } from "./vertical-bar-graph"
 import { formatMoney } from "@/lib/format-money"
+import { AccountsSection } from "./accounts-section"
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -93,6 +94,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <AccountsSection />
 
       {/* CHARTS */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

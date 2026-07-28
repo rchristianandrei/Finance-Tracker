@@ -22,6 +22,7 @@ interface ManageTransactionsContextType {
   updateTransaction: (updatedValues: {
     id: number
     date: Date
+    accountId: number
     categoryId: number
     description: string
     amount: number
@@ -99,12 +100,12 @@ export function ManageTransactionsProvider({
     async (updatedValues: {
       id: number
       date: Date
+      accountId: number
       categoryId: number
       description: string
       amount: number
     }) => {
       await transactionApi.update(updatedValues)
-      console.log("called")
       getTransactions()
     },
     [getTransactions]

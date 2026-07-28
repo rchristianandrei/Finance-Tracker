@@ -13,7 +13,7 @@ import { toast } from "sonner"
 import { TransactionForm } from "./transaction-form"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import { useState } from "react"
-import { CreateCategoryDialog } from "./category/create-category-dialog"
+import { CreateCategoryDialog } from "../category/create-category-dialog"
 
 export function CreateTransactionDialog() {
   const { addTransaction } = useAddTransaction()
@@ -24,6 +24,7 @@ export function CreateTransactionDialog() {
   async function onSubmit(values: TransactionFormValues) {
     try {
       const response = await transactionApi.createTransaction({
+        accountId: values.accountId,
         categoryId: values.categoryId,
         description: values.description,
         amount: values.amount!,

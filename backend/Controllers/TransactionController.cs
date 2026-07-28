@@ -1,10 +1,12 @@
 using backend.Attributes;
 using backend.Dtos;
+using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
 using backend.Models;
+using backend.Services.Sql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -19,6 +21,7 @@ namespace backend.Controllers;
 public class TransactionController(
     ITransactionRepo _transactionService,
     ICurrentUserService _currentUserService,
+    AccountRepo _accountRepo,
     ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
@@ -26,15 +29,30 @@ public class TransactionController(
     [HttpPost()]
     public async Task<IActionResult> Create([FromBody] AddTransactionDto value)
     {
-        var id = _currentUserService.Id();
+        var userId = _currentUserService.Id();
+
+        var account = await _accountRepo.GetAccountById(value.AccountId);
+        if (account == null) return BadRequest("Account does not exist");
+        if (account.UserId != userId) return Forbid();
 
         var category = await _categoryRepo.GetById(value.CategoryId);
         if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != id) return Forbid();
+        if (category.UserId != userId) return Forbid();
+
+        // Update Associated Account Balance
+        if (category.Type == Enums.TransactionType.INCOME)
+        {
+            account.Balance += value.Amount;
+        }
+        else
+        {
+            account.Balance -= value.Amount;
+        }
 
         var transaction = new Transaction
         {
-            UserId = id,
+            AccountId = account.Id,
+            UserId = userId,
             CategoryId = category.Id,
             Amount = value.Amount,
             Description = value.Description,
@@ -64,8 +82,55 @@ public class TransactionController(
     public async Task<IActionResult> GetDashboard([FromQuery] DashboardQueryParams query)
     {
         var userId = _currentUserService.Id();
-        var dashboardData = await _transactionService.GetDashboard(userId, query);
-        return Ok(dashboardData);
+
+        var transactions = await _transactionService.GetDashboard(userId, query);
+        var accounts = await _accountRepo.GetAccountsByUserId(userId);
+
+        var totalIncome = transactions
+            .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
+            .Sum(x => x.Amount);
+
+        var totalExpense = transactions
+            .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
+            .Sum(x => x.Amount);
+
+        var netAmount = totalIncome - totalExpense;
+
+        var dashboard = new DashboardDto
+        {
+            TotalIncome = totalIncome,
+            TotalExpense = totalExpense,
+            NetAmount = netAmount,
+            IncomeByCategory = [.. transactions
+                .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
+                .GroupBy(x => new
+                {
+                    x.Category.Id,
+                    x.Category.Name
+                })
+                .Select(g => new CategoryAmountDto
+                {
+                    Category = g.Key.Name,
+                    Amount = g.Sum(x => x.Amount),
+                    Percentage = totalIncome > 0 ? g.Sum(x => x.Amount) / totalIncome * 100 : 0
+                })],
+            ExpenseByCategory = [.. transactions
+                .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
+                .GroupBy(x => new
+                {
+                    x.Category.Id,
+                    x.Category.Name
+                })
+                .Select(g => new CategoryAmountDto
+                {
+                    Category = g.Key.Name,
+                    Amount = g.Sum(x => x.Amount),
+                    Percentage = totalExpense > 0 ? g.Sum(x => x.Amount) / totalExpense * 100 : 0
+                })],
+            Accounts = accounts.Select(a => a.ToDto())
+        };
+
+        return Ok(dashboard);
     }
 
     [Transaction]
@@ -78,9 +143,33 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
+        var account = await _accountRepo.GetAccountById(value.AccountId);
+        if (account == null) return BadRequest("Account does not exist");
+        if (account.UserId != userId) return Forbid();
+
         var category = await _categoryRepo.GetById(value.CategoryId);
         if (category == null) return BadRequest("Category does not exist");
         if (category.UserId != userId) return Forbid();
+
+        // Update Old Account
+        if (transaction.Category.Type == Enums.TransactionType.INCOME)
+        {
+            transaction.Account.Balance -= transaction.Amount;
+        }
+        else
+        {
+            transaction.Account.Balance += transaction.Amount;
+        }
+
+        // New Old Account
+        if (category.Type == Enums.TransactionType.INCOME)
+        {
+            account.Balance += value.Amount;
+        }
+        else
+        {
+            account.Balance -= value.Amount;
+        }
 
         transaction.Category = category;
         transaction.Description = value.Description;

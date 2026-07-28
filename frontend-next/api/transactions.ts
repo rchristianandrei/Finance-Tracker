@@ -3,6 +3,7 @@ import { Transaction } from "@/types/transaction"
 
 export const transactionApi = {
   createTransaction: async (expense: {
+    accountId: number
     categoryId: number
     amount: number
     description: string
@@ -66,6 +67,7 @@ export const transactionApi = {
   update: (updatedValues: {
     id: number
     date: Date
+    accountId: number
     categoryId: number
     description: string
     amount: number

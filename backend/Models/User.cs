@@ -25,6 +25,8 @@ public class User
     [JsonIgnore]
     public GoogleCredential? GoogleCredential { get; set; }
     [JsonIgnore]
+    public ICollection<Account> Accounts { get; set; } = [];
+    [JsonIgnore]
     public ICollection<Category> Categories { get; set; } = [];
     [JsonIgnore]
     public ICollection<Transaction> Transactions { get; set; } = [];
