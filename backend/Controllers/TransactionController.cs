@@ -143,13 +143,13 @@ public class TransactionController(
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
-        var account = await _accountRepo.GetAccountById(value.AccountId);
-        if (account == null) return BadRequest("Account does not exist");
-        if (account.UserId != userId) return Forbid();
+        var newAccount = await _accountRepo.GetAccountById(value.AccountId);
+        if (newAccount == null) return BadRequest("Account does not exist");
+        if (newAccount.UserId != userId) return Forbid();
 
-        var category = await _categoryRepo.GetById(value.CategoryId);
-        if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != userId) return Forbid();
+        var newCategory = await _categoryRepo.GetById(value.CategoryId);
+        if (newCategory == null) return BadRequest("Category does not exist");
+        if (newCategory.UserId != userId) return Forbid();
 
         // Update Old Account
         if (transaction.Category.Type == Enums.TransactionType.INCOME)
@@ -162,16 +162,17 @@ public class TransactionController(
         }
 
         // New Old Account
-        if (category.Type == Enums.TransactionType.INCOME)
+        if (newCategory.Type == Enums.TransactionType.INCOME)
         {
-            account.Balance += value.Amount;
+            newAccount.Balance += value.Amount;
         }
         else
         {
-            account.Balance -= value.Amount;
+            newAccount.Balance -= value.Amount;
         }
 
-        transaction.Category = category;
+        transaction.AccountId = newAccount.Id;
+        transaction.CategoryId = newCategory.Id;
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
         transaction.Date = value.Date;

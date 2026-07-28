@@ -32,7 +32,6 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
         return await _context.Transactions
             .Include(t => t.Account)
             .Include(t => t.Category)
-            .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
