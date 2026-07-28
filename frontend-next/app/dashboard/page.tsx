@@ -1,14 +1,11 @@
 import { PrivateRoute } from "@/components/guards/PrivateRoute"
 import { RootLayout } from "@/components/layouts/root-layout/root-layout"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import DashboardPage from "./components/dashboard"
+import { DashboardProvider } from "./providers/dashboard-provider"
+import { DashboardFilter } from "./components/dashboard-filter"
+import { AccountsSection } from "./components/accounts-section"
+import { TransctionSummary } from "./components/transaction-summary"
+import { IncomeByCategory } from "./components/income-by-category"
+import { ExpenseByCategory } from "./components/expense-by-category"
 
 export const metadata = {
   title: "Dashboard",
@@ -18,15 +15,18 @@ export default function Page() {
   return (
     <PrivateRoute>
       <RootLayout>
-        {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
+        <DashboardProvider>
+          <div className="flex flex-col gap-4">
+            <AccountsSection />
+            <DashboardFilter />
+            <TransctionSummary />
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <IncomeByCategory />
+              <ExpenseByCategory />
+            </div>
           </div>
-          <div className="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-        </div> */}
-        <DashboardPage />
+        </DashboardProvider>
       </RootLayout>
     </PrivateRoute>
   )

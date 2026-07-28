@@ -12,5 +12,4 @@ export type DashboardType = {
   netAmount: number
   incomeByCategory: CategorySummary[]
   expenseByCategory: CategorySummary[]
-  accounts: Account[]
 }
