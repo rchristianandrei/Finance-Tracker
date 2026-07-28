@@ -11,7 +11,7 @@ export function TransctionSummary() {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       <Card>
-        <CardHeader className="flex items-center gap-2">
+        <CardHeader className="flex items-center gap-1">
           <CircleDollarSign></CircleDollarSign>
           <CardTitle>Total Net Income</CardTitle>
         </CardHeader>
@@ -24,7 +24,7 @@ export function TransctionSummary() {
       </Card>
 
       <Card>
-        <CardHeader className="flex items-center gap-2">
+        <CardHeader className="flex items-center gap-1">
           <TrendingUp></TrendingUp>
           <CardTitle>Total Income</CardTitle>
         </CardHeader>
@@ -37,7 +37,7 @@ export function TransctionSummary() {
       </Card>
 
       <Card>
-        <CardHeader className="flex items-center gap-2">
+        <CardHeader className="flex items-center gap-1">
           <TrendingDown></TrendingDown>
           <CardTitle>Total Expenses</CardTitle>
         </CardHeader>
