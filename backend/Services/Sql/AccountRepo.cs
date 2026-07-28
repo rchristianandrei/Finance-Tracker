@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Dtos.Account;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,12 @@ public class AccountRepo(ApplicationDbContext _context)
     public async Task<IEnumerable<Account>> GetAccountsByUserId(int userId)
     {
         return await _context.Accounts.Where(a => a.UserId == userId).ToListAsync();
+    }
+
+    public async Task Update(Account account)
+    {
+        _context.Accounts.Update(account);
+        await _context.SaveChangesAsync();
     }
 
     public async Task Delete(Account account)

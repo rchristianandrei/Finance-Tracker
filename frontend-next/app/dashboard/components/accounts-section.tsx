@@ -13,9 +13,13 @@ import { Account } from "@/types/account"
 import { Edit, Trash } from "lucide-react"
 import { useState } from "react"
 import { DeleteAccountDialog } from "./delete-account-dialog"
+import { UpdateAccountDialog } from "./update-account-dialog"
 
 export function AccountsSection() {
   const { accounts } = useAccount()
+  const [updateAccountEvent, setUpdateAccountEvent] = useState<Account | null>(
+    null
+  )
   const [deleteAccountEvent, setDeleteAccountEvent] = useState<Account | null>(
     null
   )
@@ -28,32 +32,34 @@ export function AccountsSection() {
           <CreateAccountDialog />
         </CardHeader>
         <CardContent className="grid-cols-3-1 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-          {accounts.map((a) => (
-            <ContextMenu key={a.id}>
+          {accounts.map((account) => (
+            <ContextMenu key={account.id}>
               <ContextMenuTrigger asChild>
-                <Card key={a.id} className="gap-1">
+                <Card key={account.id} className="gap-1">
                   <CardHeader>
-                    <CardTitle>{a.name}</CardTitle>
+                    <CardTitle>{account.name}</CardTitle>
                   </CardHeader>
                   <CardContent
                     className={cn(
                       "text-2xl",
-                      a.balance >= 0 ? "text-green-600" : "text-destructive"
+                      account.balance >= 0
+                        ? "text-green-600"
+                        : "text-destructive"
                     )}
                   >
-                    {formatMoney(Math.abs(a.balance))}
+                    {formatMoney(Math.abs(account.balance))}
                   </CardContent>
                 </Card>
               </ContextMenuTrigger>
               <ContextMenuContent>
-                <ContextMenuItem>
+                <ContextMenuItem onClick={() => setUpdateAccountEvent(account)}>
                   <Edit />
                   Edit
                 </ContextMenuItem>
 
                 <ContextMenuItem
                   className="text-destructive"
-                  onClick={() => setDeleteAccountEvent(a)}
+                  onClick={() => setDeleteAccountEvent(account)}
                 >
                   <Trash /> Delete
                 </ContextMenuItem>
@@ -62,6 +68,12 @@ export function AccountsSection() {
           ))}
         </CardContent>
       </Card>
+      {updateAccountEvent && (
+        <UpdateAccountDialog
+          account={updateAccountEvent}
+          onClose={() => setUpdateAccountEvent(null)}
+        />
+      )}
       {deleteAccountEvent && (
         <DeleteAccountDialog
           account={deleteAccountEvent}

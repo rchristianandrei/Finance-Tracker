@@ -9,13 +9,18 @@ import { TransactionType } from "@/types/category"
 import axios from "axios"
 import { useAuth } from "./auth-provider"
 import { Account } from "@/types/account"
-import { accountApi, CreateAccountRequest } from "@/api/account"
+import {
+  accountApi,
+  CreateAccountRequest,
+  UpdateAccountRequest,
+} from "@/api/account"
 
 interface AccountContextType {
   accounts: Account[]
   loading: boolean
-  loadAccounts: () => Promise<void>
   createAccount: (data: CreateAccountRequest) => Promise<void>
+  loadAccounts: () => Promise<void>
+  updateAccount: (data: UpdateAccountRequest) => Promise<void>
   deleteAccount: (accountId: number) => Promise<void>
 }
 
@@ -53,6 +58,11 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     await loadAccounts()
   }, [])
 
+  const updateAccount = useCallback(async (data: UpdateAccountRequest) => {
+    await accountApi.update(data)
+    await loadAccounts()
+  }, [])
+
   const deleteAccount = useCallback(async (accountId: number) => {
     await accountApi.delete(accountId)
     await loadAccounts()
@@ -60,7 +70,14 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AccountContext.Provider
-      value={{ accounts, loading, loadAccounts, createAccount, deleteAccount }}
+      value={{
+        accounts,
+        loading,
+        loadAccounts,
+        createAccount,
+        updateAccount,
+        deleteAccount,
+      }}
     >
       {children}
     </AccountContext.Provider>

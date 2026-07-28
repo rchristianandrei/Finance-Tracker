@@ -1,9 +1,15 @@
 import api from "@/lib/axios"
 import { Account } from "@/types/account"
 
-export type CreateAccountRequest = {
+type AccountRequest = {
   name: string
   initialBalance: number
+}
+
+export type CreateAccountRequest = AccountRequest & {}
+
+export type UpdateAccountRequest = AccountRequest & {
+  accountId: number
 }
 
 export const accountApi = {
@@ -13,7 +19,9 @@ export const accountApi = {
   getAccounts: () => {
     return api.get<Account[]>(`/account`)
   },
-  update: () => {},
+  update: (req: UpdateAccountRequest) => {
+    return api.put<Account>(`/account/${req.accountId}`, req)
+  },
   delete: (accountId: number) => {
     return api.delete<Account[]>(`/account/${accountId}`)
   },

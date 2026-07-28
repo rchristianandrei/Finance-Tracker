@@ -45,6 +45,23 @@ public class AccountController(
         return Ok(accounts.Select(a => a.ToDto()));
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateAccountDto dto)
+    {
+        var account = await _accountRepo.GetAccountById(id);
+        if (account == null) return NotFound("Account not found");
+
+        var userId = _currentUserService.Id();
+        if (account.UserId != userId) return Forbid();
+
+        account.Name = dto.Name;
+        account.Balance = dto.InitialBalance;
+
+        await _accountRepo.Update(account);
+
+        return Ok(account.ToDto());
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
