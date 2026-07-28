@@ -38,7 +38,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       return
     }
     loadAccounts()
-  }, [isLoggingIn])
+  }, [isLoggingIn, user])
 
   const loadAccounts = useCallback(async () => {
     try {
