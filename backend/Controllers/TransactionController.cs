@@ -84,7 +84,6 @@ public class TransactionController(
         var userId = _currentUserService.Id();
 
         var transactions = await _transactionService.GetDashboard(userId, query);
-        var accounts = await _accountRepo.GetAccountsByUserId(userId);
 
         var totalIncome = transactions
             .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
@@ -127,7 +126,6 @@ public class TransactionController(
                     Amount = g.Sum(x => x.Amount),
                     Percentage = totalExpense > 0 ? g.Sum(x => x.Amount) / totalExpense * 100 : 0
                 })],
-            Accounts = accounts.Select(a => a.ToDto())
         };
 
         return Ok(dashboard);
