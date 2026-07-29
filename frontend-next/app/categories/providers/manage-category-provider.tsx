@@ -1,26 +1,12 @@
 "use client"
 
-import {
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useContext,
-  useState,
-} from "react"
-import { Category } from "@/types/category"
-import { categoryApi } from "@/api/category"
+import { createContext, useCallback, useContext } from "react"
+import { categoryApi, CategoryUpdateRequest } from "@/api/category"
 import { useCategory } from "@/providers/category-provider"
 
 interface ManageCategoriesContextType {
-  updateCategoryEvent: Category | null
-  deleteCategoryEvent: Category | null
-  setUpdateCategoryEvent: Dispatch<SetStateAction<Category | null>>
-  cancelUpdateCategoryEvent: () => void
-  confirmUpdateCategoryEvent: (category: Category) => Promise<void>
-  setDeleteCategoryEvent: Dispatch<SetStateAction<Category | null>>
-  cancelDeleteCategoryEvent: () => void
-  confirmDeleteCategoryEvent: () => Promise<void>
+  updateCategory: (category: CategoryUpdateRequest) => Promise<void>
+  deleteCategory: (categoryId: number) => Promise<void>
 }
 
 const ManageCategoriesContext = createContext<
@@ -34,48 +20,24 @@ export function ManageCategoriesProvider({
 }) {
   const { loadCategories } = useCategory()
 
-  const [deleteCategoryEvent, setDeleteCategoryEvent] =
-    useState<Category | null>(null)
-
-  const [updateCategoryEvent, setUpdateCategoryEvent] =
-    useState<Category | null>(null)
-
-  const confirmUpdateCategoryEvent = useCallback(
-    async (category: Category) => {
-      if (!updateCategoryEvent) return
+  const updateCategory = useCallback(
+    async (category: CategoryUpdateRequest) => {
       await categoryApi.update(category)
-      setUpdateCategoryEvent(null)
       loadCategories()
     },
-    [updateCategoryEvent]
+    []
   )
 
-  const cancelUpdateCategoryEvent = useCallback(() => {
-    setUpdateCategoryEvent(null)
-  }, [])
-
-  const confirmDeleteCategoryEvent = useCallback(async () => {
-    if (!deleteCategoryEvent) return
-    await categoryApi.delete(deleteCategoryEvent.id)
-    setDeleteCategoryEvent(null)
+  const deleteCategory = useCallback(async (categoryId: number) => {
+    await categoryApi.delete(categoryId)
     loadCategories()
-  }, [deleteCategoryEvent])
-
-  const cancelDeleteCategoryEvent = useCallback(() => {
-    setDeleteCategoryEvent(null)
   }, [])
 
   return (
     <ManageCategoriesContext.Provider
       value={{
-        updateCategoryEvent,
-        deleteCategoryEvent,
-        setUpdateCategoryEvent,
-        setDeleteCategoryEvent,
-        cancelUpdateCategoryEvent,
-        confirmUpdateCategoryEvent,
-        cancelDeleteCategoryEvent,
-        confirmDeleteCategoryEvent,
+        updateCategory,
+        deleteCategory,
       }}
     >
       {children}

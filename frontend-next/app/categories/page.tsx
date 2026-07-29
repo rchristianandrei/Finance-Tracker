@@ -1,9 +1,9 @@
 import { PrivateRoute } from "@/components/guards/PrivateRoute"
-import { Categories } from "./categories"
 import { RootLayout } from "@/components/layouts/root-layout/root-layout"
 import { ManageCategoriesProvider } from "./providers/manage-category-provider"
-import { UpdateCategoryDialog } from "./components/update-category-dialog"
-import { DeleteCategoryDialog } from "./components/delete-category-dialog"
+import { CategoryList } from "./components/category-list"
+import { CategoryFilter } from "./components/category-filter"
+import { ManageCategoryFilterProvider } from "./providers/manage-category-filter"
 
 export const metadata = {
   title: "Categories",
@@ -13,11 +13,14 @@ export default function Page() {
   return (
     <PrivateRoute>
       <RootLayout>
-        <ManageCategoriesProvider>
-          <Categories />
-          <UpdateCategoryDialog />
-          <DeleteCategoryDialog />
-        </ManageCategoriesProvider>
+        <ManageCategoryFilterProvider>
+          <ManageCategoriesProvider>
+            <div className="flex flex-col gap-4">
+              <CategoryFilter />
+              <CategoryList />
+            </div>
+          </ManageCategoriesProvider>
+        </ManageCategoryFilterProvider>
       </RootLayout>
     </PrivateRoute>
   )
