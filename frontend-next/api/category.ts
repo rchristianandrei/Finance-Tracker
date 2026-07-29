@@ -1,6 +1,12 @@
 import api from "@/lib/axios"
 import { Category, TransactionType } from "@/types/category"
 
+export type CategoryUpdateRequest = {
+  id: number
+  type: TransactionType
+  name: string
+}
+
 export const categoryApi = {
   create: (type: TransactionType, name: string) => {
     const body = {
@@ -12,12 +18,8 @@ export const categoryApi = {
   getCategories: () => {
     return api.get<Category[]>(`/category`)
   },
-  update: (category: Category) => {
-    return api.put(`/category/${category.id}`, {
-      id: category.id,
-      type: category.type,
-      name: category.name,
-    })
+  update: (req: CategoryUpdateRequest) => {
+    return api.put(`/category/${req.id}`, req)
   },
   delete: (categoryId: number) => {
     return api.delete(`/category/${categoryId}`)
