@@ -33,7 +33,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
       return
     }
     loadCategories()
-  }, [isLoggingIn])
+  }, [isLoggingIn, user])
 
   const loadCategories = useCallback(async () => {
     try {
