@@ -3,12 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TransactionFilter } from "./transaction-filter"
 import { Edit, Receipt, Trash } from "lucide-react"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { Pagination } from "./pagination"
 import { useManageTransactions } from "../providers/manage-transactions-provider"
@@ -66,85 +60,66 @@ export function Transactions() {
           </CardHeader>
 
           <CardContent className="space-y-3">
-            <TooltipProvider>
-              {Object.entries(grouped).map(([date, items]) => (
-                <Card key={date}>
-                  <CardHeader>
-                    <CardTitle>{date}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {items.map((transaction) => (
-                      <ContextMenu key={transaction.id}>
-                        <ContextMenuTrigger asChild>
-                          <div className="grid grid-cols-2">
-                            <div className="max-w-50">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="block cursor-help truncate text-muted-foreground">
-                                    {transaction.category.name}
-                                  </span>
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                  <p>{transaction.category.name}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span className="block cursor-help truncate">
-                                    {transaction.description}
-                                  </span>
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                  <p>{transaction.description}</p>
-                                </TooltipContent>
-                              </Tooltip>
+            {Object.entries(grouped).map(([date, items]) => (
+              <Card key={date}>
+                <CardHeader>
+                  <CardTitle>{date}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {items.map((transaction) => (
+                    <ContextMenu key={transaction.id}>
+                      <ContextMenuTrigger asChild>
+                        <div className="grid grid-cols-[1fr_auto] gap-1">
+                          <div>
+                            <div className="truncate">
+                              {transaction.account.name}
                             </div>
-                            <div className="flex flex-row items-center gap-1 justify-self-end">
-                              <div className="flex flex-col text-right">
-                                <span className="text-muted-foreground">
-                                  {transaction.date.toLocaleTimeString([], {
-                                    hour: "numeric",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                                <TransactionBadge
-                                  type={
-                                    transaction.type === 2
-                                      ? "income"
-                                      : "expense"
-                                  }
-                                >
-                                  {formatMoney(transaction.amount)}
-                                </TransactionBadge>
-                              </div>
+                            <div className="truncate text-muted-foreground">
+                              {transaction.category.name}
+                            </div>
+                            <div className="truncate">
+                              {transaction.description}
                             </div>
                           </div>
-                        </ContextMenuTrigger>
-                        <ContextMenuContent>
-                          <ContextMenuItem
-                            onClick={() => setUpdateTransaction(transaction)}
-                          >
-                            <Edit />
-                            Edit
-                          </ContextMenuItem>
+                          <div className="flex flex-col items-end gap-1">
+                            <TransactionBadge
+                              type={
+                                transaction.type === 2 ? "income" : "expense"
+                              }
+                            >
+                              {formatMoney(transaction.amount)}
+                            </TransactionBadge>
+                            <div className="text-muted-foreground">
+                              {transaction.date.toLocaleTimeString([], {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </ContextMenuTrigger>
+                      <ContextMenuContent>
+                        <ContextMenuItem
+                          onClick={() => setUpdateTransaction(transaction)}
+                        >
+                          <Edit />
+                          Edit
+                        </ContextMenuItem>
 
-                          <ContextMenuItem
-                            className="text-destructive"
-                            onClick={() => {
-                              setDeleteTransaction(transaction)
-                            }}
-                          >
-                            <Trash /> Delete
-                          </ContextMenuItem>
-                        </ContextMenuContent>
-                      </ContextMenu>
-                    ))}
-                  </CardContent>
-                </Card>
-              ))}
-            </TooltipProvider>
+                        <ContextMenuItem
+                          className="text-destructive"
+                          onClick={() => {
+                            setDeleteTransaction(transaction)
+                          }}
+                        >
+                          <Trash /> Delete
+                        </ContextMenuItem>
+                      </ContextMenuContent>
+                    </ContextMenu>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
           </CardContent>
         </Card>
       </div>
