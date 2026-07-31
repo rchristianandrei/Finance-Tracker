@@ -3,7 +3,6 @@
 import { toast } from "sonner"
 import { Dialog } from "@/components/ui/dialog"
 import { useState } from "react"
-import { CreateCategoryDialog } from "@/components/category/create-category-dialog"
 import { Account } from "@/types/account"
 import { AccountForm } from "@/components/account/account-form"
 import { AccountFormValues } from "@/lib/validations/account"
@@ -19,8 +18,6 @@ export function UpdateAccountDialog({
   const { updateAccount } = useAccount()
   const [isOpen, setIsOpen] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
-  const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] =
-    useState(false)
 
   async function onSubmit(values: AccountFormValues) {
     if (!account) return
@@ -56,14 +53,6 @@ export function UpdateAccountDialog({
           ></AccountForm>
         )}
       </Dialog>
-      {isCreateCategoryDialogOpen && (
-        <CreateCategoryDialog
-          onClose={() => {
-            setIsCreateCategoryDialogOpen(false)
-            setIsOpen(true)
-          }}
-        />
-      )}
     </>
   )
 }
