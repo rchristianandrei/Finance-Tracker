@@ -51,7 +51,7 @@ namespace backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Category", b =>
@@ -83,7 +83,7 @@ namespace backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.GoogleCredential", b =>
@@ -110,7 +110,7 @@ namespace backend.Migrations
                     b.HasIndex("Subject")
                         .IsUnique();
 
-                    b.ToTable("GoogleCredentials");
+                    b.ToTable("GoogleCredentials", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.RefreshToken", b =>
@@ -144,7 +144,7 @@ namespace backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Transaction", b =>
@@ -189,7 +189,7 @@ namespace backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>
@@ -224,7 +224,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("backend.Models.Account", b =>

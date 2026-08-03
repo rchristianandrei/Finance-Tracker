@@ -5,7 +5,8 @@ namespace backend.Dtos.Category;
 
 public class CreateCategoryDto
 {
-    public TransactionType Type { get; set; } = TransactionType.EXPENSE;
+    [EnumDataType(typeof(TransactionType))]
+    public TransactionType Type { get; set; }
 
     [Required]
     [MaxLength(50)]

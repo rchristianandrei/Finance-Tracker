@@ -7,7 +7,8 @@ public class UpdateCategoryDto
 {
     public int Id { get; set; }
 
-    public TransactionType Type { get; set; } = TransactionType.EXPENSE;
+    [EnumDataType(typeof(TransactionType))]
+    public TransactionType Type { get; set; }
 
     [Required]
     [MaxLength(50)]
