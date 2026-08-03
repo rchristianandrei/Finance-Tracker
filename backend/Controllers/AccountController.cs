@@ -35,9 +35,11 @@ public class AccountController(
         return Ok(account.ToDto());
     }
 
-    [HttpPost]
+    [HttpPost("transfer")]
     public async Task<IActionResult> TransferBalance([FromBody] TransferBalanceDto dto)
     {
+        if (dto.FromAccountId == dto.ToAccountId) return BadRequest("Cannot transfer to the same account");
+
         var userId = _currentUserService.Id();
 
         var fromAccount = await _accountRepo.GetAccountById(dto.FromAccountId);

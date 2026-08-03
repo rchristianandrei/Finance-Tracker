@@ -12,6 +12,7 @@ import { Account } from "@/types/account"
 import {
   accountApi,
   CreateAccountRequest,
+  TransferBalanceRequest,
   UpdateAccountRequest,
 } from "@/api/account"
 
@@ -19,6 +20,7 @@ interface AccountContextType {
   accounts: Account[]
   loading: boolean
   createAccount: (data: CreateAccountRequest) => Promise<void>
+  transferBalance: (details: TransferBalanceRequest) => Promise<void>
   loadAccounts: () => Promise<void>
   updateAccount: (data: UpdateAccountRequest) => Promise<void>
   deleteAccount: (accountId: number) => Promise<void>
@@ -58,6 +60,14 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     await loadAccounts()
   }, [])
 
+  const transferBalance = useCallback(
+    async (details: TransferBalanceRequest) => {
+      await accountApi.transferBalance(details)
+      await loadAccounts()
+    },
+    []
+  )
+
   const updateAccount = useCallback(async (data: UpdateAccountRequest) => {
     await accountApi.update(data)
     await loadAccounts()
@@ -75,6 +85,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         loading,
         loadAccounts,
         createAccount,
+        transferBalance,
         updateAccount,
         deleteAccount,
       }}
