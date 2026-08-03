@@ -31,7 +31,7 @@ export function DebouncedSearchBox({
     <Input
       placeholder={placeholder ?? "Search..."}
       value={search}
-      className="w-full md:w-75"
+      className="w-75"
       onChange={(e) => {
         setSearch(e.target.value)
         changeSearch(e.target.value)
