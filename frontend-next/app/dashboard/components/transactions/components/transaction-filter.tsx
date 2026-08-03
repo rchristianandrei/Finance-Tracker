@@ -3,7 +3,7 @@
 import { useDashboard } from "../providers/dashboard-provider"
 import { MonthPicker } from "./month-picker"
 
-export function DashboardFilter() {
+export function TransactionFilter() {
   const { month, setMonth } = useDashboard()
   return (
     <div className="flex flex-col gap-2">

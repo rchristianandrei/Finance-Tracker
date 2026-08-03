@@ -16,7 +16,7 @@ import { ArrowUpDownIcon, Edit, Trash } from "lucide-react"
 import { useState } from "react"
 import { DeleteAccountDialog } from "./delete-account-dialog"
 import { UpdateAccountDialog } from "./update-account-dialog"
-import { TransferBalanceDialog } from "./accounts/transfer-balance-dialog"
+import { TransferBalanceDialog } from "./transfer-balance-dialog"
 
 export function AccountsSection() {
   const { accounts } = useAccount()

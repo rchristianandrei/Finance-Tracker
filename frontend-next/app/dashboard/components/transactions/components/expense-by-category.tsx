@@ -2,9 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BanknoteArrowDown } from "lucide-react"
-import { VerticalBarGraph } from "./vertical-bar-graph"
 import { useMemo } from "react"
 import { useDashboard } from "../providers/dashboard-provider"
+import { HorizontalBarGraph } from "./horizontal-bar-graph"
 
 export function ExpenseByCategory() {
   const { dashboardData } = useDashboard()
@@ -19,7 +19,7 @@ export function ExpenseByCategory() {
       </CardHeader>
 
       <CardContent>
-        <VerticalBarGraph
+        <HorizontalBarGraph
           categorySummaries={sortedExpenseCategories || []}
           type="expense"
         />
