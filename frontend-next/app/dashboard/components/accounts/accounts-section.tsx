@@ -12,13 +12,16 @@ import { formatMoney } from "@/lib/format-money"
 import { cn } from "@/lib/utils"
 import { useAccount } from "@/providers/account-provider"
 import { Account } from "@/types/account"
-import { Edit, Trash } from "lucide-react"
+import { ArrowUpDownIcon, Edit, Trash } from "lucide-react"
 import { useState } from "react"
 import { DeleteAccountDialog } from "./delete-account-dialog"
 import { UpdateAccountDialog } from "./update-account-dialog"
+import { TransferBalanceDialog } from "./transfer-balance-dialog"
 
 export function AccountsSection() {
   const { accounts } = useAccount()
+  const [transferBalanceEvent, setTransferBalanceEvent] =
+    useState<Account | null>(null)
   const [updateAccountEvent, setUpdateAccountEvent] = useState<Account | null>(
     null
   )
@@ -54,6 +57,12 @@ export function AccountsSection() {
                 </Card>
               </ContextMenuTrigger>
               <ContextMenuContent>
+                <ContextMenuItem
+                  onClick={() => setTransferBalanceEvent(account)}
+                >
+                  <ArrowUpDownIcon />
+                  Transfer Balance
+                </ContextMenuItem>
                 <ContextMenuItem onClick={() => setUpdateAccountEvent(account)}>
                   <Edit />
                   Edit
@@ -70,6 +79,12 @@ export function AccountsSection() {
           ))}
         </div>
       </div>
+      {transferBalanceEvent && (
+        <TransferBalanceDialog
+          account={transferBalanceEvent}
+          onClose={() => setTransferBalanceEvent(null)}
+        />
+      )}
       {updateAccountEvent && (
         <UpdateAccountDialog
           account={updateAccountEvent}

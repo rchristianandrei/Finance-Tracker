@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
 import { formatMoney } from "@/lib/format-money"
 
-export function VerticalBarGraph({
+export function HorizontalBarGraph({
   categorySummaries,
   type,
 }: {

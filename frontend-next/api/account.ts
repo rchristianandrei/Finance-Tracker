@@ -12,9 +12,18 @@ export type UpdateAccountRequest = AccountRequest & {
   accountId: number
 }
 
+export type TransferBalanceRequest = {
+  fromAccountId: number
+  toAccountId: number
+  amount: number
+}
+
 export const accountApi = {
   create: (req: CreateAccountRequest) => {
     return api.post<Account>(`/account`, req)
+  },
+  transferBalance: (req: TransferBalanceRequest) => {
+    return api.post<Account>(`/account/transfer`, req)
   },
   getAccounts: () => {
     return api.get<Account[]>(`/account`)

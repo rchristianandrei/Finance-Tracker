@@ -1,10 +1,10 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useDashboard } from "../providers/dashboard-provider"
 import { useMemo } from "react"
 import { BanknoteArrowUp } from "lucide-react"
-import { VerticalBarGraph } from "./vertical-bar-graph"
+import { HorizontalBarGraph } from "./components/horizontal-bar-graph"
+import { useDashboard } from "./providers/dashboard-provider"
 
 export function IncomeByCategory() {
   const { dashboardData } = useDashboard()
@@ -21,7 +21,7 @@ export function IncomeByCategory() {
       </CardHeader>
 
       <CardContent>
-        <VerticalBarGraph
+        <HorizontalBarGraph
           categorySummaries={sortedIncomeCategories || []}
           type="income"
         />
