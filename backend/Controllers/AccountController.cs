@@ -35,6 +35,30 @@ public class AccountController(
         return Ok(account.ToDto());
     }
 
+    [HttpPost]
+    public async Task<IActionResult> TransferBalance([FromBody] TransferBalanceDto dto)
+    {
+        var userId = _currentUserService.Id();
+
+        var fromAccount = await _accountRepo.GetAccountById(dto.FromAccountId);
+        if (fromAccount == null) return NotFound("From account not found");
+        if (fromAccount.UserId != userId) return Forbid();
+
+        var toAccount = await _accountRepo.GetAccountById(dto.ToAccountId);
+        if (toAccount == null) return NotFound("To account not found");
+        if (toAccount.UserId != userId) return Forbid();
+
+        fromAccount.Balance -= dto.Amount;
+        toAccount.Balance += dto.Amount;
+
+        await _accountRepo.Update(fromAccount);
+        await _accountRepo.Update(toAccount);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(fromAccount.ToDto());
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
