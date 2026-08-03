@@ -1,7 +1,9 @@
 using backend.Data;
+using backend.Enums;
 using backend.Interfaces.Sql;
 using backend.Services.Sql;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace backend.Extensions;
 
@@ -10,7 +12,10 @@ public static class ProgramSqlExtension
     public static IServiceCollection AddMySql(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        var dataSource = dataSourceBuilder.Build();
+
+        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(dataSource, npgsqlOptions =>
         {
             npgsqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
