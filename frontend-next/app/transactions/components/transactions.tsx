@@ -48,55 +48,47 @@ export function Transactions() {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="grid h-full grid-cols-1 grid-rows-[auto_1fr_auto] gap-4">
         <TransactionFilter />
-        <Card className="flex flex-1 flex-col overflow-auto">
-          <CardHeader className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Receipt></Receipt>
-              <CardTitle>Transactions</CardTitle>
-            </div>
-            <Pagination />
-          </CardHeader>
-
-          <CardContent className="space-y-3">
+        <div className="flex flex-1 flex-col overflow-auto">
+          <div className="space-y-3">
             {Object.entries(grouped).map(([date, items]) => (
-              <Card key={date}>
-                <CardHeader>
-                  <CardTitle>{date}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+              <div key={date} className="flex flex-col gap-2">
+                <div>{date}</div>
+                <div className="space-y-3">
                   {items.map((transaction) => (
                     <ContextMenu key={transaction.id}>
                       <ContextMenuTrigger asChild>
-                        <div className="grid grid-cols-[1fr_auto] gap-1">
-                          <div>
-                            <div className="truncate">
-                              {transaction.account.name}
+                        <Card className="gap-2">
+                          <CardHeader>
+                            <CardTitle>{transaction.account.name}</CardTitle>
+                          </CardHeader>
+                          <CardContent className="grid grid-cols-[1fr_auto] gap-1">
+                            <div className="flex flex-col justify-center gap-1">
+                              <div className="truncate text-muted-foreground">
+                                {transaction.category.name}
+                              </div>
+                              <div className="truncate">
+                                {transaction.description}
+                              </div>
                             </div>
-                            <div className="truncate text-muted-foreground">
-                              {transaction.category.name}
+                            <div className="flex flex-col items-end gap-1">
+                              <TransactionBadge
+                                type={
+                                  transaction.type === 2 ? "income" : "expense"
+                                }
+                              >
+                                {formatMoney(transaction.amount)}
+                              </TransactionBadge>
+                              <div className="text-muted-foreground">
+                                {transaction.date.toLocaleTimeString([], {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                })}
+                              </div>
                             </div>
-                            <div className="truncate">
-                              {transaction.description}
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <TransactionBadge
-                              type={
-                                transaction.type === 2 ? "income" : "expense"
-                              }
-                            >
-                              {formatMoney(transaction.amount)}
-                            </TransactionBadge>
-                            <div className="text-muted-foreground">
-                              {transaction.date.toLocaleTimeString([], {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}
-                            </div>
-                          </div>
-                        </div>
+                          </CardContent>
+                        </Card>
                       </ContextMenuTrigger>
                       <ContextMenuContent>
                         <ContextMenuItem
@@ -117,11 +109,14 @@ export function Transactions() {
                       </ContextMenuContent>
                     </ContextMenu>
                   ))}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <Pagination />
+        </div>
       </div>
       {updateTransaction && (
         <UpdateTransactionDialog
