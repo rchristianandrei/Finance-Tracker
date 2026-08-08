@@ -13,6 +13,7 @@ import { useTransactionFilter } from "./transaction-filter-provider"
 import { toast } from "sonner"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
 import axios from "axios"
+import { useAccount } from "@/providers/account-provider"
 
 interface ManageTransactionsContextType {
   transactions: Transaction[]
@@ -39,6 +40,7 @@ export function ManageTransactionsProvider({
 }: {
   children: React.ReactNode
 }) {
+  const { loadAccounts } = useAccount()
   const { transactionAdded } = useAddTransaction()
 
   const { dateRange, type, selectedCategories, currentPage, search } =
@@ -107,16 +109,18 @@ export function ManageTransactionsProvider({
     }) => {
       await transactionApi.update(updatedValues)
       getTransactions()
+      loadAccounts()
     },
-    [getTransactions]
+    [getTransactions, loadAccounts]
   )
 
   const deleteTransaction = useCallback(
     async (transactionId: number) => {
       await transactionApi.delete(transactionId)
       getTransactions()
+      loadAccounts()
     },
-    [getTransactions]
+    [getTransactions, loadAccounts]
   )
 
   return (
