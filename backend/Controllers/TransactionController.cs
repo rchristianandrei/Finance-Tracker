@@ -51,7 +51,7 @@ public class TransactionController(
 
         var transaction = new Transaction
         {
-            AccountId = account.Id,
+            ToAccountId = account.Id,
             UserId = userId,
             CategoryId = category.Id,
             Amount = value.Amount,
@@ -152,11 +152,11 @@ public class TransactionController(
         // Update Old Account
         if (transaction.Category.Type == Enums.TransactionType.INCOME)
         {
-            transaction.Account.Balance -= transaction.Amount;
+            transaction.ToAccount.Balance -= transaction.Amount;
         }
         else
         {
-            transaction.Account.Balance += transaction.Amount;
+            transaction.ToAccount.Balance += transaction.Amount;
         }
 
         // New Old Account
@@ -169,7 +169,7 @@ public class TransactionController(
             newAccount.Balance -= value.Amount;
         }
 
-        transaction.AccountId = newAccount.Id;
+        transaction.ToAccountId = newAccount.Id;
         transaction.CategoryId = newCategory.Id;
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
@@ -196,11 +196,11 @@ public class TransactionController(
         {
             if (transaction.Category.Type == Enums.TransactionType.INCOME)
             {
-                transaction.Account.Balance -= transaction.Amount;
+                transaction.ToAccount.Balance -= transaction.Amount;
             }
             else
             {
-                transaction.Account.Balance += transaction.Amount;
+                transaction.ToAccount.Balance += transaction.Amount;
             }
         }
 

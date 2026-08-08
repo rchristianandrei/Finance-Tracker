@@ -12,7 +12,7 @@ public static class TransactionDtoMapper
             Id = t.Id,
             Date = t.Date,
             Type = t.Category.Type,
-            Account = t.Account.ToDto(),
+            Account = t.ToAccount.ToDto(),
             Category = t.Category.ToDto(),
             Description = t.Description,
             Amount = t.Amount

@@ -20,5 +20,7 @@ public class Account
     public DateTimeOffset UpdatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonIgnore]
-    public ICollection<Transaction> Transactions { get; set; } = [];
+    public ICollection<Transaction> OutgoingTransactions { get; set; } = [];
+    [JsonIgnore]
+    public ICollection<Transaction> IncomingTransactions { get; set; } = [];
 }
