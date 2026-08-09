@@ -98,23 +98,29 @@ export function TransactionFilter() {
               </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="w-55 p-2" align="start">
-              <div className="flex flex-col gap-1">
-                {/* All option */}
-                <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={() => changeSelectedCategory("all", true)}
-                    className="accent-primary"
-                  />
-                  All Categories
-                </label>
+            <PopoverContent
+              align="start"
+              className="w-55 p-2"
+              style={{
+                maxHeight: "var(--radix-popover-content-available-height)",
+              }}
+            >
+              {/* Fixed */}
+              <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={() => changeSelectedCategory("all", true)}
+                  className="accent-primary"
+                />
+                All Categories
+              </label>
 
-                <div className="my-1 border-t" />
+              <div className="my-1 border-t" />
 
-                <TooltipProvider>
-                  {/* Individual categories */}
+              {/* Scrollable */}
+              <div className="overflow-y-auto">
+                <div className="flex flex-col gap-1">
                   {filteredCategories.map((category) => (
                     <label
                       key={category.id}
@@ -133,17 +139,11 @@ export function TransactionFilter() {
                         }
                         className="accent-primary"
                       />
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="truncate">{category.name}</span>
-                        </TooltipTrigger>
-                        <TooltipContent className="truncate">
-                          {category.name}
-                        </TooltipContent>
-                      </Tooltip>
+
+                      <span className="truncate">{category.name}</span>
                     </label>
                   ))}
-                </TooltipProvider>
+                </div>
               </div>
             </PopoverContent>
           </Popover>
@@ -175,8 +175,14 @@ export function TransactionFilter() {
               </Button>
             </PopoverTrigger>
 
-            <PopoverContent align="start" className="w-auto p-0">
-              <div className="border-b p-2 text-center">
+            <PopoverContent
+              align="start"
+              className="flex w-auto flex-col overflow-hidden p-0"
+              style={{
+                maxHeight: "var(--radix-popover-content-available-height)",
+              }}
+            >
+              <div className="shrink-0 border-b p-2 text-center">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -188,12 +194,14 @@ export function TransactionFilter() {
                 </Button>
               </div>
 
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={changeDate}
-                numberOfMonths={2}
-              />
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={changeDate}
+                  numberOfMonths={2}
+                />
+              </div>
             </PopoverContent>
           </Popover>
         </div>
