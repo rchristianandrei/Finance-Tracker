@@ -56,7 +56,7 @@ export function TransactionFilter() {
   return (
     <Card>
       <CardContent className="flex flex-wrap gap-3">
-        <div className="flex w-0 items-center gap-3 overflow-auto">
+        <div className="flex w-auto items-center gap-3 overflow-auto">
           {/* Search */}
           <DebouncedSearchBox
             value={search}
@@ -68,7 +68,7 @@ export function TransactionFilter() {
           {/* Type */}
 
           <Select value={type ?? "all"} onValueChange={changeType}>
-            <SelectTrigger className="w-0">
+            <SelectTrigger className="w-auto">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
 
@@ -86,7 +86,7 @@ export function TransactionFilter() {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-0 justify-start truncate font-normal"
+                className="w-auto justify-start truncate font-normal"
               >
                 {allSelected
                   ? "All Categories"
@@ -154,7 +154,7 @@ export function TransactionFilter() {
               <Button
                 variant="outline"
                 className={cn(
-                  "w-0 justify-start text-left font-normal",
+                  "w-auto justify-start text-left font-normal",
                   !dateRange && "text-muted-foreground"
                 )}
               >
