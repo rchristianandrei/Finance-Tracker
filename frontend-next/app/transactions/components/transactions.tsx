@@ -53,9 +53,11 @@ export function Transactions() {
         <div className="flex flex-1 flex-col overflow-auto">
           <div className="space-y-3">
             {Object.entries(grouped).map(([date, items]) => (
-              <div key={date} className="flex flex-col gap-2">
-                <div>{date}</div>
-                <div className="space-y-3">
+              <Card key={date} className="flex flex-col gap-2">
+                <CardHeader>
+                  <CardTitle>{date}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
                   {items.map((transaction) => (
                     <ContextMenu key={transaction.id}>
                       <ContextMenuTrigger asChild>
@@ -109,8 +111,8 @@ export function Transactions() {
                       </ContextMenuContent>
                     </ContextMenu>
                   ))}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
