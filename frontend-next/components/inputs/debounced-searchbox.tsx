@@ -1,6 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 
@@ -8,11 +9,13 @@ export function DebouncedSearchBox({
   placeholder,
   value,
   delay,
+  className,
   onValueChange: onValueChange,
 }: {
   placeholder?: string
   value?: string
   delay?: number
+  className?: string
   onValueChange?: (value: string) => void
 }) {
   const [search, setSearch] = useState(value ?? "")
@@ -31,7 +34,7 @@ export function DebouncedSearchBox({
     <Input
       placeholder={placeholder ?? "Search..."}
       value={search}
-      className="w-75"
+      className={cn("w-75", className)}
       onChange={(e) => {
         setSearch(e.target.value)
         changeSearch(e.target.value)
