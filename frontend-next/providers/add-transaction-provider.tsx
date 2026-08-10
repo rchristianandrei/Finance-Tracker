@@ -1,12 +1,15 @@
 "use client"
 
 import { createContext, useCallback, useContext, useState } from "react"
-import { Transaction } from "@/types/transaction"
 import { useAccount } from "./account-provider"
+import {
+  CreateIncomeTransactionRequest,
+  transactionApi,
+} from "@/api/transactions"
 
 interface AddTransactionContextType {
-  transactionAdded: Transaction | null
-  addTransaction: (transaction: Transaction) => void
+  transactionAdded: {}
+  addTransaction: (request: CreateIncomeTransactionRequest) => Promise<void>
 }
 
 const AddTransactionContext = createContext<
@@ -19,14 +22,16 @@ export function AddTransactionProvider({
   children: React.ReactNode
 }) {
   const { loadAccounts } = useAccount()
-  const [transactionAdded, setTransactionAdded] = useState<Transaction | null>(
-    null
-  )
+  const [transactionAdded, setTransactionAdded] = useState<{}>({})
 
-  const addTransaction = useCallback((transaction: Transaction) => {
-    setTransactionAdded(transaction)
-    loadAccounts()
-  }, [])
+  const addTransaction = useCallback(
+    async (request: CreateIncomeTransactionRequest) => {
+      await transactionApi.createIncomeTransaction(request)
+      setTransactionAdded({})
+      loadAccounts()
+    },
+    []
+  )
 
   return (
     <AddTransactionContext.Provider

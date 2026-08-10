@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { IncomeTransactionForm } from "./income-transaction-form"
 import { ExpenseTransactionForm } from "./expense-transaction-form"
@@ -19,17 +18,6 @@ import { TransferTransactionForm } from "./transfer-transaction-form"
 
 export function NewCreateTransactionDialog() {
   const [isOpen, setIsOpen] = useState(false)
-
-  async function onSubmit(values: any) {
-    try {
-      toast.success("Transaction created successfully")
-
-      setIsOpen(false)
-    } catch (err) {
-      toast.error("Failed to create transaction")
-      throw err
-    }
-  }
 
   return (
     <>
@@ -45,7 +33,7 @@ export function NewCreateTransactionDialog() {
           <DialogHeader className="gap-1">
             <DialogTitle>Create Transaction</DialogTitle>
             <DialogDescription></DialogDescription>
-            <Tabs defaultValue="income" className="flex flex-col">
+            <Tabs defaultValue="expense" className="flex flex-col">
               <TabsList className="w-full gap-3 rounded-full bg-muted p-1">
                 <TabsTrigger
                   value="income"
@@ -70,7 +58,7 @@ export function NewCreateTransactionDialog() {
               </TabsList>
 
               <TabsContent value="income">
-                <IncomeTransactionForm />
+                <IncomeTransactionForm onSuccess={() => setIsOpen(false)} />
               </TabsContent>
               <TabsContent value="expense">
                 <ExpenseTransactionForm />

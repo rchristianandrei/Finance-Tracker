@@ -30,16 +30,20 @@ import {
   IncomeTransactionFormValues,
   incomeTransactionSchema,
 } from "@/lib/validations/transactions"
+import { useAddTransaction } from "@/providers/add-transaction-provider"
 
 export function IncomeTransactionForm({
   transaction,
   onAddCategoryClick,
+  onSuccess,
 }: {
   transaction?: Transaction
   onAddCategoryClick?: () => void
+  onSuccess?: () => void
 }) {
   const { accounts } = useAccount()
   const { categories } = useCategory()
+  const { addTransaction } = useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<IncomeTransactionFormValues>({
@@ -57,6 +61,14 @@ export function IncomeTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
+      await addTransaction({
+        toAccountId: values.toAccountId,
+        categoryId: values.categoryId,
+        description: values.description,
+        amount: values.amount!,
+        date: new Date(values.date),
+      })
+      onSuccess?.()
     } finally {
       setIsSubmitting(false)
     }

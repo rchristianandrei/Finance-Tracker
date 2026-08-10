@@ -1,6 +1,14 @@
 import api from "@/lib/axios"
 import { Transaction } from "@/types/transaction"
 
+export type CreateIncomeTransactionRequest = {
+  toAccountId: number
+  categoryId: number
+  amount: number
+  description: string
+  date: Date
+}
+
 export const transactionApi = {
   createTransaction: async (expense: {
     accountId: number
@@ -14,6 +22,13 @@ export const transactionApi = {
       date: expense.date.toISOString(),
     }
     return await api.post<Transaction>(`/transaction`, body)
+  },
+  createIncomeTransaction: async (income: CreateIncomeTransactionRequest) => {
+    const body = {
+      ...income,
+      date: income.date.toISOString(),
+    }
+    return await api.post(`/transaction/income`, body)
   },
   readTransactions: async (
     filter?: {

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 
 import { TransactionFormValues } from "@/lib/validations/transaction"
-import { TransactionType } from "@/types/category"
 import { transactionApi } from "@/api/transactions"
 import { toast } from "sonner"
 import { TransactionForm } from "./transaction-form"
@@ -23,7 +22,7 @@ export function CreateTransactionDialog() {
 
   async function onSubmit(values: TransactionFormValues) {
     try {
-      const response = await transactionApi.createTransaction({
+      await transactionApi.createTransaction({
         accountId: values.accountId,
         categoryId: values.categoryId,
         description: values.description,
@@ -32,7 +31,7 @@ export function CreateTransactionDialog() {
       })
 
       toast.success("Transaction created successfully")
-      addTransaction(response.data)
+      addTransaction()
       setIsOpen(false)
     } catch (err) {
       toast.error("Failed to create transaction")

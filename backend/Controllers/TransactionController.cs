@@ -65,6 +65,38 @@ public class TransactionController(
         return Ok(transaction.ToDto());
     }
 
+    [Transaction]
+    [HttpPost("income")]
+    public async Task<IActionResult> CreateIncome([FromBody] CreateIncomeTransactionDto value)
+    {
+        var userId = _currentUserService.Id();
+
+        var account = await _accountRepo.GetAccountById(value.ToAccountId);
+        if (account == null) return BadRequest("To Account does not exist");
+        if (account.UserId != userId) return Forbid();
+
+        var category = await _categoryRepo.GetById(value.CategoryId);
+        if (category == null) return BadRequest("Category does not exist");
+        if (category.UserId != userId) return Forbid();
+        if (category.Type != Enums.TransactionType.INCOME) return BadRequest("Category is not an income category");
+
+        account.Balance += value.Amount;
+
+        var transaction = new Transaction
+        {
+            ToAccountId = account.Id,
+            UserId = userId,
+            CategoryId = category.Id,
+            Amount = value.Amount,
+            Description = value.Description,
+            Date = value.Date,
+        };
+
+        await _transactionService.Create(transaction);
+
+        return Ok();
+    }
+
     [HttpGet()]
     public async Task<IActionResult> GetAll([FromQuery] TransactionQueryParameters query)
     {
