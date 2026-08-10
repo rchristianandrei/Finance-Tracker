@@ -60,9 +60,9 @@ export function TransactionForm({
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      accountId: transaction?.account.id ?? 0,
+      accountId: transaction?.toAccount?.id ?? 0,
       type: transaction?.type ? (transaction.type === 1 ? "1" : "2") : "1",
-      categoryId: transaction?.category.id ?? 0,
+      categoryId: transaction?.category?.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),

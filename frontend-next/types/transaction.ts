@@ -5,8 +5,9 @@ export type Transaction = {
   id: number
   date: Date
   type: TransactionType
-  account: Account
-  category: Category
-  description: string
+  fromAccount: Account | null
+  toAccount: Account | null
+  category: Category | null
+  description: string | null
   amount: number
 }

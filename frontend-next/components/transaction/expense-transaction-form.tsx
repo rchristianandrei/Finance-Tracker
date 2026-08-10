@@ -45,7 +45,7 @@ export function ExpenseTransactionForm({
   const form = useForm<ExpenseTransactionFormValues>({
     resolver: zodResolver(expenseTransactionSchema),
     defaultValues: {
-      fromAccountId: transaction?.account.id ?? 0,
+      fromAccountId: transaction?.toAccount.id ?? 0,
       categoryId: transaction?.category.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,

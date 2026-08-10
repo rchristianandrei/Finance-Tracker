@@ -40,8 +40,8 @@ export function TransferTransactionForm({
   const form = useForm<TransferTransactionFormValues>({
     resolver: zodResolver(transferTransactionSchema),
     defaultValues: {
-      fromAccountId: transaction?.account.id ?? 0,
-      toAccountId: transaction?.account.id ?? 0,
+      fromAccountId: transaction?.toAccount.id ?? 0,
+      toAccountId: transaction?.toAccount.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),

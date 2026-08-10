@@ -49,7 +49,7 @@ export function IncomeTransactionForm({
   const form = useForm<IncomeTransactionFormValues>({
     resolver: zodResolver(incomeTransactionSchema),
     defaultValues: {
-      toAccountId: transaction?.account.id ?? 0,
+      toAccountId: transaction?.toAccount.id ?? 0,
       categoryId: transaction?.category.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,

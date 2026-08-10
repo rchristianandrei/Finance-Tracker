@@ -2,8 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TransactionFilter } from "./transaction-filter"
-import { Edit, Receipt, Trash } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Edit, Trash } from "lucide-react"
 import { Pagination } from "./pagination"
 import { useManageTransactions } from "../providers/manage-transactions-provider"
 import { Transaction } from "@/types/transaction"
@@ -62,27 +61,37 @@ export function Transactions() {
                     <ContextMenu key={transaction.id}>
                       <ContextMenuTrigger asChild>
                         <Card className="gap-2">
-                          <CardHeader>
-                            <CardTitle>{transaction.account.name}</CardTitle>
+                          <CardHeader className="grid grid-cols-[1fr_auto] gap-1">
+                            <CardTitle className="truncate">
+                              {transaction.description ?? "No description"}
+                            </CardTitle>
+                            <TransactionBadge
+                              type={
+                                transaction.type === 2 ? "income" : "expense"
+                              }
+                            >
+                              {formatMoney(transaction.amount)}
+                            </TransactionBadge>
                           </CardHeader>
-                          <CardContent className="grid grid-cols-[1fr_auto] gap-1">
-                            <div className="flex flex-col justify-center gap-1">
-                              <div className="truncate text-muted-foreground">
-                                {transaction.category.name}
-                              </div>
+                          <CardContent className="flex flex-col gap-1 text-muted-foreground">
+                            <div className="grid grid-cols-[1fr_auto_1fr] gap-1">
                               <div className="truncate">
-                                {transaction.description}
+                                {transaction.type === 2
+                                  ? transaction.category?.name
+                                  : transaction.fromAccount?.name}
+                              </div>
+                              <div>→</div>
+                              <div className="truncate text-right">
+                                {transaction.type === 2
+                                  ? transaction.toAccount?.name
+                                  : transaction.category?.name}
                               </div>
                             </div>
-                            <div className="flex flex-col items-end gap-1">
-                              <TransactionBadge
-                                type={
-                                  transaction.type === 2 ? "income" : "expense"
-                                }
-                              >
-                                {formatMoney(transaction.amount)}
-                              </TransactionBadge>
-                              <div className="text-muted-foreground">
+                            <div className="grid grid-cols-[1fr_auto] gap-1">
+                              <div className="truncate">
+                                {/* {transaction.category?.name} */}
+                              </div>
+                              <div>
                                 {transaction.date.toLocaleTimeString([], {
                                   hour: "numeric",
                                   minute: "2-digit",
