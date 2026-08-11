@@ -67,7 +67,11 @@ export function Transactions() {
                             </CardTitle>
                             <TransactionBadge
                               type={
-                                transaction.type === 2 ? "income" : "expense"
+                                transaction.type === 2
+                                  ? "income"
+                                  : transaction.type === 1
+                                    ? "expense"
+                                    : "transfer"
                               }
                             >
                               {formatMoney(transaction.amount)}
@@ -82,14 +86,18 @@ export function Transactions() {
                               </div>
                               <div>→</div>
                               <div className="truncate text-right">
-                                {transaction.type === 2
-                                  ? transaction.toAccount?.name
-                                  : transaction.category?.name}
+                                {transaction.type === 1
+                                  ? transaction.category?.name
+                                  : transaction.toAccount?.name}
                               </div>
                             </div>
                             <div className="grid grid-cols-[1fr_auto] gap-1">
                               <div className="truncate">
-                                {/* {transaction.category?.name} */}
+                                {transaction.type === 2
+                                  ? "Income"
+                                  : transaction.type === 1
+                                    ? "Expense"
+                                    : "Transfer"}
                               </div>
                               <div>
                                 {transaction.date.toLocaleTimeString([], {

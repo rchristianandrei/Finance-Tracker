@@ -10,7 +10,6 @@ using backend.Services.Sql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Sprache;
 
 namespace backend.Controllers;
 
@@ -25,46 +24,6 @@ public class TransactionController(
     ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
-    [Transaction]
-    [HttpPost()]
-    public async Task<IActionResult> Create([FromBody] AddTransactionDto value)
-    {
-        var userId = _currentUserService.Id();
-
-        var account = await _accountRepo.GetAccountById(value.AccountId);
-        if (account == null) return BadRequest("Account does not exist");
-        if (account.UserId != userId) return Forbid();
-
-        var category = await _categoryRepo.GetById(value.CategoryId);
-        if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != userId) return Forbid();
-
-        // Update Associated Account Balance
-        if (category.Type == Enums.TransactionType.INCOME)
-        {
-            account.Balance += value.Amount;
-        }
-        else
-        {
-            account.Balance -= value.Amount;
-        }
-
-        var transaction = new Transaction
-        {
-            ToAccountId = account.Id,
-            UserId = userId,
-            CategoryId = category.Id,
-            Amount = value.Amount,
-            Description = value.Description,
-            Date = value.Date,
-        };
-
-        await _transactionService.Create(transaction);
-
-        transaction.Category = category;
-        return Ok(transaction.ToDto());
-    }
-
     [Transaction]
     [HttpPost("income")]
     public async Task<IActionResult> CreateIncome([FromBody] CreateIncomeTransactionDto dto)
@@ -121,6 +80,39 @@ public class TransactionController(
             Type = Enums.TransactionType.EXPENSE,
             FromAccountId = account.Id,
             CategoryId = category.Id,
+            Description = dto.Description,
+            Amount = dto.Amount,
+            Date = dto.Date,
+        };
+
+        await _transactionService.Create(transaction);
+
+        return Ok();
+    }
+
+    [Transaction]
+    [HttpPost("transfer")]
+    public async Task<IActionResult> CreateTransfer([FromBody] CreateTransferTransactionDto dto)
+    {
+        var userId = _currentUserService.Id();
+
+        var fromAccount = await _accountRepo.GetAccountById(dto.FromAccountId);
+        if (fromAccount == null) return BadRequest("From Account does not exist");
+        if (fromAccount.UserId != userId) return Forbid();
+
+        var toAccount = await _accountRepo.GetAccountById(dto.ToAccountId);
+        if (toAccount == null) return BadRequest("To Account does not exist");
+        if (toAccount.UserId != userId) return Forbid();
+
+        fromAccount.Balance -= dto.Amount;
+        toAccount.Balance += dto.Amount;
+
+        var transaction = new Transaction
+        {
+            UserId = userId,
+            Type = Enums.TransactionType.TRANSFER,
+            FromAccountId = fromAccount.Id,
+            ToAccountId = toAccount.Id,
             Description = dto.Description,
             Amount = dto.Amount,
             Date = dto.Date,

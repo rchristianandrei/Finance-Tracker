@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { Transaction } from "@/types/transaction"
 import {
@@ -28,20 +28,25 @@ import {
   TransferTransactionFormValues,
   transferTransactionSchema,
 } from "@/lib/validations/transactions"
+import { useAddTransaction } from "@/providers/add-transaction-provider"
+import { formatMoney } from "@/lib/format-money"
 
 export function TransferTransactionForm({
   transaction,
+  onSuccess,
 }: {
   transaction?: Transaction
+  onSuccess?: () => void
 }) {
   const { accounts } = useAccount()
+  const { addTransferTransaction } = useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<TransferTransactionFormValues>({
     resolver: zodResolver(transferTransactionSchema),
     defaultValues: {
-      fromAccountId: transaction?.toAccount.id ?? 0,
-      toAccountId: transaction?.toAccount.id ?? 0,
+      fromAccountId: transaction?.fromAccount?.id ?? 0,
+      toAccountId: transaction?.toAccount?.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
@@ -49,6 +54,11 @@ export function TransferTransactionForm({
   })
 
   const selectedFromAccountId = form.watch("fromAccountId")
+  const selectedFromAccount = useMemo(
+    () => accounts.find((a) => a.id === selectedFromAccountId),
+    [accounts, selectedFromAccountId]
+  )
+  const selectedToAccountId = form.watch("toAccountId")
 
   useEffect(() => {
     form.resetField("toAccountId")
@@ -58,6 +68,8 @@ export function TransferTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
+      await addTransferTransaction(values)
+      onSuccess?.()
     } finally {
       setIsSubmitting(false)
     }
@@ -98,7 +110,9 @@ export function TransferTransactionForm({
                           <Plus />
                         </Button> */}
                   </div>
-
+                  <FieldLabel className="text-muted-foreground">
+                    Balance: {formatMoney(selectedFromAccount?.balance ?? 0.0)}
+                  </FieldLabel>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -141,6 +155,14 @@ export function TransferTransactionForm({
                           <Plus />
                         </Button> */}
                   </div>
+
+                  <FieldLabel className="text-muted-foreground">
+                    Balance:{" "}
+                    {formatMoney(
+                      accounts.find((a) => a.id === selectedToAccountId)
+                        ?.balance ?? 0.0
+                    )}
+                  </FieldLabel>
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

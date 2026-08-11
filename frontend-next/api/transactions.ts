@@ -17,20 +17,12 @@ export type CreateExpenseTransactionRequest = CreateTransactionBaseRequest & {
   categoryId: number
 }
 
+export type CreateTransferTransactionRequest = CreateTransactionBaseRequest & {
+  fromAccountId: number
+  toAccountId: number
+}
+
 export const transactionApi = {
-  createTransaction: async (expense: {
-    accountId: number
-    categoryId: number
-    amount: number
-    description: string
-    date: Date
-  }) => {
-    const body = {
-      ...expense,
-      date: expense.date.toISOString(),
-    }
-    return await api.post<Transaction>(`/transaction`, body)
-  },
   createIncomeTransaction: async (income: CreateIncomeTransactionRequest) => {
     const body = {
       ...income,
@@ -46,6 +38,15 @@ export const transactionApi = {
       date: expense.date.toISOString(),
     }
     return await api.post(`/transaction/expense`, body)
+  },
+  createTransferTransaction: async (
+    transfer: CreateTransferTransactionRequest
+  ) => {
+    const body = {
+      ...transfer,
+      date: transfer.date.toISOString(),
+    }
+    return await api.post(`/transaction/transfer`, body)
   },
   readTransactions: async (
     filter?: {

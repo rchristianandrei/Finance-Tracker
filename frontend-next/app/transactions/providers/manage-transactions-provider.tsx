@@ -73,7 +73,13 @@ export function ManageTransactionsProvider({
 
       let filter = {
         search: search ?? undefined,
-        type: type ? (type === "expense" ? 1 : 2) : undefined,
+        type: type
+          ? type === "expense"
+            ? 1
+            : type === "income"
+              ? 2
+              : 3
+          : undefined,
         categories: selectedCategories ?? undefined,
         startDate: dateRange?.from ?? undefined,
         endDate: dateRange?.to ?? undefined,

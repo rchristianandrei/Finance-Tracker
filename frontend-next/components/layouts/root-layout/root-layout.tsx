@@ -6,7 +6,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { DynamicBreadcrumb } from "./DynamicBreadcrumb"
-import { CreateTransactionDialog } from "@/components/transaction/create-transaction-dialog"
 import { AddTransactionProvider } from "@/providers/add-transaction-provider"
 import { NewCreateTransactionDialog } from "@/components/transaction/new-create-transaction-dialog"
 
@@ -25,7 +24,6 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
               />
               <DynamicBreadcrumb />
             </div>
-            {/* <CreateTransactionDialog /> */}
             <NewCreateTransactionDialog />
           </header>
           <div className="flex-1 overflow-auto p-4">{children}</div>

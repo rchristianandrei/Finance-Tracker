@@ -35,7 +35,7 @@ export const transferTransactionSchema = z
     toAccountId: z.number().min(1, "To Account is required"),
 
     description: transactionFields.description,
-    amount: transactionFields.amount,
+    amount: z.number(),
     date: transactionFields.date,
   })
   .refine((data) => data.fromAccountId !== data.toAccountId, {

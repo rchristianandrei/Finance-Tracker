@@ -5,6 +5,7 @@ import { useAccount } from "./account-provider"
 import {
   CreateExpenseTransactionRequest,
   CreateIncomeTransactionRequest,
+  CreateTransferTransactionRequest,
   transactionApi,
 } from "@/api/transactions"
 
@@ -15,6 +16,9 @@ interface AddTransactionContextType {
   ) => Promise<void>
   addExpenseTransaction: (
     request: CreateExpenseTransactionRequest
+  ) => Promise<void>
+  addTransferTransaction: (
+    request: CreateTransferTransactionRequest
   ) => Promise<void>
 }
 
@@ -47,9 +51,23 @@ export function AddTransactionProvider({
     []
   )
 
+  const addTransferTransaction = useCallback(
+    async (request: CreateTransferTransactionRequest) => {
+      await transactionApi.createTransferTransaction(request)
+      setTransactionAdded({})
+      loadAccounts()
+    },
+    []
+  )
+
   return (
     <AddTransactionContext.Provider
-      value={{ transactionAdded, addIncomeTransaction, addExpenseTransaction }}
+      value={{
+        transactionAdded,
+        addIncomeTransaction,
+        addExpenseTransaction,
+        addTransferTransaction,
+      }}
     >
       {children}
     </AddTransactionContext.Provider>

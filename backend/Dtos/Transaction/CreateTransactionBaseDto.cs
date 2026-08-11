@@ -6,7 +6,7 @@ public abstract class CreateTransactionBaseDto
 {
     [Required]
     [Range(0.01, double.MaxValue)]
-    public double Amount { get; set; }
+    public virtual double Amount { get; set; }
 
     [MaxLength(30)]
     public string Description { get; set; } = string.Empty;
