@@ -39,7 +39,8 @@ export function TransferTransactionForm({
   onSuccess?: () => void
 }) {
   const { accounts } = useAccount()
-  const { addTransferTransaction } = useAddTransaction()
+  const { addTransferTransaction, updateTransferTransaction } =
+    useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<TransferTransactionFormValues>({
@@ -68,7 +69,11 @@ export function TransferTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
-      await addTransferTransaction(values)
+      if (transaction) {
+        await updateTransferTransaction({ ...values, id: transaction.id })
+      } else {
+        await addTransferTransaction(values)
+      }
       onSuccess?.()
     } finally {
       setIsSubmitting(false)

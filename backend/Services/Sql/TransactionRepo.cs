@@ -83,7 +83,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
     public async Task<IEnumerable<Transaction>> GetDashboard(int userId, DashboardQueryParams? query = null)
     {
-        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.UserId == userId);
+        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.UserId == userId && t.Type != Enums.TransactionType.TRANSFER);
 
         if (query?.StartDate is DateTimeOffset startDate)
         {

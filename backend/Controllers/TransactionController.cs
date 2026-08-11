@@ -139,11 +139,11 @@ public class TransactionController(
         var transactions = await _transactionService.GetDashboard(userId, query);
 
         var totalIncome = transactions
-            .Where(x => x.Type == Enums.TransactionType.INCOME)
+            .Where(x => x.Type == TransactionType.INCOME)
             .Sum(x => x.Amount);
 
         var totalExpense = transactions
-            .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+            .Where(x => x.Type == TransactionType.EXPENSE)
             .Sum(x => x.Amount);
 
         var netAmount = totalIncome - totalExpense;
@@ -154,7 +154,7 @@ public class TransactionController(
             TotalExpense = totalExpense,
             NetAmount = netAmount,
             IncomeByCategory = [.. transactions
-                .Where(x => x.Type == Enums.TransactionType.INCOME)
+                .Where(x => x.Type == TransactionType.INCOME)
                 .GroupBy(x => new
                 {
                     x.Category!.Id,
@@ -167,7 +167,7 @@ public class TransactionController(
                     Percentage = totalIncome > 0 ? g.Sum(x => x.Amount) / totalIncome * 100 : 0
                 })],
             ExpenseByCategory = [.. transactions
-                .Where(x => x.Type == Enums.TransactionType.EXPENSE)
+                .Where(x => x.Type == TransactionType.EXPENSE)
                 .GroupBy(x => new
                 {
                     x.Category!.Id,
@@ -256,7 +256,7 @@ public class TransactionController(
         toAccount.Balance += dto.Amount;
 
         transaction.Type = TransactionType.INCOME;
-        transaction.FromAccountId = null;
+        transaction.FromAccount = null;
         transaction.ToAccountId = toAccount.Id;
         transaction.CategoryId = category.Id;
         transaction.Description = dto.Description;
@@ -292,8 +292,43 @@ public class TransactionController(
 
         transaction.Type = TransactionType.EXPENSE;
         transaction.FromAccountId = fromAccount.Id;
-        transaction.ToAccountId = null;
+        transaction.ToAccount = null;
         transaction.CategoryId = category.Id;
+        transaction.Description = dto.Description;
+        transaction.Amount = dto.Amount;
+        transaction.Date = dto.Date;
+        transaction.LastUpdated = DateTime.UtcNow;
+
+        await _transactionService.Update(transaction);
+
+        return Ok();
+    }
+
+    [Transaction]
+    [HttpPut("transfer/{id}")]
+    public async Task<IActionResult> UpdateTransfer(long id, [FromBody] CreateTransferTransactionDto dto)
+    {
+        var userId = _currentUserService.Id();
+
+        var transaction = await _transactionService.GetById(id);
+        if (transaction == null || transaction.UserId != userId) return NotFound();
+
+        var fromAccount = await _accountRepo.GetAccountById(dto.FromAccountId);
+        if (fromAccount == null || fromAccount.UserId != userId) return BadRequest("From Account does not exist");
+
+        var toAccount = await _accountRepo.GetAccountById(dto.ToAccountId);
+        if (toAccount == null || toAccount.UserId != userId) return BadRequest("To Account does not exist");
+
+        ResetAccountBalance(transaction);
+
+        // New Values
+        fromAccount.Balance -= dto.Amount;
+        toAccount.Balance += dto.Amount;
+
+        transaction.Type = TransactionType.TRANSFER;
+        transaction.FromAccountId = fromAccount.Id;
+        transaction.ToAccountId = toAccount.Id;
+        transaction.Category = null;
         transaction.Description = dto.Description;
         transaction.Amount = dto.Amount;
         transaction.Date = dto.Date;
