@@ -1,12 +1,20 @@
 import api from "@/lib/axios"
 import { Transaction } from "@/types/transaction"
 
-export type CreateIncomeTransactionRequest = {
+export type CreateTransactionBaseRequest = {
+  description: string
+  amount: number
+  date: Date
+}
+
+export type CreateIncomeTransactionRequest = CreateTransactionBaseRequest & {
   toAccountId: number
   categoryId: number
-  amount: number
-  description: string
-  date: Date
+}
+
+export type CreateExpenseTransactionRequest = CreateTransactionBaseRequest & {
+  fromAccountId: number
+  categoryId: number
 }
 
 export const transactionApi = {
@@ -29,6 +37,15 @@ export const transactionApi = {
       date: income.date.toISOString(),
     }
     return await api.post(`/transaction/income`, body)
+  },
+  createExpenseTransaction: async (
+    expense: CreateExpenseTransactionRequest
+  ) => {
+    const body = {
+      ...expense,
+      date: expense.date.toISOString(),
+    }
+    return await api.post(`/transaction/expense`, body)
   },
   readTransactions: async (
     filter?: {

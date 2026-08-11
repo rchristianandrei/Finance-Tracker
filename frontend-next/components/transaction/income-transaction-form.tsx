@@ -43,14 +43,14 @@ export function IncomeTransactionForm({
 }) {
   const { accounts } = useAccount()
   const { categories } = useCategory()
-  const { addTransaction } = useAddTransaction()
+  const { addIncomeTransaction } = useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<IncomeTransactionFormValues>({
     resolver: zodResolver(incomeTransactionSchema),
     defaultValues: {
-      toAccountId: transaction?.toAccount.id ?? 0,
-      categoryId: transaction?.category.id ?? 0,
+      toAccountId: transaction?.toAccount?.id ?? 0,
+      categoryId: transaction?.category?.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
@@ -61,13 +61,7 @@ export function IncomeTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
-      await addTransaction({
-        toAccountId: values.toAccountId,
-        categoryId: values.categoryId,
-        description: values.description,
-        amount: values.amount!,
-        date: new Date(values.date),
-      })
+      await addIncomeTransaction(values)
       onSuccess?.()
     } finally {
       setIsSubmitting(false)

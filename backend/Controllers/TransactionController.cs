@@ -67,29 +67,63 @@ public class TransactionController(
 
     [Transaction]
     [HttpPost("income")]
-    public async Task<IActionResult> CreateIncome([FromBody] CreateIncomeTransactionDto value)
+    public async Task<IActionResult> CreateIncome([FromBody] CreateIncomeTransactionDto dto)
     {
         var userId = _currentUserService.Id();
 
-        var account = await _accountRepo.GetAccountById(value.ToAccountId);
+        var account = await _accountRepo.GetAccountById(dto.ToAccountId);
         if (account == null) return BadRequest("To Account does not exist");
         if (account.UserId != userId) return Forbid();
 
-        var category = await _categoryRepo.GetById(value.CategoryId);
+        var category = await _categoryRepo.GetById(dto.CategoryId);
         if (category == null) return BadRequest("Category does not exist");
         if (category.UserId != userId) return Forbid();
         if (category.Type != Enums.TransactionType.INCOME) return BadRequest("Category is not an income category");
 
-        account.Balance += value.Amount;
+        account.Balance += dto.Amount;
 
         var transaction = new Transaction
         {
-            ToAccountId = account.Id,
             UserId = userId,
+            Type = Enums.TransactionType.INCOME,
+            ToAccountId = account.Id,
             CategoryId = category.Id,
-            Amount = value.Amount,
-            Description = value.Description,
-            Date = value.Date,
+            Amount = dto.Amount,
+            Description = dto.Description,
+            Date = dto.Date,
+        };
+
+        await _transactionService.Create(transaction);
+
+        return Ok();
+    }
+
+    [Transaction]
+    [HttpPost("expense")]
+    public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseTransactionDto dto)
+    {
+        var userId = _currentUserService.Id();
+
+        var account = await _accountRepo.GetAccountById(dto.FromAccountId);
+        if (account == null) return BadRequest("From Account does not exist");
+        if (account.UserId != userId) return Forbid();
+
+        var category = await _categoryRepo.GetById(dto.CategoryId);
+        if (category == null) return BadRequest("Category does not exist");
+        if (category.UserId != userId) return Forbid();
+        if (category.Type != Enums.TransactionType.EXPENSE) return BadRequest("Category is not an expense category");
+
+        account.Balance -= dto.Amount;
+
+        var transaction = new Transaction
+        {
+            UserId = userId,
+            Type = Enums.TransactionType.EXPENSE,
+            FromAccountId = account.Id,
+            CategoryId = category.Id,
+            Description = dto.Description,
+            Amount = dto.Amount,
+            Date = dto.Date,
         };
 
         await _transactionService.Create(transaction);
@@ -118,11 +152,11 @@ public class TransactionController(
         var transactions = await _transactionService.GetDashboard(userId, query);
 
         var totalIncome = transactions
-            .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
+            .Where(x => x.Type == Enums.TransactionType.INCOME)
             .Sum(x => x.Amount);
 
         var totalExpense = transactions
-            .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
+            .Where(x => x.Type == Enums.TransactionType.EXPENSE)
             .Sum(x => x.Amount);
 
         var netAmount = totalIncome - totalExpense;
@@ -133,10 +167,10 @@ public class TransactionController(
             TotalExpense = totalExpense,
             NetAmount = netAmount,
             IncomeByCategory = [.. transactions
-                .Where(x => x.Category.Type == Enums.TransactionType.INCOME)
+                .Where(x => x.Type == Enums.TransactionType.INCOME)
                 .GroupBy(x => new
                 {
-                    x.Category.Id,
+                    x.Category!.Id,
                     x.Category.Name
                 })
                 .Select(g => new CategoryAmountDto
@@ -146,10 +180,10 @@ public class TransactionController(
                     Percentage = totalIncome > 0 ? g.Sum(x => x.Amount) / totalIncome * 100 : 0
                 })],
             ExpenseByCategory = [.. transactions
-                .Where(x => x.Category.Type == Enums.TransactionType.EXPENSE)
+                .Where(x => x.Type == Enums.TransactionType.EXPENSE)
                 .GroupBy(x => new
                 {
-                    x.Category.Id,
+                    x.Category!.Id,
                     x.Category.Name
                 })
                 .Select(g => new CategoryAmountDto
@@ -182,7 +216,7 @@ public class TransactionController(
         if (newCategory.UserId != userId) return Forbid();
 
         // Update Old Account
-        if (transaction.Category.Type == Enums.TransactionType.INCOME)
+        if (transaction.Type == Enums.TransactionType.INCOME)
         {
             transaction.ToAccount.Balance -= transaction.Amount;
         }
@@ -226,13 +260,13 @@ public class TransactionController(
         // Update Account
         if (updateAccountBalance)
         {
-            if (transaction.Category.Type == Enums.TransactionType.INCOME)
+            if (transaction.Type == Enums.TransactionType.INCOME)
             {
-                transaction.ToAccount.Balance -= transaction.Amount;
+                transaction.ToAccount!.Balance -= transaction.Amount;
             }
             else
             {
-                transaction.ToAccount.Balance += transaction.Amount;
+                transaction.FromAccount!.Balance += transaction.Amount;
             }
         }
 

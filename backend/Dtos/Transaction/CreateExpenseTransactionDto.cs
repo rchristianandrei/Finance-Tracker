@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using backend.DataAnnotations;
 
 namespace backend.Dtos.Transaction;
 
-public class CreateIncomeTransactionDto : CreateTransactionBaseDto
+public class CreateExpenseTransactionDto : CreateTransactionBaseDto
 {
     [Required]
-    public int ToAccountId { get; set; }
+    public int FromAccountId { get; set; }
 
     [Required]
     public int CategoryId { get; set; }

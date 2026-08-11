@@ -15,7 +15,7 @@ import { useState } from "react"
 import { CreateCategoryDialog } from "../category/create-category-dialog"
 
 export function CreateTransactionDialog() {
-  const { addTransaction } = useAddTransaction()
+  const { addExpenseTransaction: addTransaction } = useAddTransaction()
   const [isOpen, setIsOpen] = useState(false)
   const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] =
     useState(false)

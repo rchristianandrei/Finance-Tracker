@@ -61,7 +61,7 @@ export function NewCreateTransactionDialog() {
                 <IncomeTransactionForm onSuccess={() => setIsOpen(false)} />
               </TabsContent>
               <TabsContent value="expense">
-                <ExpenseTransactionForm />
+                <ExpenseTransactionForm onSuccess={() => setIsOpen(false)} />
               </TabsContent>
               <TabsContent value="transfer">
                 <TransferTransactionForm />

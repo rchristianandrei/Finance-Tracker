@@ -30,23 +30,27 @@ import {
   ExpenseTransactionFormValues,
   expenseTransactionSchema,
 } from "@/lib/validations/transactions"
+import { useAddTransaction } from "@/providers/add-transaction-provider"
 
 export function ExpenseTransactionForm({
   transaction,
   onAddCategoryClick,
+  onSuccess,
 }: {
   transaction?: Transaction
   onAddCategoryClick?: () => void
+  onSuccess?: () => void
 }) {
   const { accounts } = useAccount()
   const { categories } = useCategory()
+  const { addExpenseTransaction } = useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<ExpenseTransactionFormValues>({
     resolver: zodResolver(expenseTransactionSchema),
     defaultValues: {
-      fromAccountId: transaction?.toAccount.id ?? 0,
-      categoryId: transaction?.category.id ?? 0,
+      fromAccountId: transaction?.fromAccount?.id ?? 0,
+      categoryId: transaction?.category?.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
@@ -57,6 +61,8 @@ export function ExpenseTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
+      await addExpenseTransaction(values)
+      onSuccess?.()
     } finally {
       setIsSubmitting(false)
     }
@@ -110,7 +116,7 @@ export function ExpenseTransactionForm({
             name="categoryId"
             control={form.control}
             render={({ field, fieldState }) => {
-              const filtered = categories.filter((c) => c.type === 2)
+              const filtered = categories.filter((c) => c.type === 1)
 
               return (
                 <Field data-invalid={fieldState.invalid}>

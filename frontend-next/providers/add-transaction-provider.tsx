@@ -3,13 +3,19 @@
 import { createContext, useCallback, useContext, useState } from "react"
 import { useAccount } from "./account-provider"
 import {
+  CreateExpenseTransactionRequest,
   CreateIncomeTransactionRequest,
   transactionApi,
 } from "@/api/transactions"
 
 interface AddTransactionContextType {
   transactionAdded: {}
-  addTransaction: (request: CreateIncomeTransactionRequest) => Promise<void>
+  addIncomeTransaction: (
+    request: CreateIncomeTransactionRequest
+  ) => Promise<void>
+  addExpenseTransaction: (
+    request: CreateExpenseTransactionRequest
+  ) => Promise<void>
 }
 
 const AddTransactionContext = createContext<
@@ -24,9 +30,17 @@ export function AddTransactionProvider({
   const { loadAccounts } = useAccount()
   const [transactionAdded, setTransactionAdded] = useState<{}>({})
 
-  const addTransaction = useCallback(
+  const addIncomeTransaction = useCallback(
     async (request: CreateIncomeTransactionRequest) => {
       await transactionApi.createIncomeTransaction(request)
+      setTransactionAdded({})
+      loadAccounts()
+    },
+    []
+  )
+  const addExpenseTransaction = useCallback(
+    async (request: CreateExpenseTransactionRequest) => {
+      await transactionApi.createExpenseTransaction(request)
       setTransactionAdded({})
       loadAccounts()
     },
@@ -35,7 +49,7 @@ export function AddTransactionProvider({
 
   return (
     <AddTransactionContext.Provider
-      value={{ transactionAdded, addTransaction }}
+      value={{ transactionAdded, addIncomeTransaction, addExpenseTransaction }}
     >
       {children}
     </AddTransactionContext.Provider>
