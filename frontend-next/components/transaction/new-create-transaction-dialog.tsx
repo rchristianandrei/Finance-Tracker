@@ -10,30 +10,67 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { IncomeTransactionForm } from "./income-transaction-form"
 import { ExpenseTransactionForm } from "./expense-transaction-form"
 import { TransferTransactionForm } from "./transfer-transaction-form"
+import { Transaction } from "@/types/transaction"
 
-export function NewCreateTransactionDialog() {
-  const [isOpen, setIsOpen] = useState(false)
+export function NewCreateTransactionDialog({
+  hideTrigger,
+  initialOpen,
+  title,
+  initialTransaction,
+  onClose,
+}: {
+  hideTrigger?: boolean
+  initialOpen?: boolean
+  title: string
+  initialTransaction?: Transaction
+  onClose?: () => void
+}) {
+  const [isOpen, setIsOpen] = useState(() => initialOpen || false)
+
+  function onSuccess() {
+    setIsOpen(false)
+    onClose?.()
+  }
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button variant="default">
-            <Plus></Plus>{" "}
-            <span className="hidden md:inline">Add Transaction</span>
-          </Button>
-        </DialogTrigger>
+      <Dialog
+        open={isOpen}
+        onOpenChange={(value) => {
+          setIsOpen(value)
+          onClose?.()
+        }}
+      >
+        {!hideTrigger && (
+          <DialogTrigger asChild>
+            <Button variant="default">
+              <Plus></Plus>{" "}
+              <span className="hidden md:inline">Add Transaction</span>
+            </Button>
+          </DialogTrigger>
+        )}
 
         <DialogContent>
           <DialogHeader className="gap-1">
-            <DialogTitle>Create Transaction</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             <DialogDescription></DialogDescription>
-            <Tabs defaultValue="expense" className="flex flex-col">
+            <Tabs
+              defaultValue={
+                !initialTransaction
+                  ? "expense"
+                  : initialTransaction?.type === 2
+                    ? "income"
+                    : initialTransaction?.type === 1
+                      ? "expense"
+                      : "transfer"
+              }
+              className="flex flex-col"
+            >
               <TabsList className="w-full gap-3 rounded-full bg-muted p-1">
                 <TabsTrigger
                   value="income"
@@ -58,13 +95,22 @@ export function NewCreateTransactionDialog() {
               </TabsList>
 
               <TabsContent value="income">
-                <IncomeTransactionForm onSuccess={() => setIsOpen(false)} />
+                <IncomeTransactionForm
+                  transaction={initialTransaction}
+                  onSuccess={onSuccess}
+                />
               </TabsContent>
               <TabsContent value="expense">
-                <ExpenseTransactionForm onSuccess={() => setIsOpen(false)} />
+                <ExpenseTransactionForm
+                  transaction={initialTransaction}
+                  onSuccess={onSuccess}
+                />
               </TabsContent>
               <TabsContent value="transfer">
-                <TransferTransactionForm />
+                <TransferTransactionForm
+                  transaction={initialTransaction}
+                  onSuccess={onSuccess}
+                />
               </TabsContent>
             </Tabs>
           </DialogHeader>

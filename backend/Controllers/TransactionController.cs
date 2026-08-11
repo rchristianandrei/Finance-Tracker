@@ -2,6 +2,7 @@ using backend.Attributes;
 using backend.Dtos;
 using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
+using backend.Enums;
 using backend.Interfaces.Sql;
 using backend.Interfaces.Utils;
 using backend.Mappers;
@@ -232,6 +233,53 @@ public class TransactionController(
         transaction.Description = value.Description;
         transaction.Amount = value.Amount;
         transaction.Date = value.Date;
+        transaction.LastUpdated = DateTime.UtcNow;
+
+        await _transactionService.Update(transaction);
+
+        return Ok();
+    }
+
+    [Transaction]
+    [HttpPut("income/{id}")]
+    public async Task<IActionResult> UpdateIncome(long id, [FromBody] UpdateIncomeTransactionDto dto)
+    {
+        var userId = _currentUserService.Id();
+
+        var transaction = await _transactionService.GetById(id);
+        if (transaction == null) return NotFound();
+        if (transaction.UserId != userId) return Forbid();
+
+        var toAccount = await _accountRepo.GetAccountById(dto.ToAccountId);
+        if (toAccount == null) return BadRequest("To Account does not exist");
+        if (toAccount.UserId != userId) return Forbid();
+
+        var category = await _categoryRepo.GetById(dto.CategoryId);
+        if (category == null) return BadRequest("Category does not exist");
+        if (category.UserId != userId) return Forbid();
+        if (category.Type != TransactionType.INCOME) return BadRequest("Category is not an income category");
+
+        // Reset Account Balance
+        if (transaction.Type == TransactionType.INCOME || transaction.Type == TransactionType.TRANSFER)
+        {
+            transaction.ToAccount!.Balance -= transaction.Amount;
+        }
+
+        if (transaction.Type == TransactionType.EXPENSE || transaction.Type == TransactionType.TRANSFER)
+        {
+            transaction.FromAccount!.Balance += transaction.Amount;
+        }
+
+        // New Values
+        toAccount.Balance += dto.Amount;
+
+        transaction.Type = Enums.TransactionType.INCOME;
+        transaction.FromAccountId = null;
+        transaction.ToAccountId = toAccount.Id;
+        transaction.CategoryId = category.Id;
+        transaction.Description = dto.Description;
+        transaction.Amount = dto.Amount;
+        transaction.Date = dto.Date;
         transaction.LastUpdated = DateTime.UtcNow;
 
         await _transactionService.Update(transaction);

@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { useCategory } from "@/providers/category-provider"
 import { Transaction } from "@/types/transaction"
@@ -43,13 +43,14 @@ export function IncomeTransactionForm({
 }) {
   const { accounts } = useAccount()
   const { categories } = useCategory()
-  const { addIncomeTransaction } = useAddTransaction()
+  const { addIncomeTransaction, updateIncomeTransaction } = useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<IncomeTransactionFormValues>({
     resolver: zodResolver(incomeTransactionSchema),
     defaultValues: {
-      toAccountId: transaction?.toAccount?.id ?? 0,
+      toAccountId:
+        transaction?.toAccount?.id ?? transaction?.fromAccount?.id ?? 0,
       categoryId: transaction?.category?.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
@@ -57,11 +58,26 @@ export function IncomeTransactionForm({
     },
   })
 
+  const incomeCategories = useMemo(
+    () => categories.filter((c) => c.type === 2),
+    [categories]
+  )
+
+  useEffect(() => {
+    if (!transaction) return
+    if (transaction.category?.type === 2) return
+    form.setValue("categoryId", 0)
+  }, [transaction])
+
   async function onSubmit(values: IncomeTransactionFormValues) {
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
-      await addIncomeTransaction(values)
+      if (transaction) {
+        await updateIncomeTransaction({ ...values, id: transaction.id })
+      } else {
+        await addIncomeTransaction(values)
+      }
       onSuccess?.()
     } finally {
       setIsSubmitting(false)
@@ -75,87 +91,81 @@ export function IncomeTransactionForm({
           <Controller
             name="toAccountId"
             control={form.control}
-            render={({ field, fieldState }) => {
-              return (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>To Account</FieldLabel>
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>To Account</FieldLabel>
 
-                  <div className="grid grid-cols-[1fr_auto] gap-1">
-                    <Select
-                      value={field.value?.toString()}
-                      onValueChange={(value) => {
-                        field.onChange(Number(value))
-                      }}
-                    >
-                      <SelectTrigger className="w-full min-w-0">
-                        <SelectValue placeholder="Select Account" />
-                      </SelectTrigger>
+                <div className="grid grid-cols-[1fr_auto] gap-1">
+                  <Select
+                    value={field.value?.toString()}
+                    onValueChange={(value) => {
+                      field.onChange(Number(value))
+                    }}
+                  >
+                    <SelectTrigger className="w-full min-w-0">
+                      <SelectValue placeholder="Select Account" />
+                    </SelectTrigger>
 
-                      <SelectContent>
-                        {accounts.map((a) => (
-                          <SelectItem key={a.id} value={a.id.toString()}>
-                            {a.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {/* <Button variant="outline" type="button">
+                    <SelectContent>
+                      {accounts.map((a) => (
+                        <SelectItem key={a.id} value={a.id.toString()}>
+                          {a.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {/* <Button variant="outline" type="button">
                           <Plus />
                         </Button> */}
-                  </div>
+                </div>
 
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )
-            }}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
 
           <Controller
             name="categoryId"
             control={form.control}
-            render={({ field, fieldState }) => {
-              const filtered = categories.filter((c) => c.type === 2)
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Category</FieldLabel>
 
-              return (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Category</FieldLabel>
+                <div className="grid grid-cols-[1fr_auto] gap-1">
+                  <Select
+                    value={field.value?.toString()}
+                    onValueChange={(value) => {
+                      field.onChange(Number(value))
+                    }}
+                  >
+                    <SelectTrigger className="w-full min-w-0">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
 
-                  <div className="grid grid-cols-[1fr_auto] gap-1">
-                    <Select
-                      value={field.value?.toString()}
-                      onValueChange={(value) => {
-                        field.onChange(Number(value))
-                      }}
-                    >
-                      <SelectTrigger className="w-full min-w-0">
-                        <SelectValue placeholder="Select Category" />
-                      </SelectTrigger>
+                    <SelectContent>
+                      {incomeCategories.map((m) => (
+                        <SelectItem key={m.id} value={m.id.toString()}>
+                          {m.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={onAddCategoryClick}
+                  >
+                    <Plus />
+                  </Button>
+                </div>
 
-                      <SelectContent>
-                        {filtered.map((m) => (
-                          <SelectItem key={m.id} value={m.id.toString()}>
-                            {m.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={onAddCategoryClick}
-                    >
-                      <Plus />
-                    </Button>
-                  </div>
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )
-            }}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
 
           <Controller

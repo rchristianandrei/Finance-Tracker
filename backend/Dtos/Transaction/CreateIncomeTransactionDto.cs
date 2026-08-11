@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using backend.DataAnnotations;
 
 namespace backend.Dtos.Transaction;
 
