@@ -29,6 +29,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
     public async Task<Transaction?> GetById(long id)
     {
         return await _context.Transactions
+            .Include(t => t.FromAccount)
             .Include(t => t.ToAccount)
             .Include(t => t.Category)
             .FirstOrDefaultAsync(t => t.Id == id);

@@ -306,26 +306,14 @@ public class TransactionController(
 
     [Transaction]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(long id, [FromQuery] bool updateAccountBalance)
+    public async Task<IActionResult> Delete(long id)
     {
         var userId = _currentUserService.Id();
 
         var transaction = await _transactionService.GetById(id);
-        if (transaction == null) return NoContent();
-        if (transaction.UserId != userId) return Forbid();
+        if (transaction == null || transaction.UserId != userId) return NoContent();
 
-        // Update Account
-        if (updateAccountBalance)
-        {
-            if (transaction.Type == Enums.TransactionType.INCOME)
-            {
-                transaction.ToAccount!.Balance -= transaction.Amount;
-            }
-            else
-            {
-                transaction.FromAccount!.Balance += transaction.Amount;
-            }
-        }
+        ResetAccountBalance(transaction);
 
         await _transactionService.Delete(transaction);
 
