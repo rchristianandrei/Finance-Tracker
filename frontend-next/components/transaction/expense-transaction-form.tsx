@@ -43,13 +43,15 @@ export function ExpenseTransactionForm({
 }) {
   const { accounts } = useAccount()
   const { categories } = useCategory()
-  const { addExpenseTransaction } = useAddTransaction()
+  const { addExpenseTransaction, updateExpenseTransaction } =
+    useAddTransaction()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<ExpenseTransactionFormValues>({
     resolver: zodResolver(expenseTransactionSchema),
     defaultValues: {
-      fromAccountId: transaction?.fromAccount?.id ?? 0,
+      fromAccountId:
+        transaction?.fromAccount?.id ?? transaction?.toAccount?.id ?? 0,
       categoryId: transaction?.category?.id ?? 0,
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
@@ -61,7 +63,11 @@ export function ExpenseTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
-      await addExpenseTransaction(values)
+      if (transaction) {
+        await updateExpenseTransaction({ ...values, id: transaction.id })
+      } else {
+        await addExpenseTransaction(values)
+      }
       onSuccess?.()
     } finally {
       setIsSubmitting(false)

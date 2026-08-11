@@ -32,12 +32,10 @@ public class TransactionController(
         var userId = _currentUserService.Id();
 
         var account = await _accountRepo.GetAccountById(dto.ToAccountId);
-        if (account == null) return BadRequest("To Account does not exist");
-        if (account.UserId != userId) return Forbid();
+        if (account == null || account.UserId != userId) return BadRequest("To Account does not exist");
 
         var category = await _categoryRepo.GetById(dto.CategoryId);
-        if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != userId) return Forbid();
+        if (category == null || category.UserId != userId) return BadRequest("Category does not exist");
         if (category.Type != Enums.TransactionType.INCOME) return BadRequest("Category is not an income category");
 
         account.Balance += dto.Amount;
@@ -65,12 +63,10 @@ public class TransactionController(
         var userId = _currentUserService.Id();
 
         var account = await _accountRepo.GetAccountById(dto.FromAccountId);
-        if (account == null) return BadRequest("From Account does not exist");
-        if (account.UserId != userId) return Forbid();
+        if (account == null || account.UserId != userId) return BadRequest("From Account does not exist");
 
         var category = await _categoryRepo.GetById(dto.CategoryId);
-        if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != userId) return Forbid();
+        if (category == null || category.UserId != userId) return BadRequest("Category does not exist");
         if (category.Type != Enums.TransactionType.EXPENSE) return BadRequest("Category is not an expense category");
 
         account.Balance -= dto.Amount;
@@ -98,12 +94,10 @@ public class TransactionController(
         var userId = _currentUserService.Id();
 
         var fromAccount = await _accountRepo.GetAccountById(dto.FromAccountId);
-        if (fromAccount == null) return BadRequest("From Account does not exist");
-        if (fromAccount.UserId != userId) return Forbid();
+        if (fromAccount == null || fromAccount.UserId != userId) return BadRequest("From Account does not exist");
 
         var toAccount = await _accountRepo.GetAccountById(dto.ToAccountId);
-        if (toAccount == null) return BadRequest("To Account does not exist");
-        if (toAccount.UserId != userId) return Forbid();
+        if (toAccount == null || toAccount.UserId != userId) return BadRequest("To Account does not exist");
 
         fromAccount.Balance -= dto.Amount;
         toAccount.Balance += dto.Amount;
@@ -247,35 +241,58 @@ public class TransactionController(
         var userId = _currentUserService.Id();
 
         var transaction = await _transactionService.GetById(id);
-        if (transaction == null) return NotFound();
-        if (transaction.UserId != userId) return Forbid();
+        if (transaction == null || transaction.UserId != userId) return NotFound();
 
         var toAccount = await _accountRepo.GetAccountById(dto.ToAccountId);
-        if (toAccount == null) return BadRequest("To Account does not exist");
-        if (toAccount.UserId != userId) return Forbid();
+        if (toAccount == null || toAccount.UserId != userId) return BadRequest("To Account does not exist");
 
         var category = await _categoryRepo.GetById(dto.CategoryId);
-        if (category == null) return BadRequest("Category does not exist");
-        if (category.UserId != userId) return Forbid();
+        if (category == null || category.UserId != userId) return BadRequest("Category does not exist");
         if (category.Type != TransactionType.INCOME) return BadRequest("Category is not an income category");
 
-        // Reset Account Balance
-        if (transaction.Type == TransactionType.INCOME || transaction.Type == TransactionType.TRANSFER)
-        {
-            transaction.ToAccount!.Balance -= transaction.Amount;
-        }
-
-        if (transaction.Type == TransactionType.EXPENSE || transaction.Type == TransactionType.TRANSFER)
-        {
-            transaction.FromAccount!.Balance += transaction.Amount;
-        }
+        ResetAccountBalance(transaction);
 
         // New Values
         toAccount.Balance += dto.Amount;
 
-        transaction.Type = Enums.TransactionType.INCOME;
+        transaction.Type = TransactionType.INCOME;
         transaction.FromAccountId = null;
         transaction.ToAccountId = toAccount.Id;
+        transaction.CategoryId = category.Id;
+        transaction.Description = dto.Description;
+        transaction.Amount = dto.Amount;
+        transaction.Date = dto.Date;
+        transaction.LastUpdated = DateTime.UtcNow;
+
+        await _transactionService.Update(transaction);
+
+        return Ok();
+    }
+
+    [Transaction]
+    [HttpPut("expense/{id}")]
+    public async Task<IActionResult> UpdateExpense(long id, [FromBody] CreateExpenseTransactionDto dto)
+    {
+        var userId = _currentUserService.Id();
+
+        var transaction = await _transactionService.GetById(id);
+        if (transaction == null || transaction.UserId != userId) return NotFound();
+
+        var fromAccount = await _accountRepo.GetAccountById(dto.FromAccountId);
+        if (fromAccount == null || fromAccount.UserId != userId) return BadRequest("From Account does not exist");
+
+        var category = await _categoryRepo.GetById(dto.CategoryId);
+        if (category == null || category.UserId != userId) return BadRequest("Category does not exist");
+        if (category.Type != TransactionType.EXPENSE) return BadRequest("Category is not an expense category");
+
+        ResetAccountBalance(transaction);
+
+        // New Values
+        fromAccount.Balance -= dto.Amount;
+
+        transaction.Type = TransactionType.EXPENSE;
+        transaction.FromAccountId = fromAccount.Id;
+        transaction.ToAccountId = null;
         transaction.CategoryId = category.Id;
         transaction.Description = dto.Description;
         transaction.Amount = dto.Amount;
@@ -313,5 +330,18 @@ public class TransactionController(
         await _transactionService.Delete(transaction);
 
         return NoContent();
+    }
+
+    private static void ResetAccountBalance(Transaction transaction)
+    {
+        if (transaction.Type == TransactionType.INCOME || transaction.Type == TransactionType.TRANSFER)
+        {
+            transaction.ToAccount!.Balance -= transaction.Amount;
+        }
+
+        if (transaction.Type == TransactionType.EXPENSE || transaction.Type == TransactionType.TRANSFER)
+        {
+            transaction.FromAccount!.Balance += transaction.Amount;
+        }
     }
 }

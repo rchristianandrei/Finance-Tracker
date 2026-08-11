@@ -26,6 +26,11 @@ export type UpdateIncomeTransactionRequest = CreateIncomeTransactionRequest & {
   id: number
 }
 
+export type UpdateExpenseTransactionRequest =
+  CreateExpenseTransactionRequest & {
+    id: number
+  }
+
 export const transactionApi = {
   createIncomeTransaction: async (income: CreateIncomeTransactionRequest) => {
     const body = {
@@ -121,6 +126,15 @@ export const transactionApi = {
       date: income.date.toISOString(),
     }
     return await api.put(`/transaction/income/${income.id}`, body)
+  },
+  updateExpenseTransaction: async (
+    expense: UpdateExpenseTransactionRequest
+  ) => {
+    const body = {
+      ...expense,
+      date: expense.date.toISOString(),
+    }
+    return await api.put(`/transaction/expense/${expense.id}`, body)
   },
   delete: (id: number) => {
     return api.delete(`/transaction/${id}`)

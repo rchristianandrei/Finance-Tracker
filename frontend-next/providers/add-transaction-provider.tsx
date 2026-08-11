@@ -7,6 +7,7 @@ import {
   CreateIncomeTransactionRequest,
   CreateTransferTransactionRequest,
   transactionApi,
+  UpdateExpenseTransactionRequest,
   UpdateIncomeTransactionRequest,
 } from "@/api/transactions"
 
@@ -23,6 +24,9 @@ interface AddTransactionContextType {
   ) => Promise<void>
   updateIncomeTransaction: (
     income: UpdateIncomeTransactionRequest
+  ) => Promise<void>
+  updateExpenseTransaction: (
+    income: UpdateExpenseTransactionRequest
   ) => Promise<void>
 }
 
@@ -73,6 +77,15 @@ export function AddTransactionProvider({
     [loadAccounts]
   )
 
+  const updateExpenseTransaction = useCallback(
+    async (expense: UpdateExpenseTransactionRequest) => {
+      await transactionApi.updateExpenseTransaction(expense)
+      loadAccounts()
+      setTransactionAdded({})
+    },
+    [loadAccounts]
+  )
+
   return (
     <AddTransactionContext.Provider
       value={{
@@ -81,6 +94,7 @@ export function AddTransactionProvider({
         addExpenseTransaction,
         addTransferTransaction,
         updateIncomeTransaction,
+        updateExpenseTransaction,
       }}
     >
       {children}
