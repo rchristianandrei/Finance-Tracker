@@ -11,7 +11,6 @@ import { Account } from "@/types/account"
 import {
   accountApi,
   CreateAccountRequest,
-  TransferBalanceRequest,
   UpdateAccountRequest,
 } from "@/api/account"
 
