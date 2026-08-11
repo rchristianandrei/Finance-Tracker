@@ -185,56 +185,6 @@ public class TransactionController(
     }
 
     [Transaction]
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] UpdateTransactionDto value)
-    {
-        var userId = _currentUserService.Id();
-
-        var transaction = await _transactionService.GetById(id);
-        if (transaction == null) return NotFound();
-        if (transaction.UserId != userId) return Forbid();
-
-        var newAccount = await _accountRepo.GetAccountById(value.AccountId);
-        if (newAccount == null) return BadRequest("Account does not exist");
-        if (newAccount.UserId != userId) return Forbid();
-
-        var newCategory = await _categoryRepo.GetById(value.CategoryId);
-        if (newCategory == null) return BadRequest("Category does not exist");
-        if (newCategory.UserId != userId) return Forbid();
-
-        // Update Old Account
-        if (transaction.Type == Enums.TransactionType.INCOME)
-        {
-            transaction.ToAccount.Balance -= transaction.Amount;
-        }
-        else
-        {
-            transaction.ToAccount.Balance += transaction.Amount;
-        }
-
-        // New Old Account
-        if (newCategory.Type == Enums.TransactionType.INCOME)
-        {
-            newAccount.Balance += value.Amount;
-        }
-        else
-        {
-            newAccount.Balance -= value.Amount;
-        }
-
-        transaction.ToAccountId = newAccount.Id;
-        transaction.CategoryId = newCategory.Id;
-        transaction.Description = value.Description;
-        transaction.Amount = value.Amount;
-        transaction.Date = value.Date;
-        transaction.LastUpdated = DateTime.UtcNow;
-
-        await _transactionService.Update(transaction);
-
-        return Ok();
-    }
-
-    [Transaction]
     [HttpPut("income/{id}")]
     public async Task<IActionResult> UpdateIncome(long id, [FromBody] UpdateIncomeTransactionDto dto)
     {

@@ -76,17 +76,6 @@ export function DeleteTransactionDialog({
 
               <div className="flex flex-wrap justify-between">
                 <span className="font-medium">Amount</span>
-                {/* <span
-                  className={
-                    transaction.type === 2
-                      ? "text-green-600"
-                      : transaction.type === 1
-                        ? "text-red-600"
-                        : "text-black"
-                  }
-                >
-                  {transaction.amount.toLocaleString()}
-                </span> */}
                 <TransactionBadge
                   type={
                     transaction.type === 2

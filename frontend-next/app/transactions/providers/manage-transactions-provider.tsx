@@ -20,14 +20,6 @@ interface ManageTransactionsContextType {
   loading: boolean
   totalTransactions: number
   selectedCategories: string[]
-  updateTransaction: (updatedValues: {
-    id: number
-    date: Date
-    accountId: number
-    categoryId: number
-    description: string
-    amount: number
-  }) => Promise<void>
   deleteTransaction: (transactionId: number) => Promise<void>
 }
 
@@ -104,22 +96,6 @@ export function ManageTransactionsProvider({
     [search, type, selectedCategories, dateRange, currentPage]
   )
 
-  const updateTransaction = useCallback(
-    async (updatedValues: {
-      id: number
-      date: Date
-      accountId: number
-      categoryId: number
-      description: string
-      amount: number
-    }) => {
-      await transactionApi.update(updatedValues)
-      getTransactions()
-      loadAccounts()
-    },
-    [getTransactions, loadAccounts]
-  )
-
   const deleteTransaction = useCallback(
     async (transactionId: number) => {
       await transactionApi.delete(transactionId)
@@ -136,7 +112,6 @@ export function ManageTransactionsProvider({
         loading,
         totalTransactions,
         selectedCategories,
-        updateTransaction,
         deleteTransaction,
       }}
     >

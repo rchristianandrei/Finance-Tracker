@@ -110,20 +110,6 @@ export const transactionApi = {
 
     return response.data
   },
-  update: (updatedValues: {
-    id: number
-    date: Date
-    accountId: number
-    categoryId: number
-    description: string
-    amount: number
-  }) => {
-    const body = {
-      ...updatedValues,
-      date: updatedValues.date.toISOString(),
-    }
-    return api.put(`/transaction/${updatedValues.id}`, body)
-  },
   updateIncomeTransaction: async (income: UpdateIncomeTransactionRequest) => {
     const body = {
       ...income,
