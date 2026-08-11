@@ -1,19 +1,65 @@
 import api from "@/lib/axios"
 import { Transaction } from "@/types/transaction"
 
+export type CreateTransactionBaseRequest = {
+  description: string
+  amount: number
+  date: Date
+}
+
+export type CreateIncomeTransactionRequest = CreateTransactionBaseRequest & {
+  toAccountId: number
+  categoryId: number
+}
+
+export type CreateExpenseTransactionRequest = CreateTransactionBaseRequest & {
+  fromAccountId: number
+  categoryId: number
+}
+
+export type CreateTransferTransactionRequest = CreateTransactionBaseRequest & {
+  fromAccountId: number
+  toAccountId: number
+}
+
+export type UpdateIncomeTransactionRequest = CreateIncomeTransactionRequest & {
+  id: number
+}
+
+export type UpdateExpenseTransactionRequest =
+  CreateExpenseTransactionRequest & {
+    id: number
+  }
+export type UpdateTransferTransactionRequest =
+  CreateTransferTransactionRequest & {
+    id: number
+  }
+
 export const transactionApi = {
-  createTransaction: async (expense: {
-    accountId: number
-    categoryId: number
-    amount: number
-    description: string
-    date: Date
-  }) => {
+  createIncomeTransaction: async (income: CreateIncomeTransactionRequest) => {
+    const body = {
+      ...income,
+      date: income.date.toISOString(),
+    }
+    return await api.post(`/transaction/income`, body)
+  },
+  createExpenseTransaction: async (
+    expense: CreateExpenseTransactionRequest
+  ) => {
     const body = {
       ...expense,
       date: expense.date.toISOString(),
     }
-    return await api.post<Transaction>(`/transaction`, body)
+    return await api.post(`/transaction/expense`, body)
+  },
+  createTransferTransaction: async (
+    transfer: CreateTransferTransactionRequest
+  ) => {
+    const body = {
+      ...transfer,
+      date: transfer.date.toISOString(),
+    }
+    return await api.post(`/transaction/transfer`, body)
   },
   readTransactions: async (
     filter?: {
@@ -64,19 +110,30 @@ export const transactionApi = {
 
     return response.data
   },
-  update: (updatedValues: {
-    id: number
-    date: Date
-    accountId: number
-    categoryId: number
-    description: string
-    amount: number
-  }) => {
+  updateIncomeTransaction: async (income: UpdateIncomeTransactionRequest) => {
     const body = {
-      ...updatedValues,
-      date: updatedValues.date.toISOString(),
+      ...income,
+      date: income.date.toISOString(),
     }
-    return api.put(`/transaction/${updatedValues.id}`, body)
+    return await api.put(`/transaction/income/${income.id}`, body)
+  },
+  updateExpenseTransaction: async (
+    expense: UpdateExpenseTransactionRequest
+  ) => {
+    const body = {
+      ...expense,
+      date: expense.date.toISOString(),
+    }
+    return await api.put(`/transaction/expense/${expense.id}`, body)
+  },
+  updateTransferTransaction: async (
+    transfer: UpdateTransferTransactionRequest
+  ) => {
+    const body = {
+      ...transfer,
+      date: transfer.date.toISOString(),
+    }
+    return await api.put(`/transaction/transfer/${transfer.id}`, body)
   },
   delete: (id: number) => {
     return api.delete(`/transaction/${id}`)

@@ -1,6 +1,5 @@
 using backend.Data;
 using backend.Dtos;
-using backend.Dtos.Reports;
 using backend.Dtos.Transaction;
 using backend.Interfaces.Sql;
 using backend.Models;
@@ -30,7 +29,8 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
     public async Task<Transaction?> GetById(long id)
     {
         return await _context.Transactions
-            .Include(t => t.Account)
+            .Include(t => t.FromAccount)
+            .Include(t => t.ToAccount)
             .Include(t => t.Category)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
@@ -38,9 +38,10 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
     public async Task<(IEnumerable<Transaction> Transactions, long count)> GetAll(int userId, TransactionQueryParameters query)
     {
         var queryable = _context.Transactions
-            .Include(t => t.Account)
+            .Include(t => t.FromAccount)
+            .Include(t => t.ToAccount)
             .Include(t => t.Category)
-            .Where(t => t.Category.UserId == userId);
+            .Where(t => t.UserId == userId);
 
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
@@ -49,7 +50,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
         if (query.TransactionType != null)
         {
-            queryable = queryable.Where(t => t.Category.Type == query.TransactionType);
+            queryable = queryable.Where(t => t.Type == query.TransactionType);
         }
 
         if (query.Categories != null && query.Categories.Length > 0)
@@ -82,7 +83,7 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
     public async Task<IEnumerable<Transaction>> GetDashboard(int userId, DashboardQueryParams? query = null)
     {
-        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.Category.UserId == userId);
+        var queryable = _context.Transactions.Include(t => t.Category).Where(t => t.UserId == userId && t.Type != Enums.TransactionType.TRANSFER);
 
         if (query?.StartDate is DateTimeOffset startDate)
         {

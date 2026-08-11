@@ -21,6 +21,8 @@ import {
 import axios from "axios"
 import { FieldError } from "@/components/ui/field"
 import { Transaction } from "@/types/transaction"
+import { TransactionBadge } from "@/components/transaction/transcation-badge"
+import { formatMoney } from "@/lib/format-money"
 
 export function DeleteTransactionDialog({
   transaction,
@@ -74,13 +76,17 @@ export function DeleteTransactionDialog({
 
               <div className="flex flex-wrap justify-between">
                 <span className="font-medium">Amount</span>
-                <span
-                  className={
-                    transaction.type === 2 ? "text-green-600" : "text-red-600"
+                <TransactionBadge
+                  type={
+                    transaction.type === 2
+                      ? "income"
+                      : transaction.type === 1
+                        ? "expense"
+                        : "transfer"
                   }
                 >
-                  {transaction.amount.toLocaleString()}
-                </span>
+                  {formatMoney(transaction.amount)}
+                </TransactionBadge>
               </div>
 
               <div className="flex flex-wrap justify-between">
@@ -94,9 +100,9 @@ export function DeleteTransactionDialog({
                 <span className="font-medium">Category</span>
                 <Tooltip>
                   <TooltipTrigger className="max-w-50 truncate">
-                    {transaction.category.name}
+                    {transaction.category?.name}
                   </TooltipTrigger>
-                  <TooltipContent>{transaction.category.name}</TooltipContent>
+                  <TooltipContent>{transaction.category?.name}</TooltipContent>
                 </Tooltip>
               </div>
 
@@ -121,7 +127,7 @@ export function DeleteTransactionDialog({
                   e.preventDefault()
                   onConfirm()
                 }}
-                className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+                className="bg-red-500! text-white hover:bg-red-500/90!"
               >
                 {isLoading ? "Deleting..." : "Delete"}
               </AlertDialogAction>

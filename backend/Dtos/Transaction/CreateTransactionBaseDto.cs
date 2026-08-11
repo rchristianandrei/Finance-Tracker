@@ -1,21 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-using backend.DataAnnotations;
-using backend.Enums;
 
 namespace backend.Dtos.Transaction;
 
-public class AddTransactionDto
+public abstract class CreateTransactionBaseDto
 {
     [Required]
-    public int AccountId { get; set; }
-
-    [Required]
-    public int CategoryId { get; set; }
-
-    [Required]
-    [GreaterThanZero(ErrorMessage = "Amount must be greater than zero")]
-    [Range(0, double.MaxValue)]
-    public double Amount { get; set; }
+    [Range(0.01, double.MaxValue)]
+    public virtual double Amount { get; set; }
 
     [MaxLength(30)]
     public string Description { get; set; } = string.Empty;
