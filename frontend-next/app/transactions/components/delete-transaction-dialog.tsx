@@ -92,7 +92,11 @@ export function DeleteTransactionDialog({
               <div className="flex flex-wrap justify-between">
                 <span className="font-medium">Type</span>
                 <span className="capitalize">
-                  {transaction.type === 1 ? "Expense" : "Income"}
+                  {transaction.type === 1
+                    ? "Expense"
+                    : transaction.type === 2
+                      ? "Income"
+                      : "Transfer"}
                 </span>
               </div>
 
