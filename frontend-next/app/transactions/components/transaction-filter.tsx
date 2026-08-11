@@ -3,7 +3,6 @@
 import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 
 import {
   Select,
@@ -24,13 +23,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useTransactionFilter } from "../providers/transaction-filter-provider"
 import { DebouncedSearchBox } from "@/components/inputs/debounced-searchbox"
 
@@ -78,6 +71,7 @@ export function TransactionFilter() {
               <SelectItem value="income">Income</SelectItem>
 
               <SelectItem value="expense">Expense</SelectItem>
+              <SelectItem value="transfer">Transfer</SelectItem>
             </SelectContent>
           </Select>
 

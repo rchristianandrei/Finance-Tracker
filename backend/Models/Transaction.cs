@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using backend.Enums;
 
 namespace backend.Models;
@@ -12,19 +11,25 @@ public class Transaction
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public int AccountId { get; set; }
-    public Account Account { get; set; } = null!;
+    [Required]
+    public TransactionType Type { get; set; }
 
-    public int CategoryId { get; set; } = 0;
-    [JsonIgnore]
-    public Category Category { get; set; } = null!;
+    public int? FromAccountId { get; set; }
+    public Account? FromAccount { get; set; }
+
+    public int? ToAccountId { get; set; }
+    public Account? ToAccount { get; set; }
+
+    public int? CategoryId { get; set; }
+    public Category? Category { get; set; }
+
+    [MaxLength(30)]
+    public string? Description { get; set; }
+
 
     [Required]
     [Range(0, double.MaxValue)]
     public double Amount { get; set; }
-
-    [MaxLength(30)]
-    public string Description { get; set; } = string.Empty;
 
     public DateTimeOffset Date { get; set; } = DateTime.UtcNow;
 

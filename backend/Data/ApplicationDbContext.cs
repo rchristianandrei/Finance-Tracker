@@ -56,9 +56,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<Account>(entity =>
         {
             entity.HasKey(a => a.Id);
-            entity.HasMany(a => a.Transactions)
-                .WithOne(t => t.Account)
-                .HasForeignKey(t => t.AccountId);
+            entity.HasMany(a => a.OutgoingTransactions)
+                .WithOne(t => t.FromAccount)
+                .HasForeignKey(t => t.FromAccountId);
+            entity.HasMany(a => a.IncomingTransactions)
+                .WithOne(t => t.ToAccount)
+                .HasForeignKey(t => t.ToAccountId);
         });
 
         modelBuilder.Entity<Category>(entity =>
