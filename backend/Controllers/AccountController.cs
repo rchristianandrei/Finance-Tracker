@@ -40,7 +40,10 @@ public class AccountController(
     {
         var id = _currentUserService.Id();
 
-        var accounts = await _context.Accounts.Where(a => a.UserId == id).ToListAsync();
+        var accounts = await _context.Accounts
+            .Where(a => a.UserId == id)
+            .OrderBy(a => a.Name)
+            .ToListAsync();
 
         return Ok(accounts.Select(a => a.ToDto()));
     }
