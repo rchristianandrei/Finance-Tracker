@@ -26,6 +26,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useMemo } from "react"
 import { useTransactionFilter } from "../providers/transaction-filter-provider"
 import { DebouncedSearchBox } from "@/components/inputs/debounced-searchbox"
+import { MultiSelectInput } from "../../../components/inputs/multi-select-input"
+import { useAccount } from "@/providers/account-provider"
 
 export function TransactionFilter() {
   const {
@@ -45,6 +47,8 @@ export function TransactionFilter() {
     () => selectedCategories.length === 0,
     [selectedCategories]
   )
+
+  const { accounts } = useAccount()
 
   return (
     <Card>
@@ -75,72 +79,29 @@ export function TransactionFilter() {
             </SelectContent>
           </Select>
 
+          {/* Account */}
+          {/* <MultiSelectInput
+            displayText="Accounts"
+            choices={accounts.map((a) => ({
+              key: a.id.toString(),
+              value: a.name,
+            }))}
+            initiallySelected={[]}
+            onSelectedValueChange={(values) => console.log(values)}
+          /> */}
+
           {/* Category */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-auto justify-start truncate font-normal"
-              >
-                {allSelected
-                  ? "All Categories"
-                  : selectedCategories.length === 1
-                    ? filteredCategories.find(
-                        (c) => c.id === Number(selectedCategories[0])
-                      )?.name
-                    : `${selectedCategories.length} categories`}
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent
-              align="start"
-              className="w-55 p-2"
-              style={{
-                maxHeight: "var(--radix-popover-content-available-height)",
-              }}
-            >
-              {/* Fixed */}
-              <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={() => changeSelectedCategory("all", true)}
-                  className="accent-primary"
-                />
-                All Categories
-              </label>
-
-              <div className="my-1 border-t" />
-
-              {/* Scrollable */}
-              <div className="overflow-y-auto">
-                <div className="flex flex-col gap-1">
-                  {filteredCategories.map((category) => (
-                    <label
-                      key={category.id}
-                      className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCategories.includes(
-                          category.id.toString()
-                        )}
-                        onChange={(e) =>
-                          changeSelectedCategory(
-                            category.id.toString(),
-                            e.target.checked
-                          )
-                        }
-                        className="accent-primary"
-                      />
-
-                      <span className="truncate">{category.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          {type !== "transfer" && (
+            <MultiSelectInput
+              displayText="Categories"
+              choices={filteredCategories.map((c) => ({
+                key: c.id.toString(),
+                value: c.name,
+              }))}
+              initiallySelected={selectedCategories}
+              onSelectedValueChange={(values) => changeSelectedCategory(values)}
+            />
+          )}
 
           {/* Date Range */}
           <Popover>

@@ -16,7 +16,7 @@ interface TransactionFilterContextType {
   currentPage: number
   changeSearch: (value: string) => void
   changeType: (value: string) => void
-  changeSelectedCategory: (categoryName: string, checked: boolean) => void
+  changeSelectedCategory: (categories: string[]) => void
   changeDate: (range: DateRange | undefined) => void
   goToPage: (page: number) => void
   clearFilters: () => void
@@ -137,24 +137,13 @@ export function TransactionFilterProvider({
   }, [categories, type])
 
   const changeSelectedCategory = useCallback(
-    (categoryName: string, checked: boolean) => {
-      let next: string[]
-
-      if (categoryName === "all") {
-        next = []
-      } else {
-        next = checked
-          ? [...selectedCategories, categoryName]
-          : selectedCategories.filter((c) => c !== categoryName)
-      }
-
-      if (next.length === filteredCategories.length) {
-        next = []
-      }
-
-      navigate({ category: next.length > 0 ? next.join(",") : "", page: null })
+    (categories: string[]) => {
+      navigate({
+        category: categories.length > 0 ? categories.join(",") : "",
+        page: null,
+      })
     },
-    [selectedCategories, filteredCategories, navigate]
+    [navigate]
   )
 
   // Page
