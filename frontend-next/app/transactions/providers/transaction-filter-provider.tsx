@@ -11,11 +11,13 @@ interface TransactionFilterContextType {
   search: string
   dateRange: DateRange | undefined
   type: string | null
+  selectedAccounts: string[]
   selectedCategories: string[]
   filteredCategories: Category[]
   currentPage: number
   changeSearch: (value: string) => void
   changeType: (value: string) => void
+  changeSelectedAccount: (accounts: string[]) => void
   changeSelectedCategory: (categories: string[]) => void
   changeDate: (range: DateRange | undefined) => void
   goToPage: (page: number) => void
@@ -33,6 +35,7 @@ export function TransactionFilterProvider({
 }) {
   const searchKey = "search"
   const typeKey = "type"
+  const accountKey = "account"
   const categoryKey = "category"
   const dateFromKey = "from"
   const dateToKey = "to"
@@ -47,6 +50,7 @@ export function TransactionFilterProvider({
     (filter: {
       search?: string
       type?: string
+      account?: string
       category?: string
       from?: string
       to?: string
@@ -64,6 +68,12 @@ export function TransactionFilterProvider({
         params.set(typeKey, filter.type)
       } else if (filter.type === "") {
         params.delete(typeKey)
+      }
+
+      if (filter.account) {
+        params.set(accountKey, filter.account)
+      } else if (filter.account === "") {
+        params.delete(accountKey)
       }
 
       if (filter.category) {
@@ -120,6 +130,21 @@ export function TransactionFilterProvider({
         category: "",
         page: null,
       }),
+    [navigate]
+  )
+
+  // Accounts
+  const selectedAccounts = useMemo(() => {
+    return searchParams.get(accountKey)?.split(",").filter(Boolean) ?? []
+  }, [searchParams])
+
+  const changeSelectedAccount = useCallback(
+    (accounts: string[]) => {
+      navigate({
+        account: accounts.length > 0 ? accounts.join(",") : "",
+        page: null,
+      })
+    },
     [navigate]
   )
 
@@ -192,11 +217,13 @@ export function TransactionFilterProvider({
         search,
         dateRange,
         type,
+        selectedAccounts,
         selectedCategories,
         filteredCategories,
         currentPage,
         changeSearch,
         changeType,
+        changeSelectedAccount,
         changeSelectedCategory,
         changeDate,
         goToPage,

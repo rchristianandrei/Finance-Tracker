@@ -4,29 +4,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo } from "react"
 
 export function MultiSelectInput({
   displayText,
   choices,
-  initiallySelected,
+  selected,
   onSelectedValueChange,
 }: {
   displayText: string
   choices: { key: string; value: string }[]
-  initiallySelected: string[]
+  selected: string[]
   onSelectedValueChange?: (selected: string[]) => void
 }) {
-  const [selected, setSelected] = useState<string[]>(initiallySelected)
-
   const allSelected = useMemo(
     () => selected.length === choices.length || selected.length === 0,
     [choices, selected]
   )
-
-  useEffect(() => {
-    onSelectedValueChange?.(selected)
-  }, [selected])
 
   return (
     <Popover>
@@ -58,7 +52,7 @@ export function MultiSelectInput({
             checked={allSelected}
             onChange={() => {
               if (allSelected) return
-              setSelected([])
+              onSelectedValueChange?.([])
             }}
             className="accent-primary"
           />
@@ -80,13 +74,13 @@ export function MultiSelectInput({
                   checked={selected.includes(choice.key)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelected((prev) => [...prev, choice.key])
-                      setSelected((prev) =>
-                        prev.length === choices.length ? [] : prev
+                      const current = [...selected, choice.key]
+                      onSelectedValueChange?.(
+                        current.length === choices.length ? [] : current
                       )
                     } else {
-                      setSelected((prev) =>
-                        prev.filter((s) => s !== choice.key)
+                      onSelectedValueChange?.(
+                        selected.filter((s) => s !== choice.key)
                       )
                     }
                   }}

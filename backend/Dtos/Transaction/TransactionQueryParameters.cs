@@ -6,5 +6,6 @@ public class TransactionQueryParameters : QueryParameters
 {
     public TransactionType? TransactionType { get; set; }
 
-    public string[]? Categories { get; set; } = [];
+    public string[]? Accounts { get; set; }
+    public string[]? Categories { get; set; }
 }

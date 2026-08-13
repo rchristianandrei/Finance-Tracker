@@ -23,10 +23,9 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
-import { useMemo } from "react"
 import { useTransactionFilter } from "../providers/transaction-filter-provider"
 import { DebouncedSearchBox } from "@/components/inputs/debounced-searchbox"
-import { MultiSelectInput } from "../../../components/inputs/multi-select-input"
+import { MultiSelectInput } from "@/components/inputs/multi-select-input"
 import { useAccount } from "@/providers/account-provider"
 
 export function TransactionFilter() {
@@ -34,19 +33,16 @@ export function TransactionFilter() {
     search,
     type,
     dateRange,
+    selectedAccounts,
     selectedCategories,
     filteredCategories,
     changeSearch,
     changeType,
+    changeSelectedAccount,
     changeSelectedCategory,
     changeDate,
     clearFilters,
   } = useTransactionFilter()
-
-  const allSelected = useMemo(
-    () => selectedCategories.length === 0,
-    [selectedCategories]
-  )
 
   const { accounts } = useAccount()
 
@@ -80,15 +76,15 @@ export function TransactionFilter() {
           </Select>
 
           {/* Account */}
-          {/* <MultiSelectInput
+          <MultiSelectInput
             displayText="Accounts"
             choices={accounts.map((a) => ({
               key: a.id.toString(),
               value: a.name,
             }))}
-            initiallySelected={[]}
-            onSelectedValueChange={(values) => console.log(values)}
-          /> */}
+            selected={selectedAccounts}
+            onSelectedValueChange={(values) => changeSelectedAccount(values)}
+          />
 
           {/* Category */}
           {type !== "transfer" && (
@@ -98,7 +94,7 @@ export function TransactionFilter() {
                 key: c.id.toString(),
                 value: c.name,
               }))}
-              initiallySelected={selectedCategories}
+              selected={selectedCategories}
               onSelectedValueChange={(values) => changeSelectedCategory(values)}
             />
           )}

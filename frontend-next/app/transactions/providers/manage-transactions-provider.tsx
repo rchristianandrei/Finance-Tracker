@@ -35,29 +35,18 @@ export function ManageTransactionsProvider({
   const { loadAccounts } = useAccount()
   const { transactionAdded } = useAddTransaction()
 
-  const { dateRange, type, selectedCategories, currentPage, search } =
-    useTransactionFilter()
+  const {
+    dateRange,
+    type,
+    selectedAccounts,
+    selectedCategories,
+    currentPage,
+    search,
+  } = useTransactionFilter()
 
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [totalTransactions, setTotalTransactions] = useState(0)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    getTransactions(controller)
-
-    return () => {
-      controller.abort()
-    }
-  }, [
-    transactionAdded,
-    search,
-    type,
-    selectedCategories,
-    dateRange,
-    currentPage,
-  ])
 
   const getTransactions = useCallback(
     async (controller?: AbortController) => {
@@ -72,6 +61,7 @@ export function ManageTransactionsProvider({
               ? 2
               : 3
           : undefined,
+        accounts: selectedAccounts ?? undefined,
         categories: selectedCategories ?? undefined,
         startDate: dateRange?.from ?? undefined,
         endDate: dateRange?.to ?? undefined,
@@ -93,8 +83,18 @@ export function ManageTransactionsProvider({
         setLoading(false)
       }
     },
-    [search, type, selectedCategories, dateRange, currentPage]
+    [search, type, selectedAccounts, selectedCategories, dateRange, currentPage]
   )
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    getTransactions(controller)
+
+    return () => {
+      controller.abort()
+    }
+  }, [getTransactions])
 
   const deleteTransaction = useCallback(
     async (transactionId: number) => {
