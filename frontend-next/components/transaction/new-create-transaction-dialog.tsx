@@ -16,6 +16,7 @@ import { IncomeTransactionForm } from "./income-transaction-form"
 import { ExpenseTransactionForm } from "./expense-transaction-form"
 import { TransferTransactionForm } from "./transfer-transaction-form"
 import { Transaction } from "@/types/transaction"
+import { CreateCategoryDialog } from "@/components/category/create-category-dialog"
 
 export function NewCreateTransactionDialog({
   hideTrigger,
@@ -31,6 +32,13 @@ export function NewCreateTransactionDialog({
   onClose?: () => void
 }) {
   const [isOpen, setIsOpen] = useState(() => initialOpen || false)
+  const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] =
+    useState(false)
+
+  function onAddCategoryClick() {
+    setIsOpen(false)
+    setIsCreateCategoryDialogOpen(true)
+  }
 
   function onSuccess() {
     setIsOpen(false)
@@ -97,12 +105,14 @@ export function NewCreateTransactionDialog({
               <TabsContent value="income">
                 <IncomeTransactionForm
                   transaction={initialTransaction}
+                  onAddCategoryClick={onAddCategoryClick}
                   onSuccess={onSuccess}
                 />
               </TabsContent>
               <TabsContent value="expense">
                 <ExpenseTransactionForm
                   transaction={initialTransaction}
+                  onAddCategoryClick={onAddCategoryClick}
                   onSuccess={onSuccess}
                 />
               </TabsContent>
@@ -116,6 +126,14 @@ export function NewCreateTransactionDialog({
           </DialogHeader>
         </DialogContent>
       </Dialog>
+      {isCreateCategoryDialogOpen && (
+        <CreateCategoryDialog
+          onClose={() => {
+            setIsCreateCategoryDialogOpen(false)
+            setIsOpen(true)
+          }}
+        />
+      )}
     </>
   )
 }
