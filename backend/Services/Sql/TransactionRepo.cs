@@ -1,6 +1,7 @@
 using backend.Data;
 using backend.Dtos;
 using backend.Dtos.Transaction;
+using backend.Enums;
 using backend.Interfaces.Sql;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +54,12 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
             queryable = queryable.Where(t => t.Type == query.TransactionType);
         }
 
-        if (query.Categories != null && query.Categories.Length > 0)
+        if (query.Accounts != null)
+        {
+            queryable = queryable.Where(t => query.Accounts.Contains(t.ToAccountId.ToString()) || query.Accounts.Contains(t.FromAccountId.ToString()));
+        }
+
+        if (query.TransactionType != TransactionType.TRANSFER && query.Categories != null && query.Categories.Length > 0)
         {
             queryable = queryable.Where(t => query.Categories.Contains(t.CategoryId.ToString()));
         }

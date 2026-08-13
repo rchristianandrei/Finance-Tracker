@@ -68,6 +68,7 @@ export const transactionApi = {
       endDate?: Date
       page?: number
       type?: number
+      accounts?: string[]
       categories?: string[]
     },
     signal?: AbortSignal
@@ -80,6 +81,10 @@ export const transactionApi = {
 
     if (filter?.type) {
       params.set("TransactionType", filter.type.toString())
+    }
+
+    if (filter?.accounts) {
+      filter.accounts.forEach((c) => params.append("Accounts", c))
     }
 
     if (filter?.categories) {

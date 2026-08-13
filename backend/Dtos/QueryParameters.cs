@@ -34,5 +34,5 @@ public class QueryParameters
    public int PageOrDefault => Page ?? 1;
 
    [BindNever]
-   public int PageSizeOrDefault => PageSize ?? 10;
+   public int PageSizeOrDefault => PageSize ?? 20;
 }
