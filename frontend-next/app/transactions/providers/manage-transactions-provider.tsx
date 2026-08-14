@@ -83,7 +83,15 @@ export function ManageTransactionsProvider({
         setLoading(false)
       }
     },
-    [search, type, selectedAccounts, selectedCategories, dateRange, currentPage]
+    [
+      search,
+      type,
+      selectedAccounts,
+      selectedCategories,
+      dateRange,
+      currentPage,
+      transactionAdded,
+    ]
   )
 
   useEffect(() => {
