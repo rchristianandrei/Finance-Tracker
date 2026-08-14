@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { createContext, useCallback, useContext, useMemo } from "react"
 import { DateRange } from "react-day-picker"
+import { useDebouncedCallback } from "use-debounce"
 
 interface TransactionFilterContextType {
   search: string
@@ -111,12 +112,9 @@ export function TransactionFilterProvider({
     [searchParams]
   )
 
-  const changeSearch = useCallback(
-    (value: string) => {
-      navigate({ search: value, page: null })
-    },
-    [navigate]
-  )
+  const changeSearch = useDebouncedCallback((value: string) => {
+    navigate({ search: value, page: null })
+  }, 500)
 
   // Type
   const type = useMemo(() => {

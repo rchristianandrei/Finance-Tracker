@@ -24,13 +24,14 @@ import { CalendarIcon, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { useTransactionFilter } from "../providers/transaction-filter-provider"
-import { DebouncedSearchBox } from "@/components/inputs/debounced-searchbox"
 import { MultiSelectInput } from "@/components/inputs/multi-select-input"
 import { useAccount } from "@/providers/account-provider"
+import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 export function TransactionFilter() {
   const {
-    search,
+    search: searchParam,
     type,
     dateRange,
     selectedAccounts,
@@ -46,16 +47,21 @@ export function TransactionFilter() {
 
   const { accounts } = useAccount()
 
+  const [search, setSearch] = useState(() => searchParam ?? "")
+
   return (
     <Card>
       <CardContent className="flex flex-wrap gap-3">
         <div className="flex w-auto items-center gap-3 overflow-auto">
           {/* Search */}
-          <DebouncedSearchBox
+          <Input
+            placeholder={"Search transactions..."}
             value={search}
-            placeholder="Search transactions..."
-            onValueChange={changeSearch}
             className="min-w-50"
+            onChange={(e) => {
+              setSearch(e.target.value)
+              changeSearch(e.target.value)
+            }}
           />
 
           {/* Type */}
@@ -159,7 +165,13 @@ export function TransactionFilter() {
 
         {/* Clear */}
 
-        <Button variant="outline" onClick={clearFilters}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            clearFilters()
+            setSearch("")
+          }}
+        >
           <X className="mr-2 h-4 w-4" />
           Clear
         </Button>
