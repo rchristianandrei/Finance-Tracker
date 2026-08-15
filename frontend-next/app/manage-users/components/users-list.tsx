@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,71 +10,57 @@ import {
 import { cn } from "@/lib/utils"
 import { Edit, Trash, Users } from "lucide-react"
 import { useManageUsers } from "../providers/manage-users-provider"
-import { UserPagination } from "./user-pagination"
 
 export function UsersList() {
   const { users } = useManageUsers()
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Users />
-            <CardTitle>Users</CardTitle>
-          </div>
-          <UserPagination />
-        </div>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {users.map((user) => (
-          <Card key={user.id}>
-            <CardContent>
-              <ContextMenu>
-                <ContextMenuTrigger asChild>
-                  <div className="grid grid-cols-[1fr_auto]">
-                    <div>
-                      <span
-                        className={cn(
-                          "text-muted-foreground",
-                          user.status === 1
-                            ? "text-yellow-500"
-                            : "text-green-500"
-                        )}
-                      >
-                        {user.status === 1 ? "PENDING" : "ACTIVE"}
-                      </span>
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+      {users.map((user) => (
+        <Card key={user.id}>
+          <CardContent>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <div className="grid grid-cols-[1fr_auto]">
+                  <div>
+                    <span
+                      className={cn(
+                        "text-muted-foreground",
+                        user.status === 1 ? "text-yellow-500" : "text-green-500"
+                      )}
+                    >
+                      {user.status === 1 ? "PENDING" : "ACTIVE"}
+                    </span>
 
-                      <span className="block cursor-help truncate">
-                        {user.lastName}, {user.firstName}
-                      </span>
-                    </div>
-                    <div className="flex flex-col text-right text-muted-foreground">
-                      <span>{user.createdAt.toDateString()}</span>
-                      <span>
-                        {user.createdAt.toLocaleTimeString([], {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
+                    <span className="block cursor-help truncate">
+                      {user.lastName}, {user.firstName}
+                    </span>
                   </div>
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem>
-                    <Edit />
-                    Edit
-                  </ContextMenuItem>
+                  <div className="flex flex-col text-right text-muted-foreground">
+                    <span>{user.createdAt.toDateString()}</span>
+                    <span>
+                      {user.createdAt.toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem>
+                  <Edit />
+                  Edit
+                </ContextMenuItem>
 
-                  <ContextMenuItem className="text-destructive">
-                    <Trash /> Delete
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
-            </CardContent>
-          </Card>
-        ))}
-      </CardContent>
-    </Card>
+                <ContextMenuItem className="text-destructive">
+                  <Trash /> Delete
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   )
 }

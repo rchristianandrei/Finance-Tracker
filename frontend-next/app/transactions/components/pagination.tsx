@@ -2,15 +2,16 @@ import { Button } from "@/components/ui/button"
 import { ChevronDown } from "lucide-react"
 import { useManageTransactions } from "../providers/manage-transactions-provider"
 import { useTransactionFilter } from "../providers/transaction-filter-provider"
+import { pageSize } from "@/lib/pageSize"
 
 export function Pagination() {
   const { currentPage, goToPage } = useTransactionFilter()
   const { transactions, totalTransactions } = useManageTransactions()
 
   const hasNoTransactions = transactions.length <= 0 ? 0 : 1
-  const fromItem = (currentPage - 1) * 10 + hasNoTransactions
+  const fromItem = (currentPage - 1) * pageSize + hasNoTransactions
   const toItem = fromItem + transactions.length - hasNoTransactions
-  const disabledNext = currentPage * 10 >= totalTransactions
+  const disabledNext = currentPage * pageSize >= totalTransactions
 
   const prevPage = () => {
     if (currentPage > 1) {

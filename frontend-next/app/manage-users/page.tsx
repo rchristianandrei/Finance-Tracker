@@ -6,6 +6,7 @@ import { UsersList } from "./components/users-list"
 import { ManageUsersProvider } from "./providers/manage-users-provider"
 import { UserFilterProvider } from "./providers/user-filter-provider"
 import { Suspense } from "react"
+import { UserPagination } from "./components/user-pagination"
 
 export const metadata = {
   title: "Manage Users",
@@ -24,6 +25,7 @@ export default () => {
                 <div className="flex flex-col gap-4">
                   <Filters />
                   <UsersList />
+                  <UserPagination />
                 </div>
               </ManageUsersProvider>
             </UserFilterProvider>
