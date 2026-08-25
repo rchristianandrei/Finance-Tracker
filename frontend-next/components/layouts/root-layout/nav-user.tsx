@@ -5,6 +5,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -17,6 +18,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { useAuth } from "@/providers/auth-provider"
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 import { useMemo, useState } from "react"
+import { DarkModeSwitch } from "./dark-mode-switch"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -69,6 +71,8 @@ export function NavUser() {
             align="end"
             sideOffset={4}
           >
+            <DarkModeSwitch />
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onClickLogout}>
               <LogOutIcon />
               Log out {isLoggingOut && <Spinner />}
