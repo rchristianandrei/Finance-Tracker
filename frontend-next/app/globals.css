@@ -184,7 +184,7 @@
   --radius: 0.625rem;
 
   /* Sidebar */
-  --sidebar: oklch(0.18 0.04 167);
+  --sidebar: var(--background);
   --sidebar-foreground: oklch(0.95 0.015 170);
   --sidebar-primary: oklch(0.68 0.17 45);
   --sidebar-primary-foreground: oklch(0.16 0.025 165);
