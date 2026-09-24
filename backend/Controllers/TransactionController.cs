@@ -49,6 +49,7 @@ public class TransactionController(
             Amount = dto.Amount,
             Description = dto.Description,
             Date = dto.Date,
+            DashboardDate = dto.Date
         };
 
         await _transactionService.Create(transaction);
@@ -80,6 +81,7 @@ public class TransactionController(
             Description = dto.Description,
             Amount = dto.Amount,
             Date = dto.Date,
+            DashboardDate = dto.DashboardDate ?? dto.Date
         };
 
         await _transactionService.Create(transaction);
@@ -111,6 +113,7 @@ public class TransactionController(
             Description = dto.Description,
             Amount = dto.Amount,
             Date = dto.Date,
+            DashboardDate = dto.Date
         };
 
         await _transactionService.Create(transaction);

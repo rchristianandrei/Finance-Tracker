@@ -16,7 +16,8 @@ public static class TransactionDtoMapper
             ToAccount = t.ToAccount?.ToDto(),
             Category = t.Category?.ToDto(),
             Description = t.Description,
-            Amount = t.Amount
+            Amount = t.Amount,
+            DashboardDate = t.DashboardDate
         };
     }
 }

@@ -24,13 +24,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus } from "lucide-react"
+import { ChevronDown, Plus } from "lucide-react"
 import { useAccount } from "@/providers/account-provider"
 import {
   ExpenseTransactionFormValues,
   expenseTransactionSchema,
 } from "@/lib/validations/transactions"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 export function ExpenseTransactionForm({
   transaction,
@@ -56,6 +61,7 @@ export function ExpenseTransactionForm({
       description: transaction?.description ?? "",
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
+      dashboardDate: transaction?.dashboardDate,
     },
   })
 
@@ -282,6 +288,68 @@ export function ExpenseTransactionForm({
                       <FieldError errors={[fieldState.error]} />
                     )}
                   </Field>
+                )
+              }}
+            />
+          </fieldset>
+
+          <fieldset>
+            <Controller
+              name="dashboardDate"
+              control={form.control}
+              render={({ field, fieldState }) => {
+                const timeValue = field.value
+                  ? format(field.value, "HH:mm")
+                  : ""
+
+                return (
+                  <Collapsible>
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel asChild>
+                        <CollapsibleTrigger className="group">
+                          <ChevronDown className="size-4 -rotate-90 transition-transform duration-200 group-data-[state=open]:rotate-0" />
+                          <span>Dashboard Date</span>
+                        </CollapsibleTrigger>
+                      </FieldLabel>
+
+                      <CollapsibleContent asChild>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-full justify-start"
+                            >
+                              {field.value
+                                ? format(field.value, "MMM d")
+                                : "Select date & time"}
+                            </Button>
+                          </PopoverTrigger>
+
+                          <PopoverContent className="w-auto gap-0 p-4">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={(date) => {
+                                if (!date) return
+
+                                const current = field.value ?? new Date()
+
+                                date.setHours(current.getHours())
+                                date.setMinutes(current.getMinutes())
+
+                                field.onChange(date)
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </CollapsibleContent>
+
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  </Collapsible>
                 )
               }}
             />
