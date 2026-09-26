@@ -27,6 +27,8 @@ export const incomeTransactionSchema = z.object({
 export const expenseTransactionSchema = z.object({
   ...transactionFields,
   fromAccountId: z.number().min(1, "From Account is required"),
+  dashboardDate: z.date().optional(),
+  useSameDateAsDashboardDate: z.boolean().optional(),
 })
 
 export const transferTransactionSchema = z

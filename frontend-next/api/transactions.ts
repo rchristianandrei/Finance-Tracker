@@ -15,6 +15,7 @@ export type CreateIncomeTransactionRequest = CreateTransactionBaseRequest & {
 export type CreateExpenseTransactionRequest = CreateTransactionBaseRequest & {
   fromAccountId: number
   categoryId: number
+  dashboardDate?: Date
 }
 
 export type CreateTransferTransactionRequest = CreateTransactionBaseRequest & {
@@ -46,9 +47,21 @@ export const transactionApi = {
   createExpenseTransaction: async (
     expense: CreateExpenseTransactionRequest
   ) => {
+    if (expense.dashboardDate) {
+      expense.dashboardDate.setHours(
+        expense.date.getHours(),
+        expense.date.getMinutes(),
+        expense.date.getSeconds(),
+        expense.date.getMilliseconds()
+      )
+    }
+
+    const isoDate = expense.date.toISOString()
+
     const body = {
       ...expense,
-      date: expense.date.toISOString(),
+      date: isoDate,
+      dashboardDate: expense.dashboardDate?.toISOString() ?? isoDate,
     }
     return await api.post(`/transaction/expense`, body)
   },
@@ -111,6 +124,7 @@ export const transactionApi = {
     response.data.data = response.data.data.map((t) => ({
       ...t,
       date: new Date(t.date),
+      dashboardDate: t.dashboardDate ? new Date(t.dashboardDate) : undefined,
     }))
 
     return response.data
