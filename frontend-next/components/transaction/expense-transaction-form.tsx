@@ -36,6 +36,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { isSameISODate } from "@/lib/compare-date"
+import { Switch } from "@/components/ui/switch"
 
 export function ExpenseTransactionForm({
   transaction,
@@ -62,6 +64,10 @@ export function ExpenseTransactionForm({
       amount: transaction?.amount ?? undefined,
       date: transaction?.date ?? new Date(),
       dashboardDate: transaction?.dashboardDate,
+      useSameDateAsDashboardDate: isSameISODate(
+        transaction?.dashboardDate ?? new Date(),
+        transaction?.date ?? new Date()
+      ),
     },
   })
 
@@ -69,6 +75,9 @@ export function ExpenseTransactionForm({
     if (isSubmitting) return
     setIsSubmitting(true)
     try {
+      if (values.useSameDateAsDashboardDate) {
+        values.dashboardDate = values.date
+      }
       if (transaction) {
         await updateExpenseTransaction({ ...values, id: transaction.id })
       } else {
@@ -259,6 +268,10 @@ export function ExpenseTransactionForm({
                             date.setMinutes(current.getMinutes())
 
                             field.onChange(date)
+
+                            if (form.getValues("useSameDateAsDashboardDate")) {
+                              form.setValue("dashboardDate", date)
+                            }
                           }}
                         />
 
@@ -298,10 +311,6 @@ export function ExpenseTransactionForm({
               name="dashboardDate"
               control={form.control}
               render={({ field, fieldState }) => {
-                const timeValue = field.value
-                  ? format(field.value, "HH:mm")
-                  : ""
-
                 return (
                   <Collapsible>
                     <Field data-invalid={fieldState.invalid}>
@@ -313,41 +322,73 @@ export function ExpenseTransactionForm({
                       </FieldLabel>
 
                       <CollapsibleContent asChild>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="w-full justify-start"
-                            >
-                              {field.value
-                                ? format(field.value, "MMM d")
-                                : "Select date & time"}
-                            </Button>
-                          </PopoverTrigger>
+                        <div className="space-y-3">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full justify-start"
+                              >
+                                {field.value
+                                  ? format(field.value, "MMM d")
+                                  : "Select date"}
+                              </Button>
+                            </PopoverTrigger>
 
-                          <PopoverContent className="w-auto gap-0 p-4">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={(date) => {
-                                if (!date) return
+                            <PopoverContent className="w-auto gap-0 p-4">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={(date) => {
+                                  if (!date) return
 
-                                const current = field.value ?? new Date()
+                                  const current = field.value ?? new Date()
 
-                                date.setHours(current.getHours())
-                                date.setMinutes(current.getMinutes())
+                                  date.setHours(current.getHours())
+                                  date.setMinutes(current.getMinutes())
 
-                                field.onChange(date)
-                              }}
-                            />
-                          </PopoverContent>
-                        </Popover>
+                                  field.onChange(date)
+                                }}
+                              />
+                            </PopoverContent>
+                          </Popover>
+
+                          <Controller
+                            name="useSameDateAsDashboardDate"
+                            control={form.control}
+                            render={({ field: sameDateField }) => (
+                              <div className="flex items-center justify-between rounded-lg border p-3">
+                                <div className="space-y-0.5">
+                                  <div className="text-sm font-medium">
+                                    Use transaction date
+                                  </div>
+
+                                  <p className="text-xs text-muted-foreground">
+                                    Keep the dashboard date the same as the
+                                    transaction date.
+                                  </p>
+                                </div>
+
+                                <Switch
+                                  checked={sameDateField.value}
+                                  onCheckedChange={(checked) => {
+                                    sameDateField.onChange(checked)
+
+                                    if (checked) {
+                                      field.onChange(form.getValues("date"))
+                                    }
+                                  }}
+                                />
+                              </div>
+                            )}
+                          />
+
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </div>
                       </CollapsibleContent>
-
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
                     </Field>
                   </Collapsible>
                 )
