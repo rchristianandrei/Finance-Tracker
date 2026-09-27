@@ -71,6 +71,8 @@ export function ExpenseTransactionForm({
     },
   })
 
+  const useSameDateAsDashboardDate = form.watch("useSameDateAsDashboardDate")
+
   async function onSubmit(values: ExpenseTransactionFormValues) {
     if (isSubmitting) return
     setIsSubmitting(true)
@@ -329,6 +331,7 @@ export function ExpenseTransactionForm({
                                 type="button"
                                 variant="outline"
                                 className="w-full justify-start"
+                                disabled={useSameDateAsDashboardDate}
                               >
                                 {field.value
                                   ? format(field.value, "MMM d")
@@ -338,10 +341,12 @@ export function ExpenseTransactionForm({
 
                             <PopoverContent className="w-auto gap-0 p-4">
                               <Calendar
+                                disabled={useSameDateAsDashboardDate}
                                 mode="single"
                                 selected={field.value}
                                 onSelect={(date) => {
-                                  if (!date) return
+                                  if (!date || useSameDateAsDashboardDate)
+                                    return
 
                                   const current = field.value ?? new Date()
 
