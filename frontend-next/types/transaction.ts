@@ -4,6 +4,7 @@ import { Category, TransactionType } from "./category"
 export type Transaction = {
   id: number
   date: Date
+  dashboardDate?: Date
   type: TransactionType
   fromAccount: Account | null
   toAccount: Account | null

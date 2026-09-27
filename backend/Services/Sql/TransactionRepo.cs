@@ -93,12 +93,12 @@ public class TransactionRepo(ApplicationDbContext _context) : ITransactionRepo
 
         if (query?.StartDate is DateTimeOffset startDate)
         {
-            queryable = queryable.Where(t => t.Date >= startDate);
+            queryable = queryable.Where(t => t.DashboardDate >= startDate);
         }
 
         if (query?.EndDate is DateTimeOffset endDate)
         {
-            queryable = queryable.Where(t => t.Date <= endDate);
+            queryable = queryable.Where(t => t.DashboardDate <= endDate);
         }
 
         return await queryable.ToListAsync();

@@ -25,6 +25,21 @@ public class TransactionController(
     ICategoryRepo _categoryRepo
 ) : ControllerBase
 {
+    private Transaction CreateTransactionObject(CreateTransactionBaseDto dto, TransactionType type)
+    {
+        return new Transaction
+        {
+            UserId = _currentUserService.Id(),
+            Type = type,
+            Amount = dto.Amount,
+            Description = dto.Description,
+            Date = dto.Date,
+            DashboardDate = dto.Date,
+            CreatedAt = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+    }
+
     [Transaction]
     [HttpPost("income")]
     public async Task<IActionResult> CreateIncome([FromBody] CreateIncomeTransactionDto dto)
@@ -36,20 +51,13 @@ public class TransactionController(
 
         var category = await _categoryRepo.GetById(dto.CategoryId);
         if (category == null || category.UserId != userId) return BadRequest("Category does not exist");
-        if (category.Type != Enums.TransactionType.INCOME) return BadRequest("Category is not an income category");
+        if (category.Type != TransactionType.INCOME) return BadRequest("Category is not an income category");
 
         account.Balance += dto.Amount;
 
-        var transaction = new Transaction
-        {
-            UserId = userId,
-            Type = Enums.TransactionType.INCOME,
-            ToAccountId = account.Id,
-            CategoryId = category.Id,
-            Amount = dto.Amount,
-            Description = dto.Description,
-            Date = dto.Date,
-        };
+        var transaction = CreateTransactionObject(dto, TransactionType.INCOME);
+        transaction.ToAccountId = account.Id;
+        transaction.CategoryId = category.Id;
 
         await _transactionService.Create(transaction);
 
@@ -67,20 +75,14 @@ public class TransactionController(
 
         var category = await _categoryRepo.GetById(dto.CategoryId);
         if (category == null || category.UserId != userId) return BadRequest("Category does not exist");
-        if (category.Type != Enums.TransactionType.EXPENSE) return BadRequest("Category is not an expense category");
+        if (category.Type != TransactionType.EXPENSE) return BadRequest("Category is not an expense category");
 
         account.Balance -= dto.Amount;
 
-        var transaction = new Transaction
-        {
-            UserId = userId,
-            Type = Enums.TransactionType.EXPENSE,
-            FromAccountId = account.Id,
-            CategoryId = category.Id,
-            Description = dto.Description,
-            Amount = dto.Amount,
-            Date = dto.Date,
-        };
+        var transaction = CreateTransactionObject(dto, TransactionType.EXPENSE);
+        transaction.FromAccountId = account.Id;
+        transaction.CategoryId = category.Id;
+        transaction.DashboardDate = dto.DashboardDate ?? dto.Date;
 
         await _transactionService.Create(transaction);
 
@@ -102,16 +104,9 @@ public class TransactionController(
         fromAccount.Balance -= dto.Amount;
         toAccount.Balance += dto.Amount;
 
-        var transaction = new Transaction
-        {
-            UserId = userId,
-            Type = Enums.TransactionType.TRANSFER,
-            FromAccountId = fromAccount.Id,
-            ToAccountId = toAccount.Id,
-            Description = dto.Description,
-            Amount = dto.Amount,
-            Date = dto.Date,
-        };
+        var transaction = CreateTransactionObject(dto, TransactionType.TRANSFER);
+        transaction.FromAccountId = fromAccount.Id;
+        transaction.ToAccountId = toAccount.Id;
 
         await _transactionService.Create(transaction);
 
@@ -211,6 +206,7 @@ public class TransactionController(
         transaction.CategoryId = category.Id;
         transaction.Description = dto.Description;
         transaction.Amount = dto.Amount;
+        transaction.DashboardDate = dto.Date;
         transaction.Date = dto.Date;
         transaction.LastUpdated = DateTime.UtcNow;
 
@@ -246,6 +242,7 @@ public class TransactionController(
         transaction.CategoryId = category.Id;
         transaction.Description = dto.Description;
         transaction.Amount = dto.Amount;
+        transaction.DashboardDate = dto.DashboardDate ?? dto.Date;
         transaction.Date = dto.Date;
         transaction.LastUpdated = DateTime.UtcNow;
 
@@ -281,6 +278,7 @@ public class TransactionController(
         transaction.Category = null;
         transaction.Description = dto.Description;
         transaction.Amount = dto.Amount;
+        transaction.DashboardDate = dto.Date;
         transaction.Date = dto.Date;
         transaction.LastUpdated = DateTime.UtcNow;
 

@@ -31,6 +31,8 @@ public class Transaction
     [Range(0, double.MaxValue)]
     public double Amount { get; set; }
 
+    public DateTimeOffset DashboardDate { get; set; } = DateTime.UtcNow;
+
     public DateTimeOffset Date { get; set; } = DateTime.UtcNow;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTime.UtcNow;
