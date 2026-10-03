@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { useCategory } from "@/providers/category-provider"
 import { Transaction } from "@/types/transaction"
@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/collapsible"
 import { isSameISODate } from "@/lib/compare-date"
 import { Switch } from "@/components/ui/switch"
+import { AccountBalanceLabel } from "./components/account-balance-label"
 
 export function ExpenseTransactionForm({
   transaction,
@@ -70,6 +71,12 @@ export function ExpenseTransactionForm({
       ),
     },
   })
+
+  const selectedFromAccountId = form.watch("fromAccountId")
+  const selectedFromAccount = useMemo(
+    () => accounts.find((a) => a.id === selectedFromAccountId),
+    [accounts, selectedFromAccountId]
+  )
 
   const useSameDateAsDashboardDate = form.watch("useSameDateAsDashboardDate")
 
@@ -126,6 +133,10 @@ export function ExpenseTransactionForm({
                           <Plus />
                         </Button> */}
                   </div>
+
+                  {selectedFromAccount && (
+                    <AccountBalanceLabel account={selectedFromAccount} />
+                  )}
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

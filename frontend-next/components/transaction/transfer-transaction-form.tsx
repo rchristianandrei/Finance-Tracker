@@ -29,7 +29,7 @@ import {
   transferTransactionSchema,
 } from "@/lib/validations/transactions"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
-import { formatMoney } from "@/lib/format-money"
+import { AccountBalanceLabel } from "./components/account-balance-label"
 
 export function TransferTransactionForm({
   transaction,
@@ -115,9 +115,10 @@ export function TransferTransactionForm({
                           <Plus />
                         </Button> */}
                   </div>
-                  <FieldLabel className="text-muted-foreground">
-                    Balance: {formatMoney(selectedFromAccount?.balance ?? 0.0)}
-                  </FieldLabel>
+
+                  {selectedFromAccount && (
+                    <AccountBalanceLabel account={selectedFromAccount} />
+                  )}
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -129,6 +130,9 @@ export function TransferTransactionForm({
             name="toAccountId"
             control={form.control}
             render={({ field, fieldState }) => {
+              const selectedToAccount = accounts.find(
+                (a) => a.id === selectedToAccountId
+              )
               return (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>To Account</FieldLabel>
@@ -161,13 +165,9 @@ export function TransferTransactionForm({
                         </Button> */}
                   </div>
 
-                  <FieldLabel className="text-muted-foreground">
-                    Balance:{" "}
-                    {formatMoney(
-                      accounts.find((a) => a.id === selectedToAccountId)
-                        ?.balance ?? 0.0
-                    )}
-                  </FieldLabel>
+                  {selectedToAccount && (
+                    <AccountBalanceLabel account={selectedToAccount} />
+                  )}
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
