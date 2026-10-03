@@ -31,6 +31,7 @@ import {
   incomeTransactionSchema,
 } from "@/lib/validations/transactions"
 import { useAddTransaction } from "@/providers/add-transaction-provider"
+import { AccountBalanceLabel } from "./components/account-balance-label"
 
 export function IncomeTransactionForm({
   transaction,
@@ -61,6 +62,12 @@ export function IncomeTransactionForm({
   const incomeCategories = useMemo(
     () => categories.filter((c) => c.type === 2),
     [categories]
+  )
+
+  const selectedToAccountId = form.watch("toAccountId")
+  const selectedToAccount = useMemo(
+    () => accounts.find((a) => a.id === selectedToAccountId),
+    [accounts, selectedToAccountId]
   )
 
   useEffect(() => {
@@ -118,6 +125,10 @@ export function IncomeTransactionForm({
                           <Plus />
                         </Button> */}
                 </div>
+
+                {selectedToAccount && (
+                  <AccountBalanceLabel account={selectedToAccount} />
+                )}
 
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
