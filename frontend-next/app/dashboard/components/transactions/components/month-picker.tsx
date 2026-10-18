@@ -30,9 +30,11 @@ export function MonthPicker({
     "December",
   ]
 
+  const years = ["2026", "2027", "2028", "2029", "2030"]
+
   return (
     <Card>
-      <CardContent>
+      <CardContent className="flex items-center gap-1">
         <Select
           value={month.getMonth().toString()}
           onValueChange={(value) => {
@@ -40,7 +42,7 @@ export function MonthPicker({
             setMonth(new Date(new Date().getFullYear(), newMonth, 1))
           }}
         >
-          <SelectTrigger className="w-45">
+          <SelectTrigger className="w-30">
             <SelectValue placeholder="Select month" />
           </SelectTrigger>
 
@@ -48,6 +50,25 @@ export function MonthPicker({
             {months.map((m, i) => (
               <SelectItem key={i} value={i.toString()}>
                 {m}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={month.getFullYear().toString()}
+          onValueChange={(value) => {
+            const newYear = Number(value)
+            setMonth(new Date(newYear, month.getMonth(), 1))
+          }}
+        >
+          <SelectTrigger className="w-20">
+            <SelectValue placeholder="Select year" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {years.map((y) => (
+              <SelectItem key={y} value={y}>
+                {y}
               </SelectItem>
             ))}
           </SelectContent>
