@@ -1,12 +1,5 @@
 "use client"
 
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -19,6 +12,12 @@ import { useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { Category } from "@/types/category"
 import { CategoryFormValues, categorySchema } from "@/lib/validations/category"
+import {
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 
 export function CategoryForm({
   title,
@@ -55,15 +54,15 @@ export function CategoryForm({
   }
 
   return (
-    <DialogContent className="sm:max-w-125">
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>
+    <>
+      <SheetHeader>
+        <SheetTitle>{title}</SheetTitle>
+        <SheetDescription>
           Enter the category details below and click save.
-        </DialogDescription>
-      </DialogHeader>
-      <fieldset disabled={isSubmitting}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        </SheetDescription>
+      </SheetHeader>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <fieldset disabled={isSubmitting} className="space-y-4 px-4">
           <Controller
             name="type"
             control={form.control}
@@ -117,12 +116,13 @@ export function CategoryForm({
           {errorMessage && (
             <FieldError className="text-center">{errorMessage}</FieldError>
           )}
-
+        </fieldset>
+        <SheetFooter>
           <Button type="submit" className="w-full">
             {isSubmitting ? <Spinner className="ml-2" /> : "Save"}
           </Button>
-        </form>
-      </fieldset>
-    </DialogContent>
+        </SheetFooter>
+      </form>
+    </>
   )
 }

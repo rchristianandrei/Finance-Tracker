@@ -6,7 +6,7 @@ import { useCategory } from "@/providers/category-provider"
 import { useManageCategoryFilter } from "../providers/manage-category-filter"
 import { useMemo, useState } from "react"
 import { Category } from "@/types/category"
-import { UpdateCategoryDialog } from "./update-category-dialog"
+import { UpdateCategorySheet } from "./update-category-sheet"
 import {
   ContextMenu,
   ContextMenuContent,
@@ -68,7 +68,7 @@ export function CategoryList() {
         ))}
       </div>
       {updateCategoryEvent && (
-        <UpdateCategoryDialog
+        <UpdateCategorySheet
           category={updateCategoryEvent}
           onClose={() => setUpdateCategoryEvent(null)}
         />

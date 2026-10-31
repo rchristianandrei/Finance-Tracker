@@ -1,6 +1,6 @@
 "use client"
 
-import { CreateCategoryDialog } from "@/components/category/create-category-dialog"
+import { CreateCategorySheet } from "@/components/category/create-category-sheet"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,11 +14,11 @@ export function CategoryFilter() {
     useState(false)
   return (
     <Card>
-      <CardContent className="flex flex-wrap items-center justify-between gap-3">
+      <CardContent className="flex items-center justify-between gap-3">
         <Input
           placeholder="Search categories..."
           value={search}
-          className="w-full md:w-75"
+          className="max-w-75 flex-1"
           onChange={(e) => {
             setSearch(e.target.value)
           }}
@@ -29,10 +29,10 @@ export function CategoryFilter() {
           onClick={() => setIsCreateCategoryDialogOpen(true)}
         >
           <Plus />
-          Add Category
+          <p className="hidden md:block">Add Category</p>
         </Button>
         {isCreateCategoryDialogOpen && (
-          <CreateCategoryDialog
+          <CreateCategorySheet
             onClose={() => setIsCreateCategoryDialogOpen(false)}
           />
         )}
