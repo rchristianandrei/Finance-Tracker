@@ -16,8 +16,9 @@ import { IncomeTransactionForm } from "./income-transaction-form"
 import { ExpenseTransactionForm } from "./expense-transaction-form"
 import { TransferTransactionForm } from "./transfer-transaction-form"
 import { Transaction } from "@/types/transaction"
-import { CreateCategoryDialog } from "@/components/category/create-category-dialog"
+import { CreateCategorySheet } from "@/components/category/create-category-sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { ResponsiveSheetContent } from "../ResponsiveSheetContent"
 
 export function NewCreateTransactionDialog({
   hideTrigger,
@@ -74,14 +75,7 @@ export function NewCreateTransactionDialog({
         )}
 
         {/* Mobile: slide up from the bottom */}
-        <SheetContent
-          side={isMobile ? "bottom" : "right"}
-          className={
-            isMobile
-              ? "flex h-[90dvh] max-h-[90dvh] flex-col gap-0 overflow-hidden rounded-t-2xl px-4 pb-[env(safe-area-inset-bottom)]"
-              : "flex w-full flex-col gap-0 overflow-hidden px-6 sm:max-w-sm"
-          }
-        >
+        <ResponsiveSheetContent>
           <SheetHeader className="shrink-0 gap-1 text-left">
             <SheetTitle>{title}</SheetTitle>
             <SheetDescription className="sr-only">
@@ -92,7 +86,7 @@ export function NewCreateTransactionDialog({
           <Tabs
             key={defaultTab}
             defaultValue={defaultTab}
-            className="flex min-h-0 flex-1 flex-col"
+            className="mb-4 flex min-h-0 flex-1 flex-col"
           >
             <TabsList className="mt-4 w-full shrink-0 gap-3 rounded-full bg-muted p-1">
               <TabsTrigger
@@ -142,11 +136,11 @@ export function NewCreateTransactionDialog({
               </TabsContent>
             </div>
           </Tabs>
-        </SheetContent>
+        </ResponsiveSheetContent>
       </Sheet>
 
       {isCreateCategoryDialogOpen && (
-        <CreateCategoryDialog
+        <CreateCategorySheet
           onClose={() => {
             setIsCreateCategoryDialogOpen(false)
             setIsOpen(true)

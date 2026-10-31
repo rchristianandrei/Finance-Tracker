@@ -3,14 +3,15 @@
 import axios from "axios"
 import { toast } from "sonner"
 
-import { Dialog } from "@/components/ui/dialog"
 import { CategoryFormValues } from "@/lib/validations/category"
 
 import { useState } from "react"
 import { useCategory } from "@/providers/category-provider"
 import { CategoryForm } from "./category-form"
+import { Sheet } from "@/components/ui/sheet"
+import { ResponsiveSheetContent } from "@/components/ResponsiveSheetContent"
 
-export function CreateCategoryDialog({ onClose }: { onClose: () => void }) {
+export function CreateCategorySheet({ onClose }: { onClose: () => void }) {
   const { createCategory } = useCategory()
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -38,12 +39,14 @@ export function CreateCategoryDialog({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Dialog open={true} onOpenChange={onOpenDialogChange}>
-      <CategoryForm
-        title="Create Category"
-        errorMessage={errorMessage}
-        onSave={onSubmit}
-      />
-    </Dialog>
+    <Sheet open={true} onOpenChange={onOpenDialogChange}>
+      <ResponsiveSheetContent>
+        <CategoryForm
+          title="Create Category"
+          errorMessage={errorMessage}
+          onSave={onSubmit}
+        />
+      </ResponsiveSheetContent>
+    </Sheet>
   )
 }

@@ -1,15 +1,15 @@
 "use client"
 
 import { toast } from "sonner"
-import { Dialog } from "@/components/ui/dialog"
 import { CategoryFormValues } from "@/lib/validations/category"
 import { useManageCategories } from "../providers/manage-category-provider"
 import { CategoryForm } from "@/components/category/category-form"
 import axios from "axios"
 import { useState } from "react"
 import { Category } from "@/types/category"
+import { Sheet } from "@/components/ui/sheet"
 
-export function UpdateCategoryDialog({
+export function UpdateCategorySheet({
   category,
   onClose,
 }: {
@@ -41,7 +41,7 @@ export function UpdateCategoryDialog({
   }
 
   return (
-    <Dialog
+    <Sheet
       open={true}
       onOpenChange={() => {
         onClose()
@@ -53,6 +53,6 @@ export function UpdateCategoryDialog({
         errorMessage={errorMessage}
         onSave={onSubmit}
       ></CategoryForm>
-    </Dialog>
+    </Sheet>
   )
 }
