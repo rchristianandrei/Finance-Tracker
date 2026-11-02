@@ -26,7 +26,9 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
             </div>
             <NewCreateTransactionDialog title="Create Transaction" />
           </header>
-          <div className="flex-1 overflow-auto p-4">{children}</div>
+          <div className="flex flex-1 justify-center overflow-auto p-4">
+            <div className="max-w-5xl flex-1">{children}</div>
+          </div>
         </SidebarInset>
       </AddTransactionProvider>
     </SidebarProvider>
