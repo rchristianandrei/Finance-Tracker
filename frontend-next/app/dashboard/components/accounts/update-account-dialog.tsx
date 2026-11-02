@@ -7,6 +7,8 @@ import { Account } from "@/types/account"
 import { AccountForm } from "@/components/account/account-form"
 import { AccountFormValues } from "@/lib/validations/account"
 import { useAccount } from "@/providers/account-provider"
+import { Sheet } from "@/components/ui/sheet"
+import { ResponsiveSheetContent } from "@/components/ResponsiveSheetContent"
 
 export function UpdateAccountDialog({
   account,
@@ -36,14 +38,14 @@ export function UpdateAccountDialog({
   }
 
   return (
-    <>
-      <Dialog
-        open={isOpen && account != null}
-        onOpenChange={(value) => {
-          setIsOpen(value)
-          onClose()
-        }}
-      >
+    <Sheet
+      open={isOpen && account != null}
+      onOpenChange={(value) => {
+        setIsOpen(value)
+        onClose()
+      }}
+    >
+      <ResponsiveSheetContent>
         {account && (
           <AccountForm
             title="Update Account"
@@ -52,7 +54,7 @@ export function UpdateAccountDialog({
             errorMessage={errorMessage}
           ></AccountForm>
         )}
-      </Dialog>
-    </>
+      </ResponsiveSheetContent>
+    </Sheet>
   )
 }

@@ -15,6 +15,12 @@ import { useState } from "react"
 import { Spinner } from "@/components/ui/spinner"
 import { Account } from "@/types/account"
 import { AccountFormValues, accountSchema } from "@/lib/validations/account"
+import {
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "../ui/sheet"
 
 export function AccountForm({
   title,
@@ -49,20 +55,15 @@ export function AccountForm({
   }
 
   return (
-    <DialogContent
-      className="sm:max-w-125"
-      onCloseAutoFocus={(e) => {
-        e.preventDefault()
-      }}
-    >
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>
+    <>
+      <SheetHeader>
+        <SheetTitle>{title}</SheetTitle>
+        <SheetDescription>
           Enter the account details below and click save.
-        </DialogDescription>
-      </DialogHeader>
-      <fieldset disabled={isSubmitting}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        </SheetDescription>
+      </SheetHeader>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <fieldset disabled={isSubmitting} className="space-y-4 px-4">
           <Controller
             name="name"
             control={form.control}
@@ -114,12 +115,13 @@ export function AccountForm({
           {errorMessage && (
             <FieldError className="text-center">{errorMessage}</FieldError>
           )}
-
+        </fieldset>
+        <SheetFooter>
           <Button type="submit" className="w-full">
             {isSubmitting ? <Spinner className="ml-2" /> : "Save"}
           </Button>
-        </form>
-      </fieldset>
-    </DialogContent>
+        </SheetFooter>
+      </form>
+    </>
   )
 }
