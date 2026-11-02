@@ -11,6 +11,8 @@ import { AccountFormValues } from "@/lib/validations/account"
 import { Button } from "../ui/button"
 import { Plus } from "lucide-react"
 import { useAccount } from "@/providers/account-provider"
+import { Sheet, SheetTrigger } from "../ui/sheet"
+import { ResponsiveSheetContent } from "../ResponsiveSheetContent"
 
 export function CreateAccountDialog({
   isInitiallyOpen,
@@ -50,17 +52,19 @@ export function CreateAccountDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenDialogChange}>
-      <DialogTrigger asChild>
+    <Sheet open={isOpen} onOpenChange={onOpenDialogChange}>
+      <SheetTrigger asChild>
         <Button variant="outline">
           <Plus /> <span className="hidden md:inline">Create New Account</span>
         </Button>
-      </DialogTrigger>
-      <AccountForm
-        title="Create Account"
-        errorMessage={errorMessage}
-        onSave={onSubmit}
-      />
-    </Dialog>
+      </SheetTrigger>
+      <ResponsiveSheetContent>
+        <AccountForm
+          title="Create Account"
+          errorMessage={errorMessage}
+          onSave={onSubmit}
+        />
+      </ResponsiveSheetContent>
+    </Sheet>
   )
 }
