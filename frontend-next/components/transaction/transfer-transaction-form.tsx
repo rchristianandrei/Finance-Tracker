@@ -116,9 +116,8 @@ export function TransferTransactionForm({
                         </Button> */}
                   </div>
 
-                  {selectedFromAccount && (
-                    <AccountBalanceLabel account={selectedFromAccount} />
-                  )}
+                  <AccountBalanceLabel account={selectedFromAccount} />
+
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -165,9 +164,7 @@ export function TransferTransactionForm({
                         </Button> */}
                   </div>
 
-                  {selectedToAccount && (
-                    <AccountBalanceLabel account={selectedToAccount} />
-                  )}
+                  <AccountBalanceLabel account={selectedToAccount} />
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

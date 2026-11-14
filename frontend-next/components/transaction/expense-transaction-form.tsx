@@ -134,9 +134,7 @@ export function ExpenseTransactionForm({
                         </Button> */}
                   </div>
 
-                  {selectedFromAccount && (
-                    <AccountBalanceLabel account={selectedFromAccount} />
-                  )}
+                  <AccountBalanceLabel account={selectedFromAccount} />
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
