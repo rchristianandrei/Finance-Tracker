@@ -1,6 +1,12 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { TransactionFilter } from "./transaction-filter"
 import { Edit, Trash } from "lucide-react"
 import { Pagination } from "./pagination"
@@ -17,6 +23,7 @@ import { UpdateTransactionDialog } from "./update-transaction-dialog"
 import { DeleteTransactionDialog } from "./delete-transaction-dialog"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
 import { formatMoney } from "@/lib/format-money"
+import { isSameISODate } from "@/lib/compare-date"
 
 export function Transactions() {
   const { transactions } = useManageTransactions()
@@ -78,13 +85,13 @@ export function Transactions() {
                             </TransactionBadge>
                           </CardHeader>
                           <CardContent className="flex flex-col gap-1 text-muted-foreground">
-                            <div className="grid grid-cols-[1fr_auto_1fr] gap-1">
+                            <div className="grid grid-cols-[1fr_1fr] gap-1">
                               <div className="truncate">
                                 {transaction.type === 2
                                   ? transaction.category?.name
                                   : transaction.fromAccount?.name}
                               </div>
-                              <div>→</div>
+
                               <div className="truncate text-right">
                                 {transaction.type === 1
                                   ? transaction.category?.name
@@ -106,6 +113,15 @@ export function Transactions() {
                                 })}
                               </div>
                             </div>
+                            {!isSameISODate(
+                              transaction.date,
+                              transaction.dashboardDate ?? new Date()
+                            ) && (
+                              <div className="text-red-400">
+                                {transaction.dashboardDate?.toDateString() ??
+                                  ""}
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       </ContextMenuTrigger>
