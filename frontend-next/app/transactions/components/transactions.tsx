@@ -19,11 +19,11 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-import { UpdateTransactionDialog } from "./update-transaction-dialog"
 import { DeleteTransactionDialog } from "./delete-transaction-dialog"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
 import { formatMoney } from "@/lib/format-money"
 import { isSameISODate } from "@/lib/compare-date"
+import { SaveTransactionSheet } from "@/components/transaction/save-transaction-sheet/save-transaction-sheet"
 
 export function Transactions() {
   const { transactions } = useManageTransactions()
@@ -154,8 +154,11 @@ export function Transactions() {
         </div>
       </div>
       {updateTransaction && (
-        <UpdateTransactionDialog
-          transaction={updateTransaction}
+        <SaveTransactionSheet
+          title="Update Transaction"
+          hideTrigger
+          initialOpen={true}
+          initialTransaction={updateTransaction}
           onClose={() => setUpdateTransaction(null)}
         />
       )}

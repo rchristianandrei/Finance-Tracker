@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sidebar"
 import { DynamicBreadcrumb } from "./DynamicBreadcrumb"
 import { AddTransactionProvider } from "@/providers/add-transaction-provider"
-import { NewCreateTransactionDialog } from "@/components/transaction/new-create-transaction-dialog"
+import { SaveTransactionSheet } from "@/components/transaction/save-transaction-sheet/save-transaction-sheet"
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,7 +24,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
               />
               <DynamicBreadcrumb />
             </div>
-            <NewCreateTransactionDialog title="Create Transaction" />
+            <SaveTransactionSheet title="Create Transaction" />
           </header>
           <div className="flex flex-1 justify-center overflow-auto p-4">
             <div className="max-w-5xl flex-1">{children}</div>
