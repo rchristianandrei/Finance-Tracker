@@ -1,10 +1,11 @@
 import { cn } from "@/lib/utils"
+import { TransactionTypeLabel } from "@/types/transaction-type"
 
 export function TransactionBadge({
   type,
   children,
 }: {
-  type: "income" | "expense" | "transfer"
+  type: TransactionTypeLabel
   children: React.ReactNode
 }) {
   return (

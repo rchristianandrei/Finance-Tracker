@@ -24,6 +24,7 @@ import { TransactionBadge } from "@/components/transaction/transcation-badge"
 import { formatMoney } from "@/lib/format-money"
 import { isSameISODate } from "@/lib/compare-date"
 import { SaveTransactionSheet } from "@/components/transaction/save-transaction-sheet/save-transaction-sheet"
+import { capitalize } from "@/lib/capitalize"
 
 export function Transactions() {
   const { transactions } = useManageTransactions()
@@ -72,39 +73,35 @@ export function Transactions() {
                             <CardTitle className="truncate">
                               {transaction.description ?? "No description"}
                             </CardTitle>
-                            <TransactionBadge
-                              type={
-                                transaction.type === 2
-                                  ? "income"
-                                  : transaction.type === 1
-                                    ? "expense"
-                                    : "transfer"
-                              }
-                            >
+                            <TransactionBadge type={transaction.type}>
                               {formatMoney(transaction.amount)}
                             </TransactionBadge>
                           </CardHeader>
                           <CardContent className="flex flex-col gap-1 text-muted-foreground">
                             <div className="grid grid-cols-[1fr_1fr] gap-1">
                               <div className="truncate">
-                                {transaction.type === 2
+                                {transaction.type === "income"
                                   ? transaction.category?.name
                                   : transaction.fromAccount?.name}
                               </div>
 
                               <div className="truncate text-right">
-                                {transaction.type === 1
+                                {transaction.type === "expense"
                                   ? transaction.category?.name
                                   : transaction.toAccount?.name}
                               </div>
                             </div>
                             <div className="grid grid-cols-[1fr_auto] gap-1">
                               <div className="truncate">
-                                {transaction.type === 2
-                                  ? "Income"
-                                  : transaction.type === 1
-                                    ? "Expense"
-                                    : "Transfer"}
+                                {!isSameISODate(
+                                  transaction.date,
+                                  transaction.dashboardDate ?? new Date()
+                                ) && (
+                                  <div className="truncate text-red-400">
+                                    {transaction.dashboardDate?.toDateString() ??
+                                      ""}
+                                  </div>
+                                )}
                               </div>
                               <div>
                                 {transaction.date.toLocaleTimeString([], {
@@ -113,15 +110,6 @@ export function Transactions() {
                                 })}
                               </div>
                             </div>
-                            {!isSameISODate(
-                              transaction.date,
-                              transaction.dashboardDate ?? new Date()
-                            ) && (
-                              <div className="text-red-400">
-                                {transaction.dashboardDate?.toDateString() ??
-                                  ""}
-                              </div>
-                            )}
                           </CardContent>
                         </Card>
                       </ContextMenuTrigger>

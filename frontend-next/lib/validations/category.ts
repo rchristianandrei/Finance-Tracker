@@ -1,7 +1,8 @@
+import { transactionTypes } from "@/types/transaction-type"
 import z from "zod"
 
 export const categorySchema = z.object({
-  type: z.enum(["1", "2"]),
+  type: z.enum(transactionTypes),
 
   name: z
     .string()

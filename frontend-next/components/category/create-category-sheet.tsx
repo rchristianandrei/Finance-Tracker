@@ -10,6 +10,7 @@ import { useCategory } from "@/providers/category-provider"
 import { CategoryForm } from "./category-form"
 import { Sheet } from "@/components/ui/sheet"
 import { ResponsiveSheetContent } from "@/components/ResponsiveSheetContent"
+import { transactionTypeReverseMap } from "@/types/transaction-type"
 
 export function CreateCategorySheet({ onClose }: { onClose: () => void }) {
   const { createCategory } = useCategory()
@@ -25,7 +26,7 @@ export function CreateCategorySheet({ onClose }: { onClose: () => void }) {
   async function onSubmit(values: CategoryFormValues) {
     setErrorMessage("")
     try {
-      await createCategory(values.type === "1" ? 1 : 2, values.name)
+      await createCategory(transactionTypeReverseMap[values.type], values.name)
       toast.success("Category created successfully")
       setErrorMessage("")
       onClose()

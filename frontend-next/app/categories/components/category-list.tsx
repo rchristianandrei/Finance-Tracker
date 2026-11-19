@@ -43,10 +43,8 @@ export function CategoryList() {
               <Card>
                 <CardContent className="grid grid-cols-[1fr_auto] gap-2">
                   <div className="truncate">{category.name} </div>
-                  <TransactionBadge
-                    type={category.type === 1 ? "expense" : "income"}
-                  >
-                    {category.type === 1 ? "Expense" : "Income"}
+                  <TransactionBadge type={category.type}>
+                    {category.type}
                   </TransactionBadge>
                 </CardContent>
               </Card>

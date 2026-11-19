@@ -30,14 +30,16 @@ export function ExpenseTransactionForm() {
   } = useSaveTransaction()
 
   useEffect(() => {
-    if (selectedCategory?.type === 1) return
+    if (selectedCategory?.type === "expense") return
     form.setValue("categoryId", 0)
   }, [currentType])
 
   return (
     <>
       <AccountController name="fromAccountId" account={selectedFromAccount} />
-      <CategoryController categories={categories.filter((c) => c.type === 1)} />
+      <CategoryController
+        categories={categories.filter((c) => c.type === "expense")}
+      />
       <DescriptionController />
       <AmountAndDateController />
       <fieldset>

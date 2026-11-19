@@ -1,7 +1,14 @@
-export type TransactionType = 1 | 2 | 3
+import { TransactionTypeLabel, TransactionTypeRaw } from "./transaction-type"
 
-export type Category = {
+export type BaseCategory = {
   id: number
   name: string
-  type: TransactionType
+}
+
+export type CategoryRaw = BaseCategory & {
+  type: TransactionTypeRaw
+}
+
+export type Category = BaseCategory & {
+  type: TransactionTypeLabel
 }
