@@ -78,10 +78,8 @@ export function DeleteCategoryDialog({
             <div className="flex flex-wrap justify-between">
               <span className="font-medium">Type</span>
               <span className="capitalize">
-                <TransactionBadge
-                  type={category.type === 1 ? "expense" : "income"}
-                >
-                  {category.type === 1 ? "Expense" : "Income"}
+                <TransactionBadge type={category.type}>
+                  {category.type}
                 </TransactionBadge>
               </span>
             </div>

@@ -14,12 +14,12 @@ export function IncomeTransactionForm() {
   const { categories } = useCategory()
 
   const incomeCategories = useMemo(
-    () => categories.filter((c) => c.type === 2),
+    () => categories.filter((c) => c.type === "income"),
     [categories]
   )
 
   useEffect(() => {
-    if (selectedCategory?.type === 2) return
+    if (selectedCategory?.type === "income") return
     form.setValue("categoryId", 0)
   }, [currentType])
 

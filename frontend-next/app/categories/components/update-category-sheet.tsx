@@ -8,6 +8,7 @@ import axios from "axios"
 import { useState } from "react"
 import { Category } from "@/types/category"
 import { Sheet } from "@/components/ui/sheet"
+import { transactionTypeReverseMap } from "@/types/transaction-type"
 
 export function UpdateCategorySheet({
   category,
@@ -24,7 +25,7 @@ export function UpdateCategorySheet({
     try {
       await updateCategory({
         id: category.id,
-        type: values.type === "1" ? 1 : 2,
+        type: transactionTypeReverseMap[values.type],
         name: values.name,
       })
 

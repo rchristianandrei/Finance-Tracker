@@ -35,7 +35,7 @@ export function CategoryForm({
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
-      type: category?.type ? (category.type === 1 ? "1" : "2") : "1",
+      type: category?.type ?? "expense",
       name: category?.name ?? "",
     },
   })

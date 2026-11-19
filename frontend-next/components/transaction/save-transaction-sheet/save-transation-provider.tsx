@@ -71,12 +71,7 @@ export function SaveTransactionProvider({
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const type =
-    transaction?.type === 3
-      ? "transfer"
-      : transaction?.type === 2
-        ? "income"
-        : "expense"
+  const type = transaction?.type ?? "expense"
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),

@@ -1,22 +1,33 @@
 import api from "@/lib/axios"
-import { Category, TransactionType } from "@/types/category"
+import { Category, CategoryRaw } from "@/types/category"
+import {
+  transactionTypeMap,
+  TransactionTypeRaw,
+} from "@/types/transaction-type"
 
 export type CategoryUpdateRequest = {
   id: number
-  type: TransactionType
+  type: TransactionTypeRaw
   name: string
 }
 
 export const categoryApi = {
-  create: (type: TransactionType, name: string) => {
+  create: async (type: TransactionTypeRaw, name: string) => {
     const body = {
       type,
       name,
     }
-    return api.post<Category>(`/category`, body)
+    const resp = await api.post<CategoryRaw>(`/category`, body)
+    return {
+      ...resp.data,
+      type: transactionTypeMap[resp.data.type],
+    } as Category
   },
-  getCategories: () => {
-    return api.get<Category[]>(`/category`)
+  getCategories: async () => {
+    const resp = await api.get<CategoryRaw[]>(`/category`)
+    return resp.data.map(
+      (raw) => ({ ...raw, type: transactionTypeMap[raw.type] }) as Category
+    )
   },
   update: (req: CategoryUpdateRequest) => {
     return api.put(`/category/${req.id}`, req)

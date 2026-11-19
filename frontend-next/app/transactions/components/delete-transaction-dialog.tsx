@@ -17,6 +17,7 @@ import { Transaction } from "@/types/transaction"
 import { TransactionBadge } from "@/components/transaction/transcation-badge"
 import { formatMoney } from "@/lib/format-money"
 import { Card } from "@/components/ui/card"
+import { capitalize } from "@/lib/capitalize"
 
 export function DeleteTransactionDialog({
   transaction,
@@ -58,11 +59,7 @@ export function DeleteTransactionDialog({
           <Card className="grid grid-cols-[auto_1fr] gap-2 p-4 text-sm">
             <span className="font-medium">Type</span>
             <span className="text-right capitalize">
-              {transaction.type === 1
-                ? "Expense"
-                : transaction.type === 2
-                  ? "Income"
-                  : "Transfer"}
+              {capitalize(transaction.type)}
             </span>
 
             {transaction.fromAccount && (
@@ -98,15 +95,7 @@ export function DeleteTransactionDialog({
 
             <div className="font-medium">Amount</div>
             <div className="text-right">
-              <TransactionBadge
-                type={
-                  transaction.type === 2
-                    ? "income"
-                    : transaction.type === 1
-                      ? "expense"
-                      : "transfer"
-                }
-              >
+              <TransactionBadge type={transaction.type}>
                 {formatMoney(transaction.amount)}
               </TransactionBadge>
             </div>

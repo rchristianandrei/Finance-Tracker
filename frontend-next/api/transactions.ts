@@ -1,5 +1,6 @@
 import api from "@/lib/axios"
-import { Transaction } from "@/types/transaction"
+import { Transaction, TransactionRaw } from "@/types/transaction"
+import { transactionTypeMap } from "@/types/transaction-type"
 
 export type CreateTransactionBaseRequest = {
   description: string
@@ -118,16 +119,23 @@ export const transactionApi = {
 
     const response = await api.get<{
       totalCount: number
-      data: Transaction[]
+      data: TransactionRaw[]
     }>(`/transaction`, { params, signal })
 
-    response.data.data = response.data.data.map((t) => ({
-      ...t,
-      date: new Date(t.date),
-      dashboardDate: t.dashboardDate ? new Date(t.dashboardDate) : undefined,
-    }))
-
-    return response.data
+    return {
+      totalCount: response.data.totalCount,
+      data: response.data.data.map(
+        (t) =>
+          ({
+            ...t,
+            type: transactionTypeMap[t.type],
+            date: new Date(t.date),
+            dashboardDate: t.dashboardDate
+              ? new Date(t.dashboardDate)
+              : undefined,
+          }) as Transaction
+      ),
+    }
   },
   updateIncomeTransaction: async (income: UpdateIncomeTransactionRequest) => {
     const body = {
